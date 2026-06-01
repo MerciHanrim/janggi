@@ -25,6 +25,7 @@
   const piecesLayer = document.getElementById('pieces');
   const statusEl = document.getElementById('status');
   const turnLabel = document.getElementById('turnLabel');
+  const turnPersp = document.getElementById('turnPersp');
   const msgEl = document.getElementById('msg');
   const capR = document.getElementById('capR');
   const capB = document.getElementById('capB');
@@ -95,6 +96,16 @@
       byTimeout: (s) => `시간패 — ${s} 승리`,
       undone: '한 수 물렀습니다',
       winHint: '다시 두려면 ‘처음부터’를 누르세요',
+      // ★ AI 대국 문구 (루미 톤: 보이지 않는 기객, 조용한 안내)
+      aiThinking: '건너편이 잠시 생각합니다',
+      aiWaking: 'AI 상대를 깨우는 중입니다',
+      aiFailLong: 'AI 상대를 깨우는 중입니다. 브라우저 환경에 따라 잠시 멈출 수 있어요. 지금은 혼자 판을 살펴볼 수 있습니다.',
+      aiRetry: '다시 깨우기',
+      aiWatch: '판만 보기',
+      // ★ 관점 줄 (내 차례인지 즉시 보이게)
+      perspMine: '당신이 둘 차례입니다',
+      perspAi: '상대가 수를 고르고 있습니다',
+      perspHuman: (s) => `${s}이(가) 둘 차례입니다`,   // AI 없는 모드용
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -115,7 +126,7 @@
       capByChu: 'Cho captured', capByHan: 'Han captured',
       capChuEmpty: 'Captured by Cho', capHanEmpty: 'Captured by Han',
       movelogTitle: 'Moves', movelogEmpty: 'No moves yet',
-      pickPiece: 'Select a piece to move',
+      pickPiece: 'Select a piece',
       pickDest: 'Choose a destination', cantMove: 'This piece has no legal moves',
       notYourTurn: (s) => `It's ${s}'s turn`,
       check: (s) => `Check! Save ${s}'s general`,
@@ -133,6 +144,16 @@
       byTimeout: (s) => `Timeout — ${s} wins`,
       undone: 'Move undone',
       winHint: 'Press “New Game” to play again',
+      // AI opponent strings (quiet, unseen-player tone)
+      aiThinking: 'Your opponent is considering a move',
+      aiWaking: 'Waking the AI opponent',
+      aiFailLong: 'Waking the AI opponent. Depending on your browser it may pause for a moment. For now you can study the board on your own.',
+      aiRetry: 'Wake again',
+      aiWatch: 'Just view the board',
+      // perspective line (so it's instantly clear whose turn it is)
+      perspMine: 'Your move',
+      perspAi: 'Your opponent is choosing a move',
+      perspHuman: (s) => `${s} to move`,
     },
   };
   function t(key, ...args) {
@@ -164,6 +185,14 @@
   let clock = { r: 0, b: 0 };
   let clockTimer = null;
 
+  // ── AI 대국 상태 (★ AI 통합) ──────────────────────────────
+  // aiSide: AI가 두는 자리('r'|'b'|null). null이면 AI 없음(사람끼리 — 1차엔 거의 없음).
+  //   사람이 고른 진영(playerFaction)의 반대편이 AI. 선수는 항상 초(turn='r').
+  //   사람=chu → aiSide='b' / 사람=han → aiSide='r'(AI 선공).
+  let aiSide = null;
+  let aiThinking = false;   // 중복 호출 방지 플래그
+  const AI_DEPTH = 12;      // 탐색 깊이. 중수 수준 (8→12). Skill Level은 미적용 — 한 번에 한 변수.
+
   let setupChoice = { r: null, b: null }; // 각 진영 차림
   let setupPhase = 'r'; // 현재 차림 고르는 진영
   let moveLog = []; // 기보
@@ -182,6 +211,11 @@
   // ── 진영 선택 단계 ────────────────────────────────
   function startSetup() {
     stopClock();
+    // ★ AI 상태 초기화 (새 판 시작 — 직전 판 설정 잔재 제거).
+    aiThinking = false;
+    aiSide = null;
+    clearAiFailUI();
+    frame.classList.remove('ai-thinking');
     setupChoice = { r: null, b: null };
     setupPhase = 'r';
     winOverlay.classList.remove('show');
@@ -229,10 +263,16 @@
 
   function chooseFaction(id) {
     playerFaction = id;
+    // ★ AI 대국: 사람이 고른 진영의 반대편이 AI. 선수는 항상 초(turn='r').
+    //   사람=chu → 사람이 초(r), AI=한(b).  사람=han → 사람이 한(b), AI=초(r) 선공.
+    aiSide = (id === 'chu') ? 'b' : 'r';
+    const humanSide = (id === 'chu') ? 'r' : 'b';
     // chu → flipped=false (초 아래), han → flipped=true (한 아래, 위쪽 초가 선수)
     factionStep.style.display = 'none';
     setupStep.style.display = '';
-    setupPhase = 'r';
+    // ★ 사람은 자기 진영 상차림만 고른다. AI 진영은 자동(무작위).
+    setupChoice = { r: null, b: null };
+    setupPhase = humanSide;
     renderSetupStep();
   }
 
@@ -270,6 +310,13 @@
 
   function chooseSetup(side, name) {
     setupChoice[side] = name;
+    // ★ AI 대국: 사람은 자기 진영만 고름. 고른 즉시 AI 진영은 무작위로 채우고 시작.
+    if (aiSide) {
+      setupChoice[aiSide] = Eng.randomSetup();
+      finishSetup();
+      return;
+    }
+    // (폴백) AI 없는 사람끼리 모드 — 기존 r→b 순서. 현재 1차엔 도달하지 않음.
     if (setupPhase === 'r') {
       setupPhase = 'b';
       renderSetupStep();
@@ -317,6 +364,8 @@
     setStatus(t('myFaction', youAre, setupLabel(sR), setupLabel(sB)));
     playMistIntro();
     startClock();   // timeMode 'none'이면 내부에서 즉시 빠져나감
+    // ★ AI가 선공(turn='r'이 AI 자리)이면 첫 수를 AI에게. 안개 인트로 살짝 뒤.
+    maybeAiMove();
   }
 
   function playMistIntro() {
@@ -458,6 +507,8 @@
 
   function onPieceClick(r, c) {
     if (gameOver) return;
+    // ★ AI 차례면 사람 입력 무시 (AI가 두는 중 또는 둘 차례).
+    if (aiSide && turn === aiSide) return;
     const p = board[r][c];
     // 합법수 도착점이면 이동
     if (selected && legalForSel.some(([rr,cc]) => rr===r && cc===c)) {
@@ -527,8 +578,134 @@
       // ★ 이벤트성 연출: 이번 수로 새로 장군이 걸린 경우에만. undo/setLang에선 안 울림.
       if (Eng.isInCheck(board, turn)) fireCheckFx();
       startClock();   // 새 차례 쪽 시계 시작 (none이면 무동작)
+      // ★ 다음 차례가 AI면 AI에게 위임 (연출·소리·장군은 doMove 경유라 자동 적용).
+      maybeAiMove();
     }
   }
+
+  // ── AI 턴 처리 (★ AI 통합) ────────────────────────────────
+  // 현재 차례가 AI 자리면 AI에게 수를 위임. 사람 수와 동일하게 doMove를 거치므로
+  // 연출·소리·장군·기보·시계·종료판정이 전부 자동으로 적용된다.
+  function maybeAiMove() {
+    if (!aiSide || gameOver) return;
+    if (turn !== aiSide) return;
+    if (aiThinking) return;
+    runAiTurn();
+  }
+
+  function runAiTurn() {
+    if (typeof window.JanggiAI === 'undefined') {
+      showAiFailUI();   // 어댑터/로더 자체가 없음
+      return;
+    }
+    aiThinking = true;
+    clearAiFailUI();
+    // "건너편이 잠시 생각합니다" — 보이지 않는 기객 (루미 톤). 번쩍임 없는 조용한 안내.
+    setStatus(t('aiThinking'));
+    frame.classList.add('ai-thinking');   // CSS: 옅은 먹 번짐 + 느린 호흡
+
+    // ★ 최소 생각 시간 (루미 안): 계산이 빨리 끝나도 1.5~2.5초(랜덤)는 "생각 중" 유지.
+    //   매번 같은 시간이면 그것도 기계 같으니 흔들리게. 사람이 수마다 다르게 고민하는 호흡.
+    const minThinkMs = 1500 + Math.random() * 1000;   // 1500~2500ms
+    const startedAt = Date.now();
+    const snapshotTurn = turn;
+
+    // 착수 처리 (즉시든 딜레이 후든 동일 경로).
+    const commitMove = (mv) => {
+      aiThinking = false;
+      frame.classList.remove('ai-thinking');
+      // 비동기 사이 판이 바뀌었을 수 있음(무르기/리셋). 방어.
+      if (gameOver || turn !== snapshotTurn || turn !== aiSide) return;
+      if (!mv) { showAiFailUI(); return; }
+      const [fr, fc, tr, tc] = mv;
+      // 엔진이 낸 수를 우리 합법수로 한 번 더 검증 (안전 — 좌표 사고 방지).
+      const legal = Eng.legalMoves(board, fr, fc);
+      const ok = legal.some(([rr, cc]) => rr === tr && cc === tc);
+      if (!ok) {
+        console.warn('[JanggiAI] 엔진 수가 로컬 합법수에 없음:', mv);
+        showAiFailUI();
+        return;
+      }
+      // 사람 수와 동일 경로: selected 세팅 후 doMove.
+      selected = [fr, fc];
+      legalForSel = legal;
+      doMove(tr, tc);
+    };
+
+    // 현재 판/차례를 그대로 넘긴다. (가) 매 수 전체 FEN 재생성 방식.
+    window.JanggiAI.bestMove(board, turn, AI_DEPTH).then((mv) => {
+      // 계산이 최소 시간보다 빨리 끝났으면 남은 만큼 기다렸다가 착수.
+      const elapsed = Date.now() - startedAt;
+      const wait = Math.max(0, minThinkMs - elapsed);
+      if (wait > 0) {
+        setTimeout(() => commitMove(mv), wait);
+      } else {
+        commitMove(mv);
+      }
+    }).catch((e) => {
+      aiThinking = false;
+      frame.classList.remove('ai-thinking');
+      console.warn('[JanggiAI] bestMove 실패:', e && e.message);
+      showAiFailUI();
+    });
+  }
+
+  // 실패 UX (루미 안): 기술 오류처럼 안 보이게. 조용한 안내 + "다시 깨우기"/"판만 보기".
+  function showAiFailUI() {
+    setStatus(t('aiWaking'));
+    let box = document.getElementById('aiFailBox');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'aiFailBox';
+      box.className = 'ai-fail';
+      box.innerHTML =
+        `<span class="ai-fail-text" id="aiFailText"></span>` +
+        `<div class="ai-fail-buttons">` +
+        `<button id="aiRetry" class="ai-retry"></button>` +
+        `<button id="aiWatch" class="ai-watch"></button>` +
+        `</div>`;
+      statusEl.parentNode.insertBefore(box, statusEl.nextSibling);
+      document.getElementById('aiRetry').onclick = () => {
+        clearAiFailUI();
+        // 엔진 상태에 따라 재시도. init부터 다시.
+        runAiTurn();
+      };
+      document.getElementById('aiWatch').onclick = () => {
+        // "판만 보기": AI 끄고 사람이 양쪽 다 둘 수 있게 (이미 board는 그려져 있음).
+        clearAiFailUI();
+        aiSide = null;
+        refreshPersp();
+        refreshStatus();
+      };
+    }
+    document.getElementById('aiFailText').textContent = t('aiFailLong');
+    document.getElementById('aiRetry').textContent = t('aiRetry');
+    document.getElementById('aiWatch').textContent = t('aiWatch');
+    box.classList.add('show');
+  }
+  function clearAiFailUI() {
+    const box = document.getElementById('aiFailBox');
+    if (box) box.classList.remove('show');
+  }
+
+  // ── 디버그/검증 안전장치 (★ 인수인계서 C 안) ──────────────
+  // 콘솔에서 window.aiMove() 호출 → 현재 판에 AI 한 수 강제. 엔진 점검용.
+  window.aiMove = function () {
+    if (!board) { console.log('판이 아직 없음'); return; }
+    console.log('[aiMove] 현재 차례:', turn, '/ AI 자리:', aiSide,
+                '/ 엔진상태:', window.JanggiAI && window.JanggiAI.getState());
+    const t0 = turn;
+    window.JanggiAI.bestMove(board, turn, AI_DEPTH).then((mv) => {
+      console.log('[aiMove] bestmove →', mv);
+      if (!mv || gameOver || turn !== t0) return;
+      const legal = Eng.legalMoves(board, mv[0], mv[1]);
+      if (legal.some(([r, c]) => r === mv[2] && c === mv[3])) {
+        selected = [mv[0], mv[1]]; legalForSel = legal; doMove(mv[2], mv[3]);
+      } else {
+        console.warn('[aiMove] 합법수 아님:', mv);
+      }
+    }).catch((e) => console.error('[aiMove] 실패:', e));
+  };
 
   function moveText(m) {
     if (!m) return '';
@@ -790,6 +967,31 @@
     statusEl.classList.toggle('turn-r', turn === 'r');
     statusEl.classList.toggle('turn-b', turn === 'b');
     turnLabel.textContent = factionLabel(turn);
+    refreshPersp();
+  }
+
+  // ★ 관점 줄 갱신: 지금 turn이 "내 쪽"이냐 "상대(AI) 쪽"이냐를 분명히.
+  //   playerFaction(chu/han) → 자리(r/b). turn이 내 자리면 "당신 차례",
+  //   AI 자리면 "상대가 생각 중". AI 없는 모드면 누구 차례인지만 표시.
+  function refreshPersp() {
+    if (!turnPersp) return;
+    if (gameOver) { turnPersp.textContent = ''; turnPersp.className = 'turn-persp'; return; }
+    const humanSide = (playerFaction === 'chu') ? 'r' : 'b';
+    if (aiSide) {
+      if (turn === humanSide) {
+        turnPersp.textContent = t('perspMine');
+        turnPersp.className = 'turn-persp mine';
+      } else {
+        // 상대(AI) 차례 — 수묵 점 세 개가 천천히 차오르는 안내 (스피너 대신).
+        turnPersp.innerHTML = t('perspAi') +
+          ' <span class="ai-dots"><i>·</i><i>·</i><i>·</i></span>';
+        turnPersp.className = 'turn-persp theirs';
+      }
+    } else {
+      // AI 없는 모드(판만 보기 등): 누구 차례인지만 담담하게
+      turnPersp.textContent = t('perspHuman', factionLabel(turn));
+      turnPersp.className = 'turn-persp';
+    }
   }
 
   function endGame(winner, reason) {
@@ -805,6 +1007,7 @@
       endState = { winner, reason: reason || null, loser, draw: false };
     }
     winOverlay.classList.add('show');
+    refreshPersp();   // gameOver면 관점 줄 비움
     renderEndMessages();
   }
 
@@ -898,19 +1101,29 @@
   }
 
   function undo() {
-    if (!history.length || gameOver) {
-      if (gameOver) { /* 종료 후엔 reset 권장 */ }
-      return;
+    if (gameOver) return;
+    // ★ AI가 생각 중이면 무르기 막음 (수가 들어오는 중 되감으면 꼬임).
+    if (aiThinking) return;
+    if (!history.length) return;
+    // 한 수 되감기 (공통).
+    const popOne = () => {
+      const prev = history.pop();
+      board = prev.board;
+      turn = prev.turn;
+      captured.r = prev.capR;
+      captured.b = prev.capB;
+      if (typeof prev.logLen === 'number') moveLog.length = prev.logLen;
+    };
+    popOne();
+    // ★ AI 대국: 되감은 결과가 AI 차례면, 사람 차례가 될 때까지 한 번 더 되감음.
+    //   (사람 한 수 + AI 한 수 = 두 단계를 함께 무르는 효과 → 멈춤 방지.)
+    if (aiSide && turn === aiSide && history.length) {
+      popOne();
     }
-    const prev = history.pop();
-    board = prev.board;
-    turn = prev.turn;
-    captured.r = prev.capR;
-    captured.b = prev.capB;
-    if (typeof prev.logLen === 'number') moveLog.length = prev.logLen;
     selected = null; legalForSel = [];
     gameOver = false;
     endState = null;
+    clearAiFailUI();
     winOverlay.classList.remove('show');
     render();
     renderMovelog();
@@ -918,6 +1131,8 @@
     refreshStatus(t('undone'));   // 무른 자리가 장군이면 "장군!" 우선, 아니면 "물렀습니다"
     renderClock();
     startClock();   // 진행 상태로 복귀 — 현재 차례 시계 재개 (none이면 무동작)
+    // 되감은 뒤에도 여전히 AI 차례면(첫 수가 AI였던 경우 등) AI에게 위임.
+    maybeAiMove();
   }
 
   document.getElementById('resetBtn').onclick = reset;
