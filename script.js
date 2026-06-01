@@ -229,7 +229,7 @@
   //     ★ 약한 AI라고 빨리 두지 않음(빠르면 약한 게 아니라 "계산기 느낌"). 초심자도 최소 2.5초.
   //     강할수록 살짝 더 신중(사람도 그러함). 셋 다 "다실에서 고민하는 호흡" 안에 머묾.
   const AI_LEVELS = {
-    beginner: { skill: 2,  depth: 5,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — 처음 배우는 사람도 이길 수 있음(추측)
+    beginner: { skill: 0,  depth: 3,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — 처음 두는 사람도 이겨볼 수 있는 바닥값 (skill2/depth5에서도 밀려서 하향)
     friend:   { skill: 6,  depth: 8,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — 가끔 이기고 가끔 지는 중간(추측)
     master:   { skill: 12, depth: 12, thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — ★검증된 현행 배포 강도(한림·mj님 둘 다 "못 이김")
     expert:   { skill: 20, depth: 15, thinkMin: 4000, thinkMax: 5500 },   // 🎍 대국수 — (비공개 예약) 고수층 데이터 쌓이면 공개
@@ -315,18 +315,22 @@
   }
 
   // 강도 선택지 렌더 (진영 카드와 같은 패턴). AI_LEVEL_ORDER에 있는 것만 노출.
+  //   첫 진입(아직 미선택)엔 어떤 카드도 강조하지 않음 — 사용자가 직접 고르게.
+  //   (기본 추천 강조를 두지 않음: 초보 둘 다 못 이긴 데이터상 특정 강도를 권하기 애매.)
   function renderLevelStep() {
     levelGrid.innerHTML = '';
     for (const id of AI_LEVEL_ORDER) {
       const meta = AI_LEVEL_META[id];
       if (!meta) continue;
       const card = document.createElement('div');
-      card.className = 'level-card' + (id === aiLevel ? ' current' : '');
+      // levelChosen 전엔 강조 없음. 이미 고른 적 있으면(언어전환 재렌더 등) 현재 강도 표시.
+      const isCurrent = levelChosen && id === aiLevel;
+      card.className = 'level-card' + (isCurrent ? ' current' : '');
       card.innerHTML =
         `<div class="lv-emoji">${meta.emoji}</div>` +
         `<div class="lv-text"><div class="lv-name">${t(meta.nameKey)}</div>` +
         `<div class="lv-sub">${t(meta.subKey)}</div></div>`;
-      card.onclick = (e) => { e.stopPropagation(); chooseLevel(id); };
+      card.onclick = (e) => { e.stopPropagation(); chooseLevel(id, card); };
       levelGrid.appendChild(card);
     }
     const lt = levelStep.querySelector('.setup-title');
@@ -337,10 +341,21 @@
     if (lc) lc.textContent = t('levelPlayCpu');
   }
 
-  function chooseLevel(id) {
-    if (AI_LEVELS[id]) aiLevel = id;
+  let levelPicking = false;   // 선택 피드백 진행 중 중복 클릭 방지
+  function chooseLevel(id, cardEl) {
+    if (levelPicking) return;          // 0.4초 피드백 중엔 다른 카드 무시
+    if (!AI_LEVELS[id]) return;
+    levelPicking = true;
+    aiLevel = id;
     levelChosen = true;
-    startFactionStep();
+    // 클릭 순간 그 카드만 강조 — "선택되었습니다" 찰나의 피드백.
+    for (const c of levelGrid.children) c.classList.remove('current');
+    if (cardEl) cardEl.classList.add('current');
+    // 잠깐 머무른 뒤 진영 선택으로 (무엇을 골랐는지 눈으로 확인할 틈).
+    setTimeout(() => {
+      levelPicking = false;
+      startFactionStep();
+    }, 420);
   }
 
   function renderFactionStep(autoAssigned) {
