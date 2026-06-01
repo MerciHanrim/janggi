@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>장기 · Janggi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="title-bar">
+    <h1>將棋</h1>
+    <div class="sub">JANGGI · 한국 장기</div>
+  </div>
+
+  <div class="game-area">
+    <div class="board-col">
+      <div class="board-frame" id="frame">
+        <svg class="grid" id="grid" preserveAspectRatio="none"></svg>
+        <div class="pieces" id="pieces"></div>
+        <div class="mist-overlay" id="mistOverlay">
+          <span class="mist-text" id="mistText">대국 시작</span>
+        </div>
+        <div class="win-overlay" id="winOverlay">
+          <div class="win-faction" id="winFactionLine"></div>
+          <h2 id="winTitle"></h2>
+          <p id="winHint">다시 두려면 ‘처음부터’를 누르세요</p>
+        </div>
+      </div>
+      <div class="setup-overlay show" id="setupOverlay">
+        <div class="setup-panel">
+          <div class="setup-step" id="factionStep">
+            <div class="setup-title">진영을 고르세요</div>
+            <div class="faction-grid" id="factionGrid"></div>
+            <div class="faction-note" id="factionNote">고른 진영이 화면 아래에 놓입니다 · 선수는 항상 초(楚)</div>
+          </div>
+          <div class="setup-step" id="setupStep" style="display:none">
+            <div class="setup-title"><b id="setupSideLabel">초(楚)</b>의 상차림을 고르세요</div>
+            <div class="setup-grid" id="setupGrid"></div>
+            <button class="setup-skip" id="setupSkip">자동 선택(무작위)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side-panel">
+      <div class="lang-toggle">
+        <span class="lang-label" id="langLabel">언어 선택 :</span>
+        <button id="langKo" class="lang-btn">Korean</button>
+        <button id="langEn" class="lang-btn">English</button>
+      </div>
+      <div class="status turn-r" id="status">
+        <span><span class="turn-dot"></span><b id="turnLabel">초(楚)</b> <span id="turnSuffix">차례</span></span>
+        <span class="msg" id="msg">기물을 골라 두세요</span>
+      </div>
+
+      <div class="captured-bar">
+        <div class="side-cap r" id="capR"></div>
+        <div class="side-cap b" id="capB"></div>
+      </div>
+
+      <div class="movelog-wrap">
+        <div class="movelog-title" id="movelogTitle">기보</div>
+        <ol class="movelog" id="movelog"></ol>
+      </div>
+
+      <div class="controls">
+        <button id="undoBtn">무르기</button>
+        <button id="resetBtn">처음부터</button>
+        <button id="resignBtn">돌 던지기</button>
+      </div>
+      <div class="resign-confirm" id="resignConfirm">
+        <span class="rc-text" id="resignConfirmText">정말 돌을 던지시겠습니까?</span>
+        <div class="rc-buttons">
+          <button id="resignYes" class="rc-yes">예</button>
+          <button id="resignNo" class="rc-no">아니오</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="engine.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
