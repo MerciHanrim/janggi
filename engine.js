@@ -338,12 +338,20 @@ function applyMove(board, fr, fc, tr, tc) {
   return { board: nb, captured };
 }
 
-// 게임 종료 판정: 합법수 없으면 외통(장군이면 패) 또는 빅장 상황
+// 게임 종료 판정: 합법수 없으면 외통(장군→패) 또는 수막힘(장군 아님→무승부).
+// 반환: { over, loser?, reason?, draw? }
+//   reason: 'checkmate'(외통) | 'stalemate'(외통 아닌 수막힘)
+//   외통 → loser = sideToMove (패). 수막힘 → draw = true (무승부, loser 없음).
+// ※ 빅장(대궁 무승부)·점수제·반복수는 별도 큰 작업으로 분리 — 여기선 미처리.
 function gameStatus(board, sideToMove) {
   const moves = allLegalMoves(board, sideToMove);
   if (moves.length === 0) {
-    // 장기에서는 외통이면 패. (수 없음 = 짐)
-    return { over: true, loser: sideToMove };
+    if (isInCheck(board, sideToMove)) {
+      // 장군당한 채 합법수 없음 = 외통 = 둘 차례 쪽 패
+      return { over: true, loser: sideToMove, reason: 'checkmate' };
+    }
+    // 장군은 아닌데 둘 수가 없음 = 수막힘 = 무승부
+    return { over: true, draw: true, reason: 'stalemate' };
   }
   return { over: false };
 }

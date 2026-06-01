@@ -80,7 +80,8 @@
       pickPiece: '기물을 골라 두세요',
       pickDest: '둘 곳을 고르세요', cantMove: '둘 수 없는 기물입니다',
       notYourTurn: (s) => `지금은 ${s} 차례입니다`,
-      check: (s) => `장군! ${s} 왕이 위험합니다`,
+      check: (s) => `장군! ${s} 왕을 구하는 수를 두세요`,
+      checkWord: '장군',
       myFaction: (you, sR, sB) => `내 진영: ${you} · 초 ${sR} · 한 ${sB}`,
       chuFirst: '초(楚) 선수', hanSecond: '한(漢) 후수',
       win: (s) => `${s} 승리`,
@@ -88,6 +89,10 @@
       factionWon: (s) => `${s} 승리`,
       youWon: '승리했습니다 · 다음 판은 한(漢)으로',
       youLost: '패배했습니다 · 다음 판은 초(楚)로',
+      outcomeDraw: '무승부', drawLine: '비김',
+      drawStalemate: '둘 곳이 없어 무승부입니다',
+      byCheckmate: (s) => `외통 — ${s} 승리`,
+      byTimeout: (s) => `시간패 — ${s} 승리`,
       undone: '한 수 물렀습니다',
       winHint: '다시 두려면 ‘처음부터’를 누르세요',
     },
@@ -113,7 +118,8 @@
       pickPiece: 'Select a piece to move',
       pickDest: 'Choose a destination', cantMove: 'This piece has no legal moves',
       notYourTurn: (s) => `It's ${s}'s turn`,
-      check: (s) => `Check! ${s}'s general is in danger`,
+      check: (s) => `Check! Save ${s}'s general`,
+      checkWord: 'Check',
       myFaction: (you, sR, sB) => `You: ${you} · Cho ${sR} · Han ${sB}`,
       chuFirst: 'Cho (楚) · First', hanSecond: 'Han (漢) · Second',
       win: (s) => `${s} wins`,
@@ -121,6 +127,10 @@
       factionWon: (s) => `${s} wins`,
       youWon: 'You won · next game you play Han (漢)',
       youLost: 'You lost · next game you play Cho (楚)',
+      outcomeDraw: 'Draw', drawLine: 'Stalemate',
+      drawStalemate: 'No legal moves — the game is a draw',
+      byCheckmate: (s) => `Checkmate — ${s} wins`,
+      byTimeout: (s) => `Timeout — ${s} wins`,
       undone: 'Move undone',
       winHint: 'Press “New Game” to play again',
     },
@@ -141,6 +151,19 @@
 
   let board, turn, selected, legalForSel, history, flipped, gameOver;
 
+  // ── 대국 룰 옵션 (★ 확장 지점) ──────────────────────────────
+  // 향후 입주 예정: 무르기 횟수 제한, 빅장(대궁 무승부) 처리, 점수제 등.
+  // timeMode: 'none'(시간 없음·기본) | 'simple'(단순 카운트다운).
+  //   확장 예약: 'byoyomi'(초읽기), 'fischer'(가산). 1차는 simple만 구현.
+  const ruleOptions = {
+    timeMode: 'none',
+    baseSeconds: 600,     // simple 모드 각 진영 기본 시간(초). 기본 10분.
+    // byoyomiSeconds: 30,  // (확장 예약) 초읽기 1수당 초
+  };
+  // 타이머 상태: 각 진영 남은 시간(초), 인터벌 핸들.
+  let clock = { r: 0, b: 0 };
+  let clockTimer = null;
+
   let setupChoice = { r: null, b: null }; // 각 진영 차림
   let setupPhase = 'r'; // 현재 차림 고르는 진영
   let moveLog = []; // 기보
@@ -158,6 +181,7 @@
 
   // ── 진영 선택 단계 ────────────────────────────────
   function startSetup() {
+    stopClock();
     setupChoice = { r: null, b: null };
     setupPhase = 'r';
     winOverlay.classList.remove('show');
@@ -286,9 +310,13 @@
     drawGrid();
     render();
     renderMovelog();
+    // 시계 초기화 (simple 모드면 각 진영 baseSeconds로)
+    clock.r = clock.b = ruleOptions.baseSeconds;
+    renderClock();
     const youAre = playerFaction === 'chu' ? t('chuFirst') : t('hanSecond');
     setStatus(t('myFaction', youAre, setupLabel(sR), setupLabel(sB)));
     playMistIntro();
+    startClock();   // timeMode 'none'이면 내부에서 즉시 빠져나감
   }
 
   function playMistIntro() {
@@ -367,6 +395,9 @@
     sizeBoard();
     if (!board) return;
     piecesLayer.innerHTML = '';
+    // 장군 판정은 현재 판의 파생값 — 매 render에서 r/b 각각 1회만 계산.
+    // 장군당한 side의 궁(K)에 .in-check 클래스를 붙인다.
+    const checkSide = { r: Eng.isInCheck(board, 'r'), b: Eng.isInCheck(board, 'b') };
     // 마지막 둔 수 하이라이트 (기물보다 아래)
     if (moveLog.length) {
       const last = moveLog[moveLog.length - 1];
@@ -386,7 +417,7 @@
         const { x, y } = posToXY(r, c);
         const el = document.createElement('div');
         el.className = `piece ${p.side}`;
-        if (y < 50) el.classList.add('up'); // 화면 위쪽 진영 → 180도 회전(마주 앉은 대국)
+        if (p.type === 'K' && checkSide[p.side]) el.classList.add('in-check');
         if (selected && selected[0] === r && selected[1] === c) el.classList.add('sel');
         el.style.left = x + '%';
         el.style.top = y + '%';
@@ -460,6 +491,7 @@
     const target = board[tr][tc];
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     board = res.board;
+    playMoveSound();   // 백자알 놓는 "딱" — 매 수마다. (잡기 시 먹번짐은 아래에서 추가)
     let capType = null;
     if (res.captured) {
       captured[turn].push(res.captured.type);
@@ -480,14 +512,21 @@
     render();
     renderMovelog();
     updateTurnUI();
+    renderClock();   // 새 차례 강조 갱신
     // 종료/장군 판정
     const st = Eng.gameStatus(board, turn);
     if (st.over) {
-      endGame(st.loser === 'r' ? 'b' : 'r');
-    } else if (Eng.isInCheck(board, turn)) {
-      setStatus(t('check', factionLabel(turn)));
+      stopClock();
+      if (st.draw) {
+        endGame(null, 'stalemate');   // 수막힘 무승부 (승자 없음)
+      } else {
+        endGame(st.loser === 'r' ? 'b' : 'r', st.reason);   // 외통 등 — 승자 전달
+      }
     } else {
-      setStatus(t('pickPiece'));
+      refreshStatus();   // 장군이면 "장군!", 아니면 기물 고르세요 (파생 문구)
+      // ★ 이벤트성 연출: 이번 수로 새로 장군이 걸린 경우에만. undo/setLang에선 안 울림.
+      if (Eng.isInCheck(board, turn)) fireCheckFx();
+      startClock();   // 새 차례 쪽 시계 시작 (none이면 무동작)
     }
   }
 
@@ -528,6 +567,225 @@
     setTimeout(() => s.remove(), 650);
   }
 
+  // ── 장군 청각/시각 연출 (★ 이벤트성 — doMove에서 새 장군 발생 시에만) ──
+  // 소리: 파일이 있으면 파일, 없으면 Web Audio 합성(징 비슷한 금속 울림).
+  // 나중에 assets/sound/check.mp3 넣으면 자동으로 파일 사용으로 전환됨.
+  let _checkAudioEl = null;     // 파일 재생용 (있을 때)
+  let _checkAudioFailed = false;
+  let _audioCtx = null;
+  const CHECK_SOUND_SRC = 'assets/sound/check.mp3';
+  let _moveAudioEl = null;
+  let _moveAudioFailed = false;
+  const MOVE_SOUND_SRC = 'assets/sound/move.mp3';
+
+  function playCheckSound() {
+    // 1순위: 음원 파일. 로드 실패 이력이 있으면 바로 합성으로.
+    if (!_checkAudioFailed) {
+      try {
+        if (!_checkAudioEl) {
+          _checkAudioEl = new Audio(CHECK_SOUND_SRC);
+          _checkAudioEl.addEventListener('error', () => { _checkAudioFailed = true; });
+        }
+        if (!_checkAudioFailed) {
+          _checkAudioEl.currentTime = 0;
+          const pr = _checkAudioEl.play();
+          if (pr && pr.catch) pr.catch(() => { _checkAudioFailed = true; synthCheckSound(); });
+          return;
+        }
+      } catch (e) {
+        _checkAudioFailed = true;
+      }
+    }
+    synthCheckSound();
+  }
+
+  // Web Audio 합성: 두 음(징 기음 + 배음)을 빠른 어택·긴 감쇠로. 사용자 제스처 후에만 소리남(브라우저 정책).
+  function synthCheckSound() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!_audioCtx) _audioCtx = new Ctx();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      const ctx = _audioCtx;
+      const now = ctx.currentTime;
+      const master = ctx.createGain();
+      master.gain.value = 0.0001;
+      master.connect(ctx.destination);
+      // 징 느낌: 약간 불협한 두 배음
+      const freqs = [196, 277];   // G3 + 약간 위 — 금속 울림감
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = i === 0 ? 'triangle' : 'sine';
+        osc.frequency.value = f;
+        g.gain.value = i === 0 ? 1.0 : 0.5;
+        osc.connect(g); g.connect(master);
+        osc.start(now);
+        osc.stop(now + 1.6);
+      });
+      // 엔벨로프: 빠른 어택 → 긴 감쇠
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.35, now + 0.012);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+    } catch (e) { /* 오디오 불가 환경 — 무음으로 폴백 */ }
+  }
+
+  // 장군당한 궁 위치에 일회성 붉은 파동
+  function spawnCheckBurst() {
+    const k = Eng.findKing(board, turn);   // turn = 방금 장군당한(둘 차례) 쪽
+    if (!k) return;
+    const { x, y } = posToXY(k[0], k[1]);
+    const burst = document.createElement('div');
+    burst.className = 'check-burst';
+    burst.style.left = x + '%';
+    burst.style.top = y + '%';
+    piecesLayer.appendChild(burst);
+    setTimeout(() => burst.remove(), 900);
+  }
+
+  // 보드 중앙에 "장군" 글자 — 안개 결로 떴다 걷힘 (일회성, 0.8s)
+  // mist-overlay와 같은 디자인 언어. index.html 무수정 위해 동적 생성.
+  function spawnCheckAnnounce() {
+    // 직전 잔상이 남아있으면 제거(연속 장군 시 깔끔하게)
+    const old = frame.querySelector('.check-announce');
+    if (old) old.remove();
+    const ov = document.createElement('div');
+    ov.className = 'check-announce';
+    const span = document.createElement('span');
+    span.className = 'check-announce-text';
+    span.textContent = t('checkWord');
+    ov.appendChild(span);
+    frame.appendChild(ov);   // pieces가 아니라 frame에 — 보드 전체 덮음(mist와 같은 위치)
+    setTimeout(() => ov.remove(), 850);
+  }
+
+  // 새 장군 발생 시 호출 — 소리 + 궁 파동 + 중앙 글자
+  function fireCheckFx() {
+    spawnCheckBurst();
+    spawnCheckAnnounce();
+    playCheckSound();
+  }
+
+  // ── 기물 놓는 소리 (백자알 "딱") — 매 수마다. check와 동일한 파일-우선/합성-폴백 구조. ──
+  // 나중에 assets/sound/move.mp3 넣으면 자동으로 파일 사용으로 전환됨.
+  function playMoveSound() {
+    if (!_moveAudioFailed) {
+      try {
+        if (!_moveAudioEl) {
+          _moveAudioEl = new Audio(MOVE_SOUND_SRC);
+          _moveAudioEl.addEventListener('error', () => { _moveAudioFailed = true; });
+        }
+        if (!_moveAudioFailed) {
+          _moveAudioEl.currentTime = 0;
+          const pr = _moveAudioEl.play();
+          if (pr && pr.catch) pr.catch(() => { _moveAudioFailed = true; synthMoveSound(); });
+          return;
+        }
+      } catch (e) {
+        _moveAudioFailed = true;
+      }
+    }
+    synthMoveSound();
+  }
+
+  // Web Audio 합성: 도자기가 나무에 닿는 짧은 "딱". 노이즈 버스트(고역) + 짧은 톤 클릭, 빠른 감쇠.
+  function synthMoveSound() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!_audioCtx) _audioCtx = new Ctx();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      const ctx = _audioCtx;
+      const now = ctx.currentTime;
+      const master = ctx.createGain();
+      master.gain.value = 0.5;
+      master.connect(ctx.destination);
+
+      // (1) 짧은 노이즈 버스트 — 도자기 표면의 "딱" 질감. 고역통과로 맑게.
+      const dur = 0.09;
+      const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3); // 빠른 감쇠
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 2200;   // 2~5kHz 고역 강조 → 도자기 맑은 느낌
+      const ng = ctx.createGain();
+      ng.gain.value = 0.6;
+      noise.connect(hp); hp.connect(ng); ng.connect(master);
+      noise.start(now);
+
+      // (2) 짧은 톤 클릭 — 알맹이의 단단한 무게감. 미세 피치 변동으로 반복감 완화.
+      const osc = ctx.createOscillator();
+      const og = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = 880 * (0.96 + Math.random() * 0.08);  // ±4% 변동
+      osc.connect(og); og.connect(master);
+      og.gain.setValueAtTime(0.0001, now);
+      og.gain.exponentialRampToValueAtTime(0.5, now + 0.004);
+      og.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    } catch (e) { /* 오디오 불가 — 무음 폴백 */ }
+  }
+
+  // ── 대국 시계 (timeMode 'simple') ──────────────────────────
+  // 자기 차례인 쪽의 시간만 1초씩 감소. 0이면 timeout 패.
+  function clockEnabled() { return ruleOptions.timeMode !== 'none'; }
+
+  function startClock() {
+    stopClock();
+    if (!clockEnabled() || gameOver) return;
+    clockTimer = setInterval(() => {
+      if (gameOver) { stopClock(); return; }
+      clock[turn] = Math.max(0, clock[turn] - 1);
+      renderClock();
+      if (clock[turn] <= 0) {
+        stopClock();
+        // 시간 떨어진 쪽(turn) 패 → 상대 승리
+        endGame(turn === 'r' ? 'b' : 'r', 'timeout');
+      }
+    }, 1000);
+  }
+  function stopClock() {
+    if (clockTimer) { clearInterval(clockTimer); clockTimer = null; }
+  }
+
+  function fmtClock(sec) {
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  // 시계 표시 — 상태창 위에 동적 요소(없으면 생성). index.html 무수정 유지.
+  function renderClock() {
+    let bar = document.getElementById('clockBar');
+    if (!clockEnabled()) { if (bar) bar.remove(); return; }
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'clockBar';
+      bar.className = 'clock-bar';
+      bar.innerHTML =
+        '<span class="clock r" id="clockR"></span>' +
+        '<span class="clock b" id="clockB"></span>';
+      statusEl.parentNode.insertBefore(bar, statusEl);
+    }
+    const cr = document.getElementById('clockR');
+    const cb = document.getElementById('clockB');
+    if (cr) {
+      cr.textContent = factionLabel('r') + ' ' + fmtClock(clock.r);
+      cr.classList.toggle('active', turn === 'r' && !gameOver);
+      cr.classList.toggle('low', clock.r <= 30);
+    }
+    if (cb) {
+      cb.textContent = factionLabel('b') + ' ' + fmtClock(clock.b);
+      cb.classList.toggle('active', turn === 'b' && !gameOver);
+      cb.classList.toggle('low', clock.b <= 30);
+    }
+  }
+
   function updateTurnUI() {
     statusEl.classList.toggle('turn-r', turn === 'r');
     statusEl.classList.toggle('turn-b', turn === 'b');
@@ -536,10 +794,16 @@
 
   function endGame(winner, reason) {
     gameOver = true;
-    // winner는 자리(r/b). r=초(chu), b=한(han) — flipped 무관.
-    lastResult = (winner === 'r') ? 'chu' : 'han';
-    const loser = (winner === 'r') ? 'b' : 'r';
-    endState = { winner, reason: reason || null, loser };
+    stopClock();
+    if (winner === null) {
+      // 무승부 (수막힘 등) — 승자/패자 없음. 재대국 자동배정용 lastResult는 유지(직전 결과 보존).
+      endState = { winner: null, reason: reason || 'draw', loser: null, draw: true };
+    } else {
+      // winner는 자리(r/b). r=초(chu), b=한(han) — flipped 무관.
+      lastResult = (winner === 'r') ? 'chu' : 'han';
+      const loser = (winner === 'r') ? 'b' : 'r';
+      endState = { winner, reason: reason || null, loser, draw: false };
+    }
     winOverlay.classList.add('show');
     renderEndMessages();
   }
@@ -547,11 +811,23 @@
   // 종료 오버레이·상태창 문구를 현재 언어로 (그)리기 — endGame과 언어전환에서 공용
   function renderEndMessages() {
     if (!endState) return;
-    const { winner, reason, loser } = endState;
+    const { winner, reason, loser, draw } = endState;
+    if (draw) {
+      // 무승부: 진영 승리줄 대신 "비김", 큰 줄은 "무승부"
+      winFactionLine.textContent = t('drawLine');
+      winFactionLine.className = 'win-faction draw';
+      winTitle.textContent = t('outcomeDraw');
+      winTitle.className = 'draw';
+      setStatus(reason === 'stalemate' ? t('drawStalemate') : t('outcomeDraw'));
+      return;
+    }
     const winnerFaction = (winner === 'r') ? 'chu' : 'han';
     const iWon = (winnerFaction === playerFaction);
-    // 작은 줄: 누가 이겼나 (진영 + 진영색)
-    winFactionLine.textContent = t('factionWon', factionLabel(winner));
+    // 작은 줄: 누가 이겼나 (진영 + 진영색). 외통/시간패면 사유 명시
+    winFactionLine.textContent =
+      (reason === 'checkmate') ? t('byCheckmate', factionLabel(winner))
+      : (reason === 'timeout') ? t('byTimeout', factionLabel(winner))
+      : t('factionWon', factionLabel(winner));
     winFactionLine.className = 'win-faction ' + winnerFaction;
     // 큰 줄: 내 관점 승/패 (네트워크/AI 대비 — playerFaction이 이 화면의 주인)
     winTitle.textContent = iWon ? t('outcomeWin') : t('outcomeLose');
@@ -565,6 +841,17 @@
   }
 
   function setStatus(msg) { msgEl.textContent = msg; }
+
+  // 상태창 문구를 현재 판의 파생값으로 갱신. 장군이면 우선 "장군!", 아니면 기본 문구.
+  // fallback: 장군이 아닐 때 쓸 문구(예: 무르기 후 "물렀습니다"). 미지정 시 pickPiece.
+  function refreshStatus(fallback) {
+    if (!board || gameOver) return;
+    if (Eng.isInCheck(board, turn)) {
+      setStatus(t('check', factionLabel(turn)));
+    } else {
+      setStatus(fallback != null ? fallback : t('pickPiece'));
+    }
+  }
 
   // 정적 UI 문구 갱신 (로드 시 + 언어 전환 시)
   function applyStaticI18n() {
@@ -602,6 +889,7 @@
       updateTurnUI();
       renderCaptured();
       renderMovelog();
+      refreshStatus();   // 진행 중 장군 상태면 새 언어로 "장군!" 복원
     }
     // 게임이 끝난 상태면 종료 오버레이·상태창 문구도 현재 언어로 다시
     if (gameOver && endState) {
@@ -627,7 +915,9 @@
     render();
     renderMovelog();
     updateTurnUI();
-    setStatus(t('undone'));
+    refreshStatus(t('undone'));   // 무른 자리가 장군이면 "장군!" 우선, 아니면 "물렀습니다"
+    renderClock();
+    startClock();   // 진행 상태로 복귀 — 현재 차례 시계 재개 (none이면 무동작)
   }
 
   document.getElementById('resetBtn').onclick = reset;
