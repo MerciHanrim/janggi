@@ -616,19 +616,43 @@
       frame.classList.remove('ai-thinking');
       // 비동기 사이 판이 바뀌었을 수 있음(무르기/리셋). 방어.
       if (gameOver || turn !== snapshotTurn || turn !== aiSide) return;
-      if (!mv) { showAiFailUI(); return; }
-      const [fr, fc, tr, tc] = mv;
-      // 엔진이 낸 수를 우리 합법수로 한 번 더 검증 (안전 — 좌표 사고 방지).
-      const legal = Eng.legalMoves(board, fr, fc);
-      const ok = legal.some(([rr, cc]) => rr === tr && cc === tc);
-      if (!ok) {
-        console.warn('[JanggiAI] 엔진 수가 로컬 합법수에 없음:', mv);
-        showAiFailUI();
-        return;
+
+      let fr, fc, tr, tc;
+      let usable = false;
+      if (mv) {
+        [fr, fc, tr, tc] = mv;
+        const legal = Eng.legalMoves(board, fr, fc);
+        if (legal.some(([rr, cc]) => rr === tr && cc === tc)) {
+          selected = [fr, fc];
+          legalForSel = legal;
+          usable = true;
+        }
       }
-      // 사람 수와 동일 경로: selected 세팅 후 doMove.
-      selected = [fr, fc];
-      legalForSel = legal;
+
+      // ★ 안전망: 엔진(SF) 수가 우리 룰상 불법이거나 없을 때.
+      //   SF의 janggi 구현과 우리 engine.js 룰이 특정 국면(빅장/장군 등)에서
+      //   갈릴 수 있음. 그때 멈추지 말고 우리 합법수 중 하나를 둔다 — "끝까지 두는 경험" 우선.
+      //   잡는 수를 먼저 고려(SF의 공격 의도에 그나마 근접), 없으면 임의 합법수.
+      if (!usable) {
+        if (mv) console.warn('[JanggiAI] 엔진 수가 로컬 룰과 불일치 → 자체 합법수로 대체:', mv);
+        const all = Eng.allLegalMoves(board, turn);
+        if (all.length === 0) {
+          // 둘 수가 정말 하나도 없음 = 외통/스테일메이트. doMove 경유 없이 종료 판정에 맡김.
+          // (정상적으로는 직전 doMove에서 이미 gameOver 처리됨. 여기 오면 방어적 종료.)
+          showAiFailUI();
+          return;
+        }
+        // 잡는 수 우선
+        const captures = all.filter(([, , rr, cc]) => board[rr][cc]);
+        const pick = (captures.length ? captures : all)[
+          Math.floor(Math.random() * (captures.length ? captures.length : all.length))
+        ];
+        [fr, fc, tr, tc] = pick;
+        selected = [fr, fc];
+        legalForSel = Eng.legalMoves(board, fr, fc);
+      }
+
+      // 사람 수와 동일 경로: doMove로 연출·소리·장군·기보 자동.
       doMove(tr, tc);
     };
 
