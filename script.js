@@ -47,10 +47,10 @@
   // 보드 위 기물 이미지 (백자 팔각알). r=초(CHU), b=한(HAN)
   // 에셋 구조: pieces/{테마}/{진영}/{기물키}.png — 테마 시스템 대비
   const PIECE_IMG = {
-    r: { K:'assets/pieces/baekja/chu/K.png', R:'assets/pieces/baekja/chu/R.png', H:'assets/pieces/baekja/chu/H.png',
-         E:'assets/pieces/baekja/chu/E.png', C:'assets/pieces/baekja/chu/C.png', A:'assets/pieces/baekja/chu/A.png', P:'assets/pieces/baekja/chu/P.png' },
-    b: { K:'assets/pieces/baekja/han/K.png', R:'assets/pieces/baekja/han/R.png', H:'assets/pieces/baekja/han/H.png',
-         E:'assets/pieces/baekja/han/E.png', C:'assets/pieces/baekja/han/C.png', A:'assets/pieces/baekja/han/A.png', P:'assets/pieces/baekja/han/P.png' },
+    r: { K:'assets/pieces/baekja/chu/chu_k.png', R:'assets/pieces/baekja/chu/chu_r.png', H:'assets/pieces/baekja/chu/chu_h.png',
+         E:'assets/pieces/baekja/chu/chu_e.png', C:'assets/pieces/baekja/chu/chu_c.png', A:'assets/pieces/baekja/chu/chu_a.png', P:'assets/pieces/baekja/chu/chu_p.png' },
+    b: { K:'assets/pieces/baekja/han/han_k.png', R:'assets/pieces/baekja/han/han_r.png', H:'assets/pieces/baekja/han/han_h.png',
+         E:'assets/pieces/baekja/han/han_e.png', C:'assets/pieces/baekja/han/han_c.png', A:'assets/pieces/baekja/han/han_a.png', P:'assets/pieces/baekja/han/han_p.png' },
   };
 
   // ── i18n: UI 문구만 번역. 기물 한자·상차림 배치는 불변 ──────────
