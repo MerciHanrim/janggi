@@ -113,7 +113,7 @@
       lvFriendName: '익숙한 벗', lvFriendSub: '가볍게 한 판 즐길 수 있는 상대',
       lvMasterName: '노련한 기객', lvMasterSub: '쉽게 빈틈을 보이지 않는 상대',
       lvExpertName: '대국수', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
-      levelNote: '강도를 바꾸려면 처음부터 다시 시작하세요',
+      levelNote: '마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다',
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -169,7 +169,7 @@
       lvFriendName: 'Familiar Friend', lvFriendSub: 'A relaxed opponent for a casual game',
       lvMasterName: 'Seasoned Player', lvMasterSub: 'Rarely leaves an opening',
       lvExpertName: 'Master', lvExpertSub: 'Allows not a single opening',
-      levelNote: 'To change strength, start a new game from the beginning',
+      levelNote: 'Choose your opponent · you can pick again after each game',
     },
   };
   function t(key, ...args) {
@@ -263,10 +263,11 @@
   const levelGrid = document.getElementById('levelGrid');
 
   // ── 셋업 시작 ────────────────────────────────
-  //   첫 진입(페이지 로드/새로고침): 강도 선택 → 진영 → 상차림 → 대국
-  //   재대국("처음부터"): 진영(자동배정) → 상차림 → 대국. 강도는 유지.
-  //   강도 변경은 새로고침으로 처음부터(강도는 "오늘 누구와 둘까"라 대국 재시작보다 상위 층위).
-  let levelChosen = false;   // 이 세션에서 강도를 한 번이라도 골랐는지
+  //   진입·재대국("처음부터") 모두: 강도 선택 → 진영 → 상차림 → 대국.
+  //   "처음부터"는 글자 그대로 맨 처음(강도 선택)으로 돌아간다. 강도 선택은 "설정"이 아니라
+  //   "오늘의 상대를 정하는 과정" — 매 대국 다시 골라도 카드 한 번이라 부담 없음.
+  //   (나중에 풀 모드 메뉴가 생기면 이 자리가 자연스럽게 "대국 방식 선택"으로 자람.)
+  let levelPicked = false;   // 이번 강도 선택 화면에서 카드를 눌렀는지 (언어전환 재렌더 시 강조 유지용)
 
   function startSetup() {
     stopClock();
@@ -280,23 +281,20 @@
     winOverlay.classList.remove('show');
     setupOverlay.classList.add('show');
 
-    // 첫 진입이면 강도 선택부터. 이후(재대국)엔 강도 유지하고 진영으로.
-    if (!levelChosen) {
-      showLevelStep();
-      return;
-    }
-    startFactionStep();
+    // 언제나 강도 선택부터 (처음부터 = 정말 처음).
+    showLevelStep();
   }
 
   // 강도 선택 화면 표시 (작은 현관)
   function showLevelStep() {
+    levelPicked = false;   // 새 강도 선택 화면 — 강조 초기화
     levelStep.style.display = '';
     factionStep.style.display = 'none';
     setupStep.style.display = 'none';
     renderLevelStep();
   }
 
-  // 진영 선택 단계로 진입 (강도는 이미 정해진 상태)
+  // 진영 선택 단계로 진입 (강도는 직전 강도 선택에서 정해진 상태)
   function startFactionStep() {
     levelStep.style.display = 'none';
     // 재대국 자동배정: 직전 승자는 한(후수), 패자는 초(선수)
@@ -323,8 +321,8 @@
       const meta = AI_LEVEL_META[id];
       if (!meta) continue;
       const card = document.createElement('div');
-      // levelChosen 전엔 강조 없음. 이미 고른 적 있으면(언어전환 재렌더 등) 현재 강도 표시.
-      const isCurrent = levelChosen && id === aiLevel;
+      // 이번 화면에서 아직 안 골랐으면 강조 없음. 골랐으면(언어전환 재렌더 등) 그 강도 표시.
+      const isCurrent = levelPicked && id === aiLevel;
       card.className = 'level-card' + (isCurrent ? ' current' : '');
       card.innerHTML =
         `<div class="lv-emoji">${meta.emoji}</div>` +
@@ -347,7 +345,7 @@
     if (!AI_LEVELS[id]) return;
     levelPicking = true;
     aiLevel = id;
-    levelChosen = true;
+    levelPicked = true;
     // 클릭 순간 그 카드만 강조 — "선택되었습니다" 찰나의 피드백.
     for (const c of levelGrid.children) c.classList.remove('current');
     if (cardEl) cardEl.classList.add('current');
