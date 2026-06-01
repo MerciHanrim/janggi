@@ -162,9 +162,13 @@
 
   // ── 현재 판에 대해 AI 한 수 계산 ──────────────────────────
   //   board: 우리 board, turn: 둘 차례('r'|'b'), depth: 탐색 깊이
+  //   skill: Skill Level(0~20). 낮을수록 일부러 차선수를 섞어 "실수하는 상대".
+  //          depth만 줄이면 "얕게 보지만 그 안에선 최선"이라 초보 눈엔 여전히 안 봐주는
+  //          기계로 보임. 약한 상대의 핵심은 Skill Level(실수 섞기)에 있음.
+  //          undefined면 setoption을 보내지 않음(엔진 기본값 유지).
   //   반환: Promise<[fr,fc,tr,tc] | null>
   //   타임아웃/실패 시 reject. 호출부에서 안전하게 catch할 것.
-  function bestMove(board, turn, depth) {
+  function bestMove(board, turn, depth, skill) {
     depth = depth || 8;   // 1차 기본 깊이. 입문자 친화 — 추후 조절.
     return init().then(() => {
       if (_state === 'failed' || !_sf) {
@@ -179,6 +183,12 @@
         _state = 'thinking';
 
         const fen = boardToFen(board, turn);
+        // ★ 강도: Skill Level을 go 직전에 설정. 같은 인스턴스에 매 수 갱신 가능.
+        //   skill이 정수로 주어진 경우에만 전송(엔진 기본값을 함부로 덮지 않음).
+        if (typeof skill === 'number' && isFinite(skill)) {
+          const lv = Math.max(0, Math.min(20, Math.round(skill)));
+          _sf.postMessage('setoption name Skill Level value ' + lv);
+        }
         _sf.postMessage('position fen ' + fen);
         _sf.postMessage('go depth ' + depth);
 

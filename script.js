@@ -106,6 +106,14 @@
       perspMine: '당신이 둘 차례입니다',
       perspAi: '상대가 수를 고르고 있습니다',
       perspHuman: (s) => `${s}이(가) 둘 차례입니다`,   // AI 없는 모드용
+      // ★ 강도 선택 (작은 현관 — "오늘은 어떻게 두실까요?")
+      levelTitle: '오늘은 어떻게 두실까요?',
+      levelPlayCpu: '컴퓨터와 두기',
+      lvBeginnerName: '초심자', lvBeginnerSub: '처음 장기를 배우는 분을 위한 상대',
+      lvFriendName: '익숙한 벗', lvFriendSub: '가볍게 한 판 즐길 수 있는 상대',
+      lvMasterName: '노련한 기객', lvMasterSub: '쉽게 빈틈을 보이지 않는 상대',
+      lvExpertName: '대국수', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
+      levelNote: '강도를 바꾸려면 처음부터 다시 시작하세요',
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -154,6 +162,14 @@
       perspMine: 'Your move',
       perspAi: 'Your opponent is choosing a move',
       perspHuman: (s) => `${s} to move`,
+      // strength selection (small foyer — "How would you like to play today?")
+      levelTitle: 'How would you like to play today?',
+      levelPlayCpu: 'Play with Computer',
+      lvBeginnerName: 'Beginner', lvBeginnerSub: 'For someone learning Janggi for the first time',
+      lvFriendName: 'Familiar Friend', lvFriendSub: 'A relaxed opponent for a casual game',
+      lvMasterName: 'Seasoned Player', lvMasterSub: 'Rarely leaves an opening',
+      lvExpertName: 'Master', lvExpertSub: 'Allows not a single opening',
+      levelNote: 'To change strength, start a new game from the beginning',
     },
   };
   function t(key, ...args) {
@@ -191,7 +207,43 @@
   //   사람=chu → aiSide='b' / 사람=han → aiSide='r'(AI 선공).
   let aiSide = null;
   let aiThinking = false;   // 중복 호출 방지 플래그
-  const AI_DEPTH = 12;      // 탐색 깊이. 중수 수준 (8→12). Skill Level은 미적용 — 한 번에 한 변수.
+
+  // ── AI 강도 3단계 (★ 강도 다변화) ─────────────────────────
+  //   pc vs ai 구조라 AI 강도가 곧 "상대 그 자체". 강도 폭이 게임성 필수 요소.
+  //   skill = Skill Level(0~20): 낮을수록 일부러 차선수 섞음("실수하는 상대").
+  //           약한 상대의 핵심은 depth가 아니라 skill — 초보가 이겨보는 경험은 AI의 실수에서 나옴.
+  //   depth = 탐색 깊이.
+  //   ※ 생각 시간(호흡)은 강도와 무관하게 세 단계 모두 동일(2.5~4초). 강도는 skill/depth로만 가름.
+  //     약하다고 빨리 두면 "거침없이 빠르다"의 기계 느낌이 돌아옴.
+  //   id는 식물 성장 단계(새싹→잎→대나무)로 강도 위계와 겹침. 다실 톤 유지(Easy/Normal/Hard 아님).
+  //   ★ 값 근거: 실측된 강도는 skill12/depth12 하나뿐인데 한림·mj님 둘 다 "못 이김".
+  //     → 검증된 그 점을 맨 위(노련한 기객)에 놓고, 아래 두 칸은 추측으로 더 약하게 배치.
+  //     (추측을 위로 쌓지 않음. 미측정 강도를 "노련한 기객"이라 부르던 이전 배치를 바로잡음.)
+  //   ★ 노출 제어: 강도 정의(AI_LEVELS)와 화면 노출(AI_LEVEL_ORDER)을 분리.
+  //     expert(🎍 대국수)는 값만 예약해두고 UI엔 안 띄움. "선택지가 늘면 좋은 게 아니라
+  //     뭐가 뭔지 모르겠다가 먼저 옴" — 검증 안 된 단계를 미리 늘어놓지 않음(다실 톤).
+  //     실제 고수층이 4단계를 원한다는 데이터가 쌓이면 AI_LEVEL_ORDER에 'expert'만 추가하면 공개됨.
+  //   ※ 생각 시간(호흡)도 강도별로 미세하게 다름(thinkMin~thinkMax ms). 단 강도를 만드는 게 아니라
+  //     "사람이 고민하는 모습"을 만드는 용도. 차이는 0.5~1초로 작게 — 시간이 강도를 가르지 않음.
+  //     사람은 상대 강도를 '실력 50% + 생각하는 모습 50%'로 느낌. 강도=skill/depth, 인격=시간.
+  //     ★ 약한 AI라고 빨리 두지 않음(빠르면 약한 게 아니라 "계산기 느낌"). 초심자도 최소 2.5초.
+  //     강할수록 살짝 더 신중(사람도 그러함). 셋 다 "다실에서 고민하는 호흡" 안에 머묾.
+  const AI_LEVELS = {
+    beginner: { skill: 2,  depth: 5,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — 처음 배우는 사람도 이길 수 있음(추측)
+    friend:   { skill: 6,  depth: 8,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — 가끔 이기고 가끔 지는 중간(추측)
+    master:   { skill: 12, depth: 12, thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — ★검증된 현행 배포 강도(한림·mj님 둘 다 "못 이김")
+    expert:   { skill: 20, depth: 15, thinkMin: 4000, thinkMax: 5500 },   // 🎍 대국수 — (비공개 예약) 고수층 데이터 쌓이면 공개
+  };
+  // ★ UI에 노출할 강도 순서. expert는 의도적으로 제외(값만 살아있음).
+  const AI_LEVEL_ORDER = ['beginner', 'friend', 'master'];
+  // 강도별 표시 정보(이모지·라벨키). expert도 정의는 둠 — 공개 시 ORDER에만 추가하면 됨.
+  const AI_LEVEL_META = {
+    beginner: { emoji: '🌱', nameKey: 'lvBeginnerName', subKey: 'lvBeginnerSub' },
+    friend:   { emoji: '🍃', nameKey: 'lvFriendName',   subKey: 'lvFriendSub'   },
+    master:   { emoji: '🎋', nameKey: 'lvMasterName',   subKey: 'lvMasterSub'   },
+    expert:   { emoji: '🎍', nameKey: 'lvExpertName',   subKey: 'lvExpertSub'   },
+  };
+  let aiLevel = 'friend';   // 현재 강도. 첫 진입 시 강도 선택에서 정함. 재대국 땐 유지.
 
   let setupChoice = { r: null, b: null }; // 각 진영 차림
   let setupPhase = 'r'; // 현재 차림 고르는 진영
@@ -207,8 +259,15 @@
   const factionStep = document.getElementById('factionStep');
   const factionGrid = document.getElementById('factionGrid');
   const factionNote = document.getElementById('factionNote');
+  const levelStep = document.getElementById('levelStep');
+  const levelGrid = document.getElementById('levelGrid');
 
-  // ── 진영 선택 단계 ────────────────────────────────
+  // ── 셋업 시작 ────────────────────────────────
+  //   첫 진입(페이지 로드/새로고침): 강도 선택 → 진영 → 상차림 → 대국
+  //   재대국("처음부터"): 진영(자동배정) → 상차림 → 대국. 강도는 유지.
+  //   강도 변경은 새로고침으로 처음부터(강도는 "오늘 누구와 둘까"라 대국 재시작보다 상위 층위).
+  let levelChosen = false;   // 이 세션에서 강도를 한 번이라도 골랐는지
+
   function startSetup() {
     stopClock();
     // ★ AI 상태 초기화 (새 판 시작 — 직전 판 설정 잔재 제거).
@@ -219,6 +278,27 @@
     setupChoice = { r: null, b: null };
     setupPhase = 'r';
     winOverlay.classList.remove('show');
+    setupOverlay.classList.add('show');
+
+    // 첫 진입이면 강도 선택부터. 이후(재대국)엔 강도 유지하고 진영으로.
+    if (!levelChosen) {
+      showLevelStep();
+      return;
+    }
+    startFactionStep();
+  }
+
+  // 강도 선택 화면 표시 (작은 현관)
+  function showLevelStep() {
+    levelStep.style.display = '';
+    factionStep.style.display = 'none';
+    setupStep.style.display = 'none';
+    renderLevelStep();
+  }
+
+  // 진영 선택 단계로 진입 (강도는 이미 정해진 상태)
+  function startFactionStep() {
+    levelStep.style.display = 'none';
     // 재대국 자동배정: 직전 승자는 한(후수), 패자는 초(선수)
     if (lastResult) {
       // 플레이어가 직전에 이겼으면 → 이번엔 한. 졌으면 → 초.
@@ -232,7 +312,35 @@
     }
     factionStep.style.display = '';
     setupStep.style.display = 'none';
-    setupOverlay.classList.add('show');
+  }
+
+  // 강도 선택지 렌더 (진영 카드와 같은 패턴). AI_LEVEL_ORDER에 있는 것만 노출.
+  function renderLevelStep() {
+    levelGrid.innerHTML = '';
+    for (const id of AI_LEVEL_ORDER) {
+      const meta = AI_LEVEL_META[id];
+      if (!meta) continue;
+      const card = document.createElement('div');
+      card.className = 'level-card' + (id === aiLevel ? ' current' : '');
+      card.innerHTML =
+        `<div class="lv-emoji">${meta.emoji}</div>` +
+        `<div class="lv-text"><div class="lv-name">${t(meta.nameKey)}</div>` +
+        `<div class="lv-sub">${t(meta.subKey)}</div></div>`;
+      card.onclick = (e) => { e.stopPropagation(); chooseLevel(id); };
+      levelGrid.appendChild(card);
+    }
+    const lt = levelStep.querySelector('.setup-title');
+    if (lt) lt.textContent = t('levelTitle');
+    const ln = levelStep.querySelector('.level-note');
+    if (ln) ln.textContent = t('levelNote');
+    const lc = levelStep.querySelector('.level-play-label');
+    if (lc) lc.textContent = t('levelPlayCpu');
+  }
+
+  function chooseLevel(id) {
+    if (AI_LEVELS[id]) aiLevel = id;
+    levelChosen = true;
+    startFactionStep();
   }
 
   function renderFactionStep(autoAssigned) {
@@ -604,9 +712,16 @@
     setStatus(t('aiThinking'));
     frame.classList.add('ai-thinking');   // CSS: 옅은 먹 번짐 + 느린 호흡
 
-    // ★ 최소 생각 시간 (루미 안): 계산이 빨리 끝나도 1.5~2.5초(랜덤)는 "생각 중" 유지.
+    // ★ 최소 생각 시간 (루미 안): 계산이 빨리 끝나도 그 시간 동안 "생각 중" 유지.
     //   매번 같은 시간이면 그것도 기계 같으니 흔들리게. 사람이 수마다 다르게 고민하는 호흡.
-    const minThinkMs = 1500 + Math.random() * 1000;   // 1500~2500ms
+    //   ※ 강도별로 미세하게 다름(AI_LEVELS의 thinkMin~thinkMax). 강도를 만드는 게 아니라
+    //     "고민하는 모습"을 만드는 용도 — 차이는 작게(0.5~1초). 강할수록 살짝 더 신중.
+    //   ※ 약하다고 빨리 두지 않음. 초심자도 최소 2.5초(빠르면 "계산기 느낌"이 남).
+    //   ※ mj님(외부 테스터) "거침없이 빠르다" 피드백 반영분(1.5~2.5 → 2.5~4초)이 출발점.
+    const tlv = AI_LEVELS[aiLevel] || AI_LEVELS.master;
+    const tMin = tlv.thinkMin || 2500;
+    const tMax = tlv.thinkMax || 4000;
+    const minThinkMs = tMin + Math.random() * (tMax - tMin);
     const startedAt = Date.now();
     const snapshotTurn = turn;
 
@@ -657,7 +772,8 @@
     };
 
     // 현재 판/차례를 그대로 넘긴다. (가) 매 수 전체 FEN 재생성 방식.
-    window.JanggiAI.bestMove(board, turn, AI_DEPTH).then((mv) => {
+    const lv = AI_LEVELS[aiLevel] || AI_LEVELS.friend;   // ★ 현재 강도(depth·skill)
+    window.JanggiAI.bestMove(board, turn, lv.depth, lv.skill).then((mv) => {
       // 계산이 최소 시간보다 빨리 끝났으면 남은 만큼 기다렸다가 착수.
       const elapsed = Date.now() - startedAt;
       const wait = Math.max(0, minThinkMs - elapsed);
@@ -719,7 +835,8 @@
     console.log('[aiMove] 현재 차례:', turn, '/ AI 자리:', aiSide,
                 '/ 엔진상태:', window.JanggiAI && window.JanggiAI.getState());
     const t0 = turn;
-    window.JanggiAI.bestMove(board, turn, AI_DEPTH).then((mv) => {
+    const dbgLv = AI_LEVELS[aiLevel] || AI_LEVELS.friend;
+    window.JanggiAI.bestMove(board, turn, dbgLv.depth, dbgLv.skill).then((mv) => {
       console.log('[aiMove] bestmove →', mv);
       if (!mv || gameOver || turn !== t0) return;
       const legal = Eng.legalMoves(board, mv[0], mv[1]);
@@ -1106,7 +1223,9 @@
     // 현재 보이는 동적 영역 다시 그리기
     if (setupOverlay.classList.contains('show')) {
       // 셋업 중: 보이는 단계 갱신
-      if (factionStep.style.display !== 'none') {
+      if (levelStep.style.display !== 'none') {
+        renderLevelStep();
+      } else if (factionStep.style.display !== 'none') {
         renderFactionStep(factionAutoAssigned);
       } else {
         renderSetupStep();
