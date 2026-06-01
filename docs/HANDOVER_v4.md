@@ -14,6 +14,8 @@
 - **로컬 경로**: `C:\Work Space\Coding\1_Ongoing\Janggi` (한 폴더 = 한 저장소).
 - 파일 타임스탬프: 한림 PC는 KST(UTC+9), 샌드박스는 UTC. 같은 파일 다른 시각일 뿐.
 - ⚠️ **압축 배포 시 폴더 한 겹 주의**: zip이 `Janggi/` 폴더째 묶이므로 풀 때 `Janggi/Janggi/` 주의. 서버가 읽는 위치 = index.html 있는 위치인지 확인.
+- **커밋 메시지 규칙**: 제목은 영어 한 줄(GitHub 목록에서 스캔 쉽게), 본문은 한글 상세. (첫 커밋 9487e1d 스타일. ※ 2번째 커밋은 제목도 한글이었으나 push 후라 그대로 둠 — 3번째부터 이 규칙 적용.) 이미 push된 커밋 메시지는 force push 리스크 때문에 소급 수정 안 함.
+- ⚠️ **콘솔 한글 깨짐**: 윈도우 cmd는 한글 커밋 메시지 출력 시 깨짐 + `fatal: unknown write failure on standard output`(표시상 에러일 뿐 커밋·push는 정상). **PowerShell 또는 Git Bash 사용 권장** — 한글 안 깨짐.
 
 ---
 
