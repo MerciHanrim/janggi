@@ -553,6 +553,7 @@
     tutorialMovesLeft = 0;
     tutorialPieceOverlay.style.display = 'none';
     loadTutorialBoard(scenario);
+    frame.classList.add('tut-intro');   // intro 중 보드 클릭 차단 시각화
     renderTutorialSidePanel(id);
   }
 
@@ -569,7 +570,14 @@
     legalForSel = [];
     moveLog = [];
     drawGrid();
-    render();
+    // setupOverlay가 닫힌 직후라 frame 폭이 reflow 전일 수 있음.
+    // rAF 2회로 레이아웃이 실제로 적용된 뒤 크기를 재계산하고 render.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        sizeBoard();
+        render();
+      });
+    });
   }
 
   // 미션 시작 (자유연습 → 미션 phase)
@@ -662,6 +670,7 @@
     const introStartBtn = document.getElementById('tutIntroStartBtn');
     if (introStartBtn) introStartBtn.onclick = () => {
       tutorialPhase = 'practice';
+      frame.classList.remove('tut-intro');   // 클릭 차단 해제
       renderTutorialSidePanel(tutorialScenario);
     };
 
@@ -676,6 +685,7 @@
       tutorialScenario = null;
       tutorialPhase = 'practice';
       board = null;
+      frame.classList.remove('tut-intro');   // intro 차단 클래스 정리
       piecesLayer.innerHTML = '';
       showTutorialPieceSelect();
     };
@@ -742,6 +752,7 @@
     tutorialMovesLeft = 0;
     board = null;
     tutorialPieceOverlay.style.display = 'none';
+    frame.classList.remove('tut-intro');   // intro 차단 클래스 정리
 
     capR.style.display = '';
     capB.style.display = '';

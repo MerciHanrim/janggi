@@ -899,7 +899,18 @@
     letter-spacing: 0.02em; line-height: 1.5;
   }
 
-  /* ── 튜토리얼 ──────────────────────────────────────────── */
+  /* 튜토리얼 intro phase — 보드 클릭 차단 시각화 (설명 읽는 단계) */
+  .board-frame.tut-intro::after {
+    content: '';
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    background: rgba(43,39,36,0.12);
+    border-radius: 3px;
+  }
+  .board-frame.tut-intro .piece { cursor: default; }
+
+  /* 튜토리얼 ──────────────────────────────────────────── */
   /* 기물 선택 오버레이 — board-frame 위 fixed */
   .tutorial-piece-overlay {
     position: fixed; inset: 0;
@@ -931,6 +942,12 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 9px;
   }
+  /* 패널이 좁아질 때(모바일 세로 등) 3열로 전환 — 4번째 카드 잘림 방지 */
+  @media (max-width: 360px) {
+    .tutorial-piece-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
   .tut-piece-card {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -942,6 +959,7 @@
     cursor: pointer;
     transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     text-align: center;
+    min-width: 0;   /* grid 셀이 콘텐츠 폭에 밀려 overflow되는 것 방지 */
   }
   .tut-piece-card:hover {
     transform: translateY(-2px);
@@ -955,8 +973,8 @@
     transform: none; border-color: var(--line); box-shadow: none;
   }
   .tut-piece-img {
-    width: 72px;
-    height: 72px;
+    width: min(72px, 100%);
+    height: min(72px, 100%);
     margin: 0 auto 4px;
   }
   .tut-piece-img img {
