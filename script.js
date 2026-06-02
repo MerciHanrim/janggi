@@ -132,7 +132,7 @@
       lvExpertName: '대국수', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
       levelNote: '마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다',
       settingsBgLabel: '장기판 배경',
-      bgSansuHwa: '산수화', bgSimple: '심플',
+      bgSansuHwa: '산수화', bgSimple: '심플', bgWood: '원목', bgSipjangsaeng: '십장생', bgPaper: '한지',
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -195,7 +195,7 @@
       lvExpertName: 'Master', lvExpertSub: 'Allows not a single opening',
       levelNote: 'Choose your opponent · you can pick again after each game',
       settingsBgLabel: 'Board Background',
-      bgSansuHwa: 'Ink Wash', bgSimple: 'Simple',
+      bgSansuHwa: 'Ink Wash', bgSimple: 'Simple', bgWood: 'Wood', bgSipjangsaeng: 'Sipjangsaeng', bgPaper: 'Hanji',
     },
   };
   function t(key, ...args) {
@@ -1855,6 +1855,12 @@
     if (bgSansuHwaBtn) bgSansuHwaBtn.textContent = t('bgSansuHwa');
     const bgSimpleBtn = document.getElementById('bgSimple');
     if (bgSimpleBtn) bgSimpleBtn.textContent = t('bgSimple');
+    const bgWoodBtn = document.getElementById('bgWood');
+    if (bgWoodBtn) bgWoodBtn.textContent = t('bgWood');
+    const bgSipjangsaengBtn = document.getElementById('bgSipjangsaeng');
+    if (bgSipjangsaengBtn) bgSipjangsaengBtn.textContent = t('bgSipjangsaeng');
+    const bgPaperBtn = document.getElementById('bgPaper');
+    if (bgPaperBtn) bgPaperBtn.textContent = t('bgPaper');
   }
 
   function setLang(next) {
@@ -1962,8 +1968,12 @@
   // bg: 'sansuHwa'(기본) | 'simple'. 배경 추가 시 BG_LIST에만 추가하면 됨.
   let boardBg = 'sansuHwa';
   const BG_LIST = [
-    { id: 'sansuHwa', cls: null,        btnId: 'bgSansuHwa' },
-    { id: 'simple',   cls: 'bg-simple', btnId: 'bgSimple'   },
+    { id: 'sansuHwa',     cls: null,              btnId: 'bgSansuHwa'     },
+    { id: 'wood',         cls: 'bg-wood',         btnId: 'bgWood'         },
+    { id: 'sipjangsaeng', cls: 'bg-sipjangsaeng', btnId: 'bgSipjangsaeng' },
+    { id: 'paper',        cls: 'bg-paper',        btnId: 'bgPaper'        },
+    // 심플 배경 보류 (접근성/고대비 모드용). 복구 시 아래 주석 해제 + index.html 버튼 복구
+    // { id: 'simple',   cls: 'bg-simple',       btnId: 'bgSimple'       },
   ];
   function applyBoardBg(id) {
     boardBg = id;
@@ -1979,8 +1989,11 @@
       if (btn) btn.classList.toggle('active', b.id === id);
     }
   }
-  document.getElementById('bgSansuHwa').onclick = () => { applyBoardBg('sansuHwa'); };
-  document.getElementById('bgSimple').onclick   = () => { applyBoardBg('simple'); };
+  document.getElementById('bgSansuHwa').onclick     = () => { applyBoardBg('sansuHwa'); };
+  document.getElementById('bgWood').onclick         = () => { applyBoardBg('wood'); };
+  document.getElementById('bgSipjangsaeng').onclick = () => { applyBoardBg('sipjangsaeng'); };
+  document.getElementById('bgPaper').onclick        = () => { applyBoardBg('paper'); };
+  // 심플 보류: const s = document.getElementById('bgSimple'); if (s) s.onclick = () => { applyBoardBg('simple'); };
 
   // ⚙ 설정 드롭다운 토글
   function openSettings() {

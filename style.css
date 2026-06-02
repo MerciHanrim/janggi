@@ -1186,6 +1186,37 @@
   .board-frame.bg-simple.flipped::before {
     background: #ece8df;
   }
+  /* 원목 — 무방향 텍스처, 정방향/뒤집기 동일 이미지 고정 */
+  .board-frame.bg-wood::before,
+  .board-frame.bg-wood.flipped::before {
+    background:
+      linear-gradient(rgba(248,240,224,0.04), rgba(248,240,224,0.04)),
+      url('assets/board/board-bg-wood.png');
+    background-size: cover;
+    background-position: center;
+  }
+  .board-frame.bg-wood {
+    --move-dot-color:   rgba(74,52,32,0.85);
+    --move-dot-outline: rgba(248,240,224,0.7);
+    --move-dot-glow:    rgba(74,52,32,0.4);
+  }
+  /* 십장생 — 장식 테두리, flip 없이 한 장 고정 (판 뒤집혀도 테두리는 그대로) */
+  .board-frame.bg-sipjangsaeng::before,
+  .board-frame.bg-sipjangsaeng.flipped::before {
+    background:
+      linear-gradient(rgba(248,240,224,0.05), rgba(248,240,224,0.05)),
+      url('assets/board/board-bg-sipjangsaeng.png');
+    background-size: cover;
+    background-position: center;
+  }
+  /* 한지 — 질감 있는 미니멀 배경 (심플의 상위호환). 무방향이라 flip 동일 고정 */
+  .board-frame.bg-paper::before,
+  .board-frame.bg-paper.flipped::before {
+    background:
+      url('assets/board/board-bg-paper.png');
+    background-size: cover;
+    background-position: center;
+  }
   /* 항복 확인 */
   .resign-confirm {
     display: none;
