@@ -1911,24 +1911,29 @@
 
   window.addEventListener('resize', () => { sizeBoard(); });
 
-  // ── 모바일 AudioContext unlock ──────────────────────────────
-  // 모바일 브라우저는 사용자 제스처 없이 AudioContext를 시작하지 않음.
-  // 첫 터치/클릭 시 AudioContext를 미리 생성·resume해두면 이후 소리가 정상 재생됨.
+  // ── 모바일 AudioContext unlock (iOS Safari 대응) ────────────
+  // iOS Safari: 제스처 핸들러 안에서 동기적으로 ctx 생성 + resume + 무음 재생해야 unlock됨.
+  // `once` 옵션 대신 플래그로 중복 실행 방지 (구형 iOS 호환).
+  let _audioUnlocked = false;
   function unlockAudio() {
+    if (_audioUnlocked) return;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
+    // 동기적으로 생성·resume
     if (!_audioCtx) _audioCtx = new Ctx();
-    if (_audioCtx.state === 'suspended') _audioCtx.resume();
-    // 무음 버퍼를 한 번 재생해 unlock (구형 iOS Safari 대응)
-    const buf = _audioCtx.createBuffer(1, 1, 22050);
-    const src = _audioCtx.createBufferSource();
-    src.buffer = buf;
-    src.connect(_audioCtx.destination);
-    src.start(0);
+    _audioCtx.resume().then(() => {
+      // resume 완료 후 무음 버퍼 재생
+      const buf = _audioCtx.createBuffer(1, 1, _audioCtx.sampleRate);
+      const src = _audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(_audioCtx.destination);
+      src.start(0);
+      _audioUnlocked = true;
+    });
   }
-  document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
-  document.addEventListener('touchend',   unlockAudio, { once: true, passive: true });
-  document.addEventListener('click',      unlockAudio, { once: true });
+  document.addEventListener('touchstart', unlockAudio, { passive: true });
+  document.addEventListener('touchend',   unlockAudio, { passive: true });
+  document.addEventListener('click',      unlockAudio);
 
   applyStaticI18n();   // 시작 언어(브라우저 기준) 정적 문구 적용
   reset();
