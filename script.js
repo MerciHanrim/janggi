@@ -437,7 +437,6 @@
       // 공통 UI
       tutPracticeStart: '연습했어요',
       tutIntroStart: '직접 움직여 보기',
-      tutIntroClickHint: '설명을 읽고 [직접 움직여 보기]를 눌러보세요.',
       tutMovesLeft: (n) => `남은 수: ${n}`,
       tutSuccess: '성공!',
       tutSuccessMsg: (n) => `${n}수 안에 적 기물을 잡았습니다.`,
@@ -477,7 +476,6 @@
       tutSoldierMission: 'Capture the enemy soldier within 3 moves.',
       tutPracticeStart: 'Start Mission',
       tutIntroStart: 'Try Moving It',
-      tutIntroClickHint: 'Read the description, then press [Try Moving It].',
       tutMovesLeft: (n) => `Moves left: ${n}`,
       tutSuccess: 'Success!',
       tutSuccessMsg: (n) => `You captured the enemy piece within ${n} moves.`,
@@ -612,7 +610,7 @@
       html =
         `<div class="tut-desc">${tt(scenario.descKey)}</div>` +
         `<div class="tut-buttons">` +
-        `<button class="tut-btn tut-mission-start" id="tutIntroStartBtn">${tt('tutIntroStart')}</button>` +
+        `<button class="tut-btn tut-mission-start tut-btn-primary" id="tutIntroStartBtn">${tt('tutIntroStart')}</button>` +
         `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
         `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
         `</div>`;
@@ -698,6 +696,7 @@
   // 튜토리얼 전용 이동
   function doTutorialMove(tr, tc) {
     if (tutorialPhase === 'intro') return;
+    const [fr, fc] = selected;
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     const captured = res.captured;
     board = res.board;
@@ -1174,22 +1173,8 @@
     if (gameOver) return;
     // ★ 튜토리얼 모드: AI 없음, turn 체크 없이 플레이어(r) 기물만 선택 가능
     if (tutorialMode) {
+      if (tutorialPhase === 'intro') return;    // intro 중엔 기물 선택 차단
       const p = board[r][c];
-      if (tutorialPhase === 'intro') {
-        // intro 중: 선택·합법수 표시는 허용, 이동만 차단
-        if (p && p.side === 'r') {
-          selected = [r, c];
-          legalForSel = Eng.pseudoMoves(board, r, c);
-          render();
-          setStatus(tt('tutIntroClickHint'));
-        } else {
-          selected = null;
-          legalForSel = [];
-          render();
-          setStatus(tt(TUTORIAL_SCENARIOS[tutorialScenario].practiceActionKey));
-        }
-        return;
-      }
       if (selected && legalForSel.some(([rr, cc]) => rr === r && cc === c)) {
         doTutorialMove(r, c);
         return;

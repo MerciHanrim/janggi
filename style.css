@@ -1039,6 +1039,13 @@
     color: var(--ink-soft);
   }
   .tut-exit:hover { background: rgba(43,39,36,0.14); }
+  .tut-btn-primary {
+    background: rgba(31,78,95,0.10);
+    border: 1.5px solid var(--blue);
+    color: var(--blue-deep);
+    font-weight: 600;
+  }
+  .tut-btn-primary:hover { background: rgba(31,78,95,0.20); }
   /* 설정 버튼 — 타이틀바 우측 */
   .settings-btn {
     position: absolute;
