@@ -52,10 +52,18 @@
     flex-direction: column;
     gap: 12px;
   }
-  /* 좁은 화면(모바일/좁은 iframe): 세로로 접기 */
+  /* 좁은 화면(모바일/좁은 iframe): 세로로 접기 + 순서 재배치 */
   @media (max-width: 720px) {
     .game-area { flex-direction: column; align-items: stretch; }
     .board-col, .side-panel { flex: 1 1 auto; }
+    /* 사이드 패널 내부 순서: 상태 → 버튼 → 항복확인 → 잡은기물 → 기보 */
+    .side-panel { display: flex; flex-direction: column; }
+    .lang-toggle-wrap { order: -1; }   /* 설정버튼은 타이틀바에 있으므로 side-panel엔 없음 */
+    .status      { order: 1; }
+    .controls    { order: 2; }
+    .resign-confirm { order: 3; }
+    .captured-bar   { order: 4; }
+    .movelog-wrap   { order: 5; }
   }
 
   .title-bar {
@@ -606,16 +614,15 @@
   .win-overlay h2.draw { color: #e8dcc0; }
   .win-overlay p { font-size: 0.85rem; opacity: 0.85; }
 
-  /* 상차림 선택 오버레이 — 보드 영역 기준 중앙 */
+  /* 상차림 선택 오버레이 — viewport 기준 중앙 (모바일 보드 높이 0 문제 해결) */
   .setup-overlay {
-    position: absolute; inset: 0;
+    position: fixed; inset: 0;
     background: rgba(43,39,36,0.78);
     display: none;
     align-items: center; justify-content: center;
-    z-index: 20;
+    z-index: 200;
     backdrop-filter: blur(3px);
     padding: 16px;
-    border-radius: 4px;
   }
   .setup-overlay.show { display: flex; animation: fadein 0.35s; }
   .setup-panel {
@@ -815,33 +822,90 @@
   @media (max-width: 380px) {
     .setup-grid, .faction-grid { grid-template-columns: 1fr; }
   }
-  /* 언어 토글 */
-  .lang-toggle { display: flex; gap: 6px; justify-content: flex-end; align-items: center; }
-  .lang-label {
+  /* 설정 버튼 — 타이틀바 우측 */
+  .settings-btn {
+    position: absolute;
+    right: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(107,93,72,0.14);
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    opacity: 0.75;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+    flex: none;
+    padding: 0;
+    letter-spacing: 0;
+  }
+  .settings-btn:hover {
+    background: rgba(176,141,87,0.15);
+    border-color: var(--gold);
+    color: var(--ink);
+    opacity: 1;
+  }
+  /* 전역 button:active의 transform 간섭 차단 — top:50%+translateY(-50%) 와 충돌 방지 */
+  .settings-btn:active { transform: translateY(-50%); }
+  /* 설정 드롭다운 */
+  .settings-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: linear-gradient(160deg, var(--paper), var(--paper-deep));
+    border: 1.5px solid var(--gold);
+    border-radius: 4px;
+    padding: 10px 0;
+    min-width: 160px;
+    box-shadow: 0 8px 24px rgba(43,39,36,0.28);
+    z-index: 300;
+    display: none;
+    animation: fadein 0.18s;
+  }
+  .settings-dropdown.open { display: block; }
+  .settings-section-label {
     font-family: 'Gowun Batang', serif;
-    font-size: 0.74rem; color: var(--ink-soft);
-    letter-spacing: 0.03em; margin-right: 2px;
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+    padding: 4px 16px 6px;
+    border-bottom: 1px solid rgba(107,93,72,0.2);
+    margin-bottom: 4px;
   }
   .lang-btn {
-    flex: 0 0 auto;
+    display: block; width: 100%;
     font-family: 'Gowun Batang', serif;
-    font-size: 0.74rem;
-    padding: 4px 12px;
-    background: rgba(43,39,36,0.04);
-    border: 1px solid rgba(107,93,72,0.3);
-    border-radius: 2px;
+    font-size: 0.84rem;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     color: var(--ink-soft);
     cursor: pointer;
     letter-spacing: 0.04em;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+    flex: none;
   }
-  .lang-btn:hover { background: rgba(176,141,87,0.15); }
+  .lang-btn:hover { background: rgba(176,141,87,0.15); color: var(--ink); }
   .lang-btn.active {
-    background: rgba(176,141,87,0.22);
     color: var(--ink);
-    border-color: var(--gold);
     font-weight: 700;
+    background: rgba(176,141,87,0.12);
   }
+  .lang-btn.active::before {
+    content: '✓ ';
+    color: var(--gold);
+  }
+  /* 드롭다운 열려있을 때 바깥 클릭 닫기용 오버레이 */
+  .settings-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 299;
+  }
+  .settings-backdrop.open { display: block; }
   /* 항복 확인 */
   .resign-confirm {
     display: none;

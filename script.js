@@ -20,7 +20,11 @@
   const elMistText = document.getElementById('mistText');
   const langKo = document.getElementById('langKo');
   const langEn = document.getElementById('langEn');
+  // langLabel은 타이틀바 ⚙ 드롭다운으로 이동 — HTML에 없음, null-safe 처리
   const langLabel = document.getElementById('langLabel');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsDropdown = document.getElementById('settingsDropdown');
+  const settingsBackdrop = document.getElementById('settingsBackdrop');
   const grid = document.getElementById('grid');
   const piecesLayer = document.getElementById('pieces');
   const statusEl = document.getElementById('status');
@@ -1213,7 +1217,7 @@
   // 정적 UI 문구 갱신 (로드 시 + 언어 전환 시)
   function applyStaticI18n() {
     elSub.textContent = t('sub');
-    langLabel.textContent = t('langLabel');
+    if (langLabel) langLabel.textContent = t('langLabel');   // ⚙ 드롭다운 이동 후 null-safe
     elTurnSuffix.textContent = t('turnLabel');
     elMovelogTitle.textContent = t('movelogTitle');
     elUndo.textContent = t('undo');
@@ -1312,8 +1316,23 @@
     if (selected) { selected = null; legalForSel = []; render(); }
   };
   setupSkip.onclick = (e) => { e.stopPropagation(); skipSetup(); };
-  langKo.onclick = () => setLang('ko');
-  langEn.onclick = () => setLang('en');
+  langKo.onclick = () => { setLang('ko'); closeSettings(); };
+  langEn.onclick = () => { setLang('en'); closeSettings(); };
+
+  // ⚙ 설정 드롭다운 토글
+  function openSettings() {
+    settingsDropdown.classList.add('open');
+    settingsBackdrop.classList.add('open');
+  }
+  function closeSettings() {
+    settingsDropdown.classList.remove('open');
+    settingsBackdrop.classList.remove('open');
+  }
+  settingsBtn.onclick = (e) => {
+    e.stopPropagation();
+    settingsDropdown.classList.contains('open') ? closeSettings() : openSettings();
+  };
+  settingsBackdrop.onclick = closeSettings;
 
   window.addEventListener('resize', () => { sizeBoard(); });
 
