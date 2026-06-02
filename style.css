@@ -307,6 +307,19 @@
   .piece:hover { transform: translate(-50%, -52%); }
 
   /* 합법수 표시 — 히트박스(투명) + 시각 표시 */
+  /* 이동점 CSS 변수 — 테마별로 :root 또는 .board-frame.bg-* 에서 재정의 가능 */
+  :root {
+    --move-dot-color:   rgba(176,141,87,0.88);    /* 고금색 — 산수화 기본 */
+    --move-dot-outline: rgba(248,240,224,0.55);   /* 한지빛 외곽 — 배경 분리 */
+    --move-dot-glow:    rgba(176,141,87,0.45);
+    --cap-dot-color:    rgba(176,141,87,0.90);    /* 잡기 링 */
+    --cap-dot-glow:     rgba(176,141,87,0.55);
+    --cap-dot-inset:    rgba(176,141,87,0.22);
+  }
+  /* 심플 배경: 외곽선 더 진하게 (밝은 배경에서 금색 점 분리) */
+  .board-frame.bg-simple {
+    --move-dot-outline: rgba(160,130,70,0.7);
+  }
   .dot {
     position: absolute;
     width: 8.2%; aspect-ratio: 1;
@@ -315,27 +328,23 @@
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  /* 이동 가능: 작은 채워진 점 — 존재감 줄이고 판 정갈하게 */
+  /* 이동 가능: 35% 채워진 점 + 밝은 외곽선으로 배경과 분리 */
   .dot::after {
     content: '';
-    width: 28%; aspect-ratio: 1;
+    width: 35%; aspect-ratio: 1;
     border-radius: 50%;
-    background: var(--dot-line, rgba(31,78,95,0.75));
-    border: none;
-    box-shadow: 0 0 6px var(--dot-glow, rgba(31,78,95,0.4));
+    background: var(--move-dot-color);
+    border: 1px solid var(--move-dot-outline);
+    box-shadow: 0 0 6px var(--move-dot-glow);
     animation: pulse 1.3s ease-in-out infinite;
   }
   /* 잡기 가능: 링 유지 — 적 기물 위에 강조 */
   .dot.capture::after {
     width: 96%;
     background: transparent;
-    border: 3.5px solid var(--dot-line, rgba(158,43,37,0.7));
-    box-shadow: 0 0 14px var(--dot-glow, rgba(158,43,37,0.6)), inset 0 0 8px var(--dot-fill, rgba(158,43,37,0.25));
+    border: 3.5px solid var(--cap-dot-color);
+    box-shadow: 0 0 14px var(--cap-dot-glow), inset 0 0 8px var(--cap-dot-inset);
   }
-  /* 초(楚) 차례 — 청먹 */
-  .dot-r { --dot-fill: rgba(31,78,95,0.2); --dot-line: rgba(31,78,95,0.75); --dot-glow: rgba(31,78,95,0.5); }
-  /* 한(漢) 차례 — 적먹 */
-  .dot-b { --dot-fill: rgba(158,43,37,0.18); --dot-line: rgba(158,43,37,0.72); --dot-glow: rgba(158,43,37,0.45); }
   @keyframes pulse { 0%,100%{opacity:0.55; transform: scale(0.94);} 50%{opacity:0.62; transform: scale(1.06);} }
 
   /* 잡기 연출: 먹 번짐 */
@@ -1157,10 +1166,10 @@
   /* 장기판 배경 테마 — board-frame에 클래스로 전환 */
   /* 기본(산수화)은 기존 ::before 그대로 */
   .board-frame.bg-simple::before {
-    background: #f3eee3;
+    background: #ece8df;
   }
   .board-frame.bg-simple.flipped::before {
-    background: #f3eee3;
+    background: #ece8df;
   }
   /* 항복 확인 */
   .resign-confirm {
