@@ -696,6 +696,7 @@
   // 튜토리얼 전용 이동
   function doTutorialMove(tr, tc) {
     if (tutorialPhase === 'intro') return;
+    const [fr, fc] = selected;
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     const captured = res.captured;
     board = res.board;
