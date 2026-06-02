@@ -52,10 +52,18 @@
   // 보드 위 기물 이미지 (백자 팔각알). r=초(CHU), b=한(HAN)
   // 에셋 구조: pieces/{테마}/{진영}/{기물키}.png — 테마 시스템 대비
   const PIECE_IMG = {
-    r: { K:'assets/pieces/baekja/chu/chu_k.png', R:'assets/pieces/baekja/chu/chu_r.png', H:'assets/pieces/baekja/chu/chu_h.png',
-         E:'assets/pieces/baekja/chu/chu_e.png', C:'assets/pieces/baekja/chu/chu_c.png', A:'assets/pieces/baekja/chu/chu_a.png', P:'assets/pieces/baekja/chu/chu_p.png' },
-    b: { K:'assets/pieces/baekja/han/han_k.png', R:'assets/pieces/baekja/han/han_r.png', H:'assets/pieces/baekja/han/han_h.png',
-         E:'assets/pieces/baekja/han/han_e.png', C:'assets/pieces/baekja/han/han_c.png', A:'assets/pieces/baekja/han/han_a.png', P:'assets/pieces/baekja/han/han_p.png' },
+    r: { K:'assets/pieces/baekja/chu/chu_k.webp', R:'assets/pieces/baekja/chu/chu_r.webp', H:'assets/pieces/baekja/chu/chu_h.webp',
+         E:'assets/pieces/baekja/chu/chu_e.webp', C:'assets/pieces/baekja/chu/chu_c.webp', A:'assets/pieces/baekja/chu/chu_a.webp', P:'assets/pieces/baekja/chu/chu_p.webp' },
+    b: { K:'assets/pieces/baekja/han/han_k.webp', R:'assets/pieces/baekja/han/han_r.webp', H:'assets/pieces/baekja/han/han_h.webp',
+         E:'assets/pieces/baekja/han/han_e.webp', C:'assets/pieces/baekja/han/han_c.webp', A:'assets/pieces/baekja/han/han_a.webp', P:'assets/pieces/baekja/han/han_p.webp' },
+  };
+
+  // 튜토리얼 카드 전용 이미지 — baekja_tut 고정 (테마 시스템 확장과 무관)
+  const TUT_PIECE_IMG = {
+    r: { K:'assets/pieces/baekja_tut/chu/chu_k_tut.webp', R:'assets/pieces/baekja_tut/chu/chu_r_tut.webp', H:'assets/pieces/baekja_tut/chu/chu_h_tut.webp',
+         E:'assets/pieces/baekja_tut/chu/chu_e_tut.webp', C:'assets/pieces/baekja_tut/chu/chu_c_tut.webp', A:'assets/pieces/baekja_tut/chu/chu_a_tut.webp', P:'assets/pieces/baekja_tut/chu/chu_p_tut.webp' },
+    b: { K:'assets/pieces/baekja_tut/han/han_k_tut.webp', R:'assets/pieces/baekja_tut/han/han_r_tut.webp', H:'assets/pieces/baekja_tut/han/han_h_tut.webp',
+         E:'assets/pieces/baekja_tut/han/han_e_tut.webp', C:'assets/pieces/baekja_tut/han/han_c_tut.webp', A:'assets/pieces/baekja_tut/han/han_a_tut.webp', P:'assets/pieces/baekja_tut/han/han_p_tut.webp' },
   };
 
   // ── i18n: UI 문구만 번역. 기물 한자·상차림 배치는 불변 ──────────
@@ -110,8 +118,13 @@
       perspMine: '당신이 둘 차례입니다',
       perspAi: '상대가 수를 고르고 있습니다',
       perspHuman: (s) => `${s}이(가) 둘 차례입니다`,   // AI 없는 모드용
-      // ★ 강도 선택 (작은 현관 — "오늘은 어떻게 두실까요?")
+      // ★ 모드 메뉴 / 강도 선택
       levelTitle: '오늘은 어떻게 두실까요?',
+      modeCpu: '컴퓨터와 두기', modeCpuSub: 'AI 상대와 대국',
+      modeTutorial: '장기 배우기', modeTutorialSub: '기물 행마법과 이기는 방법',
+      modeHuman: '사람과 두기', modeHumanSub: '준비 중입니다',
+      modeReview: '복기하기', modeReviewSub: '준비 중입니다',
+      modeComing: '아직 준비 중입니다',
       levelPlayCpu: '컴퓨터와 두기',
       lvBeginnerName: '초심자', lvBeginnerSub: '처음 장기를 배우는 분을 위한 상대',
       lvFriendName: '익숙한 벗', lvFriendSub: '가볍게 한 판 즐길 수 있는 상대',
@@ -168,6 +181,11 @@
       perspHuman: (s) => `${s} to move`,
       // strength selection (small foyer — "How would you like to play today?")
       levelTitle: 'How would you like to play today?',
+      modeCpu: 'Play with Computer', modeCpuSub: 'Play against the AI',
+      modeTutorial: 'Learn Janggi', modeTutorialSub: 'How pieces move and how to win',
+      modeHuman: 'Play with a Friend', modeHumanSub: 'Coming soon',
+      modeReview: 'Review a Game', modeReviewSub: 'Coming soon',
+      modeComing: 'This mode is not yet available',
       levelPlayCpu: 'Play with Computer',
       lvBeginnerName: 'Beginner', lvBeginnerSub: 'For someone learning Janggi for the first time',
       lvFriendName: 'Familiar Friend', lvFriendSub: 'A relaxed opponent for a casual game',
@@ -264,9 +282,462 @@
   const factionGrid = document.getElementById('factionGrid');
   const factionNote = document.getElementById('factionNote');
   const levelStep = document.getElementById('levelStep');
+  const levelStepTitle = document.getElementById('levelStepTitle');
+  const modeGrid = document.getElementById('modeGrid');
+  const levelSubPanel = document.getElementById('levelSubPanel');
+  const levelPlayLabel = document.getElementById('levelPlayLabel');
+  const levelNote = document.getElementById('levelNote');
   const levelGrid = document.getElementById('levelGrid');
 
-  // ── 셋업 시작 ────────────────────────────────
+  // ── 튜토리얼 모드 ────────────────────────────────────────
+  //   tutorialMode: true면 대국 상태(turn/aiSide/history/moveLog)와 완전 분리.
+  //   phase: 'practice'(자유연습) → 'mission'(미션) → 'success'/'fail'
+  let tutorialMode = false;
+  let tutorialScenario = null;
+  let tutorialPhase = 'practice';   // 'practice' | 'mission' | 'success' | 'fail'
+  let tutorialMovesLeft = 0;        // 미션 남은 수
+
+  // 기물 선택 오버레이 DOM
+  const tutorialPieceOverlay = document.getElementById('tutorialPieceOverlay');
+  const tutorialPieceGrid = document.getElementById('tutorialPieceGrid');
+  const tutorialPieceTitle = document.getElementById('tutorialPieceTitle');
+
+  // ── 시나리오 정의 ──────────────────────────────────────
+  //   pieces: 배치 목록
+  //   missionMoves: 미션 허용 수
+  //   missionKey: 미션 설명 i18n 키
+  const TUTORIAL_SCENARIOS = {
+    rook: {
+      nameKey: 'tutRookName',
+      descKey: 'tutRookDesc',
+      practiceActionKey: 'tutRookAction',
+      missionKey: 'tutRookMission',
+      missionMoves: 3,
+      pieces: [
+        { side: 'r', type: 'R', r: 5, c: 4 },
+        { side: 'b', type: 'P', r: 5, c: 7 },
+        { side: 'b', type: 'P', r: 2, c: 4 },
+        { side: 'r', type: 'P', r: 8, c: 4 },
+      ],
+    },
+    horse: {
+      nameKey: 'tutHorseName',
+      descKey: 'tutHorseDesc',
+      practiceActionKey: 'tutHorseAction',
+      missionKey: 'tutHorseMission',
+      missionMoves: 3,
+      pieces: [
+        { side: 'r', type: 'H', r: 6, c: 4 },
+        { side: 'b', type: 'P', r: 4, c: 5 },
+        { side: 'r', type: 'P', r: 5, c: 4 },
+      ],
+    },
+    elephant: {
+      nameKey: 'tutElephantName',
+      descKey: 'tutElephantDesc',
+      practiceActionKey: 'tutElephantAction',
+      missionKey: 'tutElephantMission',
+      missionMoves: 3,
+      pieces: [
+        { side: 'r', type: 'E', r: 6, c: 4 },
+        { side: 'b', type: 'P', r: 3, c: 2 },
+        { side: 'r', type: 'P', r: 5, c: 4 },
+      ],
+    },
+    cannon: {
+      nameKey: 'tutCannonName',
+      descKey: 'tutCannonDesc',
+      practiceActionKey: 'tutCannonAction',
+      missionKey: 'tutCannonMission',
+      missionMoves: 3,
+      pieces: [
+        { side: 'r', type: 'C', r: 6, c: 4 },
+        { side: 'r', type: 'P', r: 3, c: 4 },
+        { side: 'b', type: 'P', r: 1, c: 4 },
+        { side: 'b', type: 'P', r: 6, c: 7 },
+      ],
+    },
+    guard: {
+      nameKey: 'tutGuardName',
+      descKey: 'tutGuardDesc',
+      practiceActionKey: 'tutGuardAction',
+      missionKey: 'tutGuardMission',
+      missionMoves: 4,
+      pieces: [
+        { side: 'r', type: 'A', r: 8, c: 4 },
+        { side: 'b', type: 'P', r: 7, c: 3 },
+      ],
+    },
+    king: {
+      nameKey: 'tutKingName',
+      descKey: 'tutKingDesc',
+      practiceActionKey: 'tutKingAction',
+      missionKey: 'tutKingMission',
+      missionMoves: 4,
+      pieces: [
+        { side: 'r', type: 'K', r: 9, c: 4 },
+        { side: 'b', type: 'P', r: 7, c: 3 },
+      ],
+    },
+    soldier: {
+      nameKey: 'tutSoldierName',
+      descKey: 'tutSoldierDesc',
+      practiceActionKey: 'tutSoldierAction',
+      missionKey: 'tutSoldierMission',
+      missionMoves: 3,
+      pieces: [
+        { side: 'r', type: 'P', r: 5, c: 4 },
+        { side: 'b', type: 'P', r: 3, c: 4 },
+        { side: 'b', type: 'P', r: 5, c: 6 },
+      ],
+    },
+  };
+
+  // 기물 선택 화면 목록
+  const TUTORIAL_PIECE_LIST = [
+    { id: 'rook',     type: 'R', nameKey: 'tutRookName',     active: true  },
+    { id: 'horse',    type: 'H', nameKey: 'tutHorseName',    active: true  },
+    { id: 'elephant', type: 'E', nameKey: 'tutElephantName', active: true  },
+    { id: 'cannon',   type: 'C', nameKey: 'tutCannonName',   active: true  },
+    { id: 'guard',    type: 'A', nameKey: 'tutGuardName',    active: true  },
+    { id: 'king',     type: 'K', nameKey: 'tutKingName',     active: true  },
+    { id: 'soldier',  type: 'P', nameKey: 'tutSoldierName',  active: true  },
+  ];
+
+  // i18n 튜토리얼 키
+  const TUTORIAL_I18N = {
+    ko: {
+      tutPieceTitle: '기물을 골라 행마법을 배워보세요',
+      tutRookName: '차(車)', tutHorseName: '마(馬)', tutElephantName: '상(象)',
+      tutCannonName: '포(包)', tutGuardName: '사(士)', tutSoldierName: '졸(卒)', tutKingName: '장(將)',
+      // 설명
+      tutRookDesc: '차는 직선으로 얼마든지 이동할 수 있습니다. 아군 기물은 지나갈 수 없고, 적 기물은 잡으며 멈춥니다.',
+      tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선 방향(멱)에 기물이 있으면 그쪽으로는 이동할 수 없습니다.',
+      tutElephantDesc: '상은 직선 한 칸 + 대각선 두 칸으로 이동합니다. 경로에 기물이 하나라도 있으면 그 방향으로 이동할 수 없습니다.',
+      tutCannonDesc: '포는 반드시 기물 하나(받침)를 넘어서 이동하거나 잡을 수 있습니다. 받침이 없으면 이동도 잡기도 안 됩니다. 포로 포를 잡을 수 없습니다.',
+      tutGuardDesc: '사는 궁성 안에서만 이동할 수 있습니다. 직선 한 칸, 그리고 대각선 연결점에서는 대각선으로도 이동합니다.',
+      tutKingDesc: '장은 사와 같은 방식으로 궁성 안에서만 이동합니다. 장을 잡히면 패배합니다.',
+      tutSoldierDesc: '졸/병은 앞으로 한 칸, 또는 옆으로 한 칸 이동할 수 있습니다. 뒤로는 물러날 수 없습니다.',
+      // 자유연습 행동 안내 (짧게 — 상태창에 표시)
+      tutRookAction: '차를 눌러 갈 수 있는 곳을 살펴보세요.',
+      tutHorseAction: '마를 눌러 이동 가능한 곳을 확인하세요.',
+      tutElephantAction: '상을 눌러 이동 가능한 곳을 확인하세요.',
+      tutCannonAction: '포를 눌러보세요. 받침이 있는 방향만 이동됩니다.',
+      tutGuardAction: '사를 눌러보세요. 궁성 안에서만 움직입니다.',
+      tutKingAction: '장을 눌러보세요. 궁성 안에서만 움직입니다.',
+      tutSoldierAction: '졸을 눌러보세요. 앞과 옆으로만 이동합니다.',
+      // 미션
+      tutRookMission: '3수 안에 적 병을 잡아보세요.',
+      tutHorseMission: '3수 안에 적 병을 잡아보세요.',
+      tutElephantMission: '3수 안에 적 병을 잡아보세요.',
+      tutCannonMission: '3수 안에 받침을 넘어 적 병을 잡아보세요.',
+      tutGuardMission: '4수 안에 적 병을 잡아보세요.',
+      tutKingMission: '4수 안에 적 병을 잡아보세요.',
+      tutSoldierMission: '3수 안에 적 병을 잡아보세요.',
+      // 공통 UI
+      tutPracticeStart: '연습했어요',
+      tutMovesLeft: (n) => `남은 수: ${n}`,
+      tutSuccess: '성공!',
+      tutSuccessMsg: (n) => `${n}수 안에 적 기물을 잡았습니다.`,
+      tutFail: '아쉽습니다.',
+      tutFailMsg: '적 기물을 잡지 못했습니다.',
+      tutRetry: '다시 해보기',
+      tutBackToPractice: '자유 연습으로',
+      tutNextPiece: '다른 기물 배우기',
+      tutReset: '다시 해보기',
+      tutExit: '처음으로',
+      tutComing: '아직 준비 중입니다',
+    },
+    en: {
+      tutPieceTitle: 'Choose a piece to learn how it moves',
+      tutRookName: 'Chariot (車)', tutHorseName: 'Horse (馬)', tutElephantName: 'Elephant (象)',
+      tutCannonName: 'Cannon (包)', tutGuardName: 'Guard (士)', tutSoldierName: 'Soldier (卒)', tutKingName: 'General (將)',
+      tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
+      tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
+      tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. If any piece blocks the path, it cannot move in that direction.',
+      tutCannonDesc: 'The Cannon must jump over exactly one piece (a screen) to move or capture. Without a screen, it cannot move. It cannot capture another Cannon.',
+      tutGuardDesc: 'The Guard can only move within the palace — one step straight, or diagonally along the marked lines.',
+      tutKingDesc: 'The General moves like the Guard within the palace. If the General is captured, the game is lost.',
+      tutSoldierDesc: 'The Soldier can move one step forward or sideways. It cannot retreat.',
+      tutRookAction: 'Click the Chariot to see where it can go.',
+      tutHorseAction: 'Click the Horse to see its moves.',
+      tutElephantAction: 'Click the Elephant to see its moves.',
+      tutCannonAction: 'Click the Cannon. Only directions with a screen piece are available.',
+      tutGuardAction: 'Click the Guard. It can only move within the palace.',
+      tutKingAction: 'Click the General. It can only move within the palace.',
+      tutSoldierAction: 'Click the Soldier. It can move forward or sideways only.',
+      tutRookMission: 'Capture an enemy soldier within 3 moves.',
+      tutHorseMission: 'Capture an enemy soldier within 3 moves.',
+      tutElephantMission: 'Capture an enemy soldier within 3 moves.',
+      tutCannonMission: 'Jump over the screen and capture the enemy soldier within 3 moves.',
+      tutGuardMission: 'Capture the enemy soldier within 4 moves.',
+      tutKingMission: 'Capture the enemy soldier within 4 moves.',
+      tutSoldierMission: 'Capture the enemy soldier within 3 moves.',
+      tutPracticeStart: 'Start Mission',
+      tutMovesLeft: (n) => `Moves left: ${n}`,
+      tutSuccess: 'Success!',
+      tutSuccessMsg: (n) => `You captured the enemy piece within ${n} moves.`,
+      tutFail: 'Not quite.',
+      tutFailMsg: 'You did not capture the enemy piece.',
+      tutRetry: 'Try Again',
+      tutBackToPractice: 'Back to Practice',
+      tutNextPiece: 'Learn Another Piece',
+      tutReset: 'Try Again',
+      tutExit: 'Back to Menu',
+      tutComing: 'Not available yet',
+    },
+  };
+  function tt(key, ...args) {
+    const d = TUTORIAL_I18N[lang] || TUTORIAL_I18N.ko;
+    const v = d[key];
+    if (typeof v === 'function') return v(...args);
+    return v != null ? v : key;
+  }
+
+  // ── 튜토리얼 진입 ──────────────────────────────────────
+  function enterTutorial() {
+    tutorialMode = true;
+    aiSide = null;
+    aiThinking = false;
+    gameOver = false;
+    endState = null;
+    selected = null;
+    legalForSel = [];
+    winOverlay.classList.remove('show');
+    setupOverlay.classList.remove('show');
+    stopClock();
+    renderTutorialSidePanel();
+    showTutorialPieceSelect();
+  }
+
+  // 기물 선택 오버레이 표시
+  function showTutorialPieceSelect() {
+    tutorialPieceOverlay.style.display = 'flex';
+    renderTutorialPieceGrid();
+    if (tutorialPieceTitle) tutorialPieceTitle.textContent = tt('tutPieceTitle');
+  }
+
+  function renderTutorialPieceGrid() {
+    tutorialPieceGrid.innerHTML = '';
+    for (const p of TUTORIAL_PIECE_LIST) {
+      const card = document.createElement('div');
+      card.className = 'tut-piece-card' + (p.active ? '' : ' tut-coming');
+      card.innerHTML =
+        `<div class="tut-piece-img"><img src="${TUT_PIECE_IMG.r[p.type]}" alt="${tt(p.nameKey)}" draggable="false"></div>` +
+        `<span class="tut-piece-name">${tt(p.nameKey)}</span>`;
+      if (p.active) {
+        card.onclick = (e) => { e.stopPropagation(); startTutorialScenario(p.id); };
+      } else {
+        card.onclick = (e) => {
+          e.stopPropagation();
+          const nameEl = card.querySelector('.tut-piece-name');
+          if (card.dataset.coming) return;
+          card.dataset.coming = '1';
+          const orig = nameEl.textContent;
+          nameEl.textContent = tt('tutComing');
+          setTimeout(() => { nameEl.textContent = orig; delete card.dataset.coming; }, 1800);
+        };
+      }
+      tutorialPieceGrid.appendChild(card);
+    }
+  }
+
+  // 시나리오 시작 (자유연습 phase로)
+  function startTutorialScenario(id) {
+    const scenario = TUTORIAL_SCENARIOS[id];
+    if (!scenario) return;
+    tutorialScenario = id;
+    tutorialPhase = 'practice';
+    tutorialMovesLeft = 0;
+    tutorialPieceOverlay.style.display = 'none';
+    loadTutorialBoard(scenario);
+    renderTutorialSidePanel(id);
+  }
+
+  // 보드에 시나리오 배치
+  function loadTutorialBoard(scenario) {
+    board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    for (const p of scenario.pieces) {
+      board[p.r][p.c] = { side: p.side, type: p.type };
+    }
+    flipped = false;
+    frame.classList.remove('flipped');
+    turn = 'r';
+    selected = null;
+    legalForSel = [];
+    moveLog = [];
+    drawGrid();
+    render();
+  }
+
+  // 미션 시작 (자유연습 → 미션 phase)
+  function startTutorialMission() {
+    const scenario = TUTORIAL_SCENARIOS[tutorialScenario];
+    if (!scenario) return;
+    tutorialPhase = 'mission';
+    tutorialMovesLeft = scenario.missionMoves;
+    // 미션용 보드 리셋
+    loadTutorialBoard(scenario);
+    renderTutorialSidePanel(tutorialScenario);
+  }
+
+  // 튜토리얼 전용 사이드 패널 렌더 (phase별)
+  function renderTutorialSidePanel(scenarioId) {
+    capR.style.display = 'none';
+    capB.style.display = 'none';
+    document.querySelector('.movelog-wrap').style.display = 'none';
+    document.querySelector('.controls').style.display = 'none';
+    document.querySelector('.resign-confirm').style.display = 'none';
+
+    let tutPanel = document.getElementById('tutorialSidePanel');
+    if (!tutPanel) {
+      tutPanel = document.createElement('div');
+      tutPanel.id = 'tutorialSidePanel';
+      tutPanel.className = 'tutorial-side-panel';
+      document.querySelector('.side-panel').appendChild(tutPanel);
+    }
+    tutPanel.style.display = '';
+
+    const scenario = scenarioId ? TUTORIAL_SCENARIOS[scenarioId] : null;
+    const phase = tutorialPhase;
+
+    let html = '';
+    if (!scenario) {
+      // 기물 선택 전 빈 상태
+    } else if (phase === 'practice') {
+      html =
+        `<div class="tut-desc">${tt(scenario.descKey)}</div>` +
+        `<div class="tut-buttons">` +
+        `<button class="tut-btn tut-mission-start" id="tutMissionStartBtn">${tt('tutPracticeStart')}</button>` +
+        `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
+        `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
+        `</div>`;
+    } else if (phase === 'mission') {
+      html =
+        `<div class="tut-desc">${tt(scenario.missionKey)}</div>` +
+        `<div class="tut-moves-left" id="tutMovesLeft">${tt('tutMovesLeft', tutorialMovesLeft)}</div>` +
+        `<div class="tut-buttons">` +
+        `<button class="tut-btn tut-reset" id="tutRetryBtn">${tt('tutRetry')}</button>` +
+        `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
+        `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
+        `</div>`;
+    } else if (phase === 'success') {
+      const used = scenario.missionMoves - tutorialMovesLeft;
+      html =
+        `<div class="tut-result tut-result-success">` +
+        `<div class="tut-result-title">${tt('tutSuccess')}</div>` +
+        `<div class="tut-result-msg">${tt('tutSuccessMsg', used)}</div>` +
+        `</div>` +
+        `<div class="tut-buttons">` +
+        `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
+        `<button class="tut-btn tut-reset" id="tutRetryBtn">${tt('tutRetry')}</button>` +
+        `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
+        `</div>`;
+    } else if (phase === 'fail') {
+      html =
+        `<div class="tut-result tut-result-fail">` +
+        `<div class="tut-result-title">${tt('tutFail')}</div>` +
+        `<div class="tut-result-msg">${tt('tutFailMsg')}</div>` +
+        `</div>` +
+        `<div class="tut-buttons">` +
+        `<button class="tut-btn tut-mission-start" id="tutRetryBtn">${tt('tutRetry')}</button>` +
+        `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
+        `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
+        `</div>`;
+    }
+
+    tutPanel.innerHTML = html;
+
+    // 버튼 핸들러 바인딩
+    const missionStartBtn = document.getElementById('tutMissionStartBtn');
+    if (missionStartBtn) missionStartBtn.onclick = () => startTutorialMission();
+
+    const retryBtn = document.getElementById('tutRetryBtn');
+    if (retryBtn) retryBtn.onclick = () => startTutorialScenario(tutorialScenario);
+
+    const nextPieceBtn = document.getElementById('tutNextPieceBtn');
+    if (nextPieceBtn) nextPieceBtn.onclick = () => {
+      tutorialScenario = null;
+      tutorialPhase = 'practice';
+      board = null;
+      piecesLayer.innerHTML = '';
+      showTutorialPieceSelect();
+    };
+
+    const exitBtn = document.getElementById('tutExitBtn');
+    if (exitBtn) exitBtn.onclick = () => exitTutorial();
+
+    // 상태창
+    turnLabel.textContent = '';
+    elTurnSuffix.textContent = '';
+    turnPersp.textContent = '';
+    if (phase === 'practice' && scenario) setStatus(tt(scenario.practiceActionKey));
+    else if (phase === 'mission') setStatus(tt('tutMovesLeft', tutorialMovesLeft));
+    else setStatus('');
+  }
+
+  // 튜토리얼 전용 이동
+  function doTutorialMove(tr, tc) {
+    const [fr, fc] = selected;
+    const res = Eng.applyMove(board, fr, fc, tr, tc);
+    const captured = res.captured;
+    board = res.board;
+    playMoveSound();
+    if (captured) spawnSplat(tr, tc);
+    selected = null;
+    legalForSel = [];
+
+    // 미션 phase: 수 차감 + 성공/실패 판정
+    if (tutorialPhase === 'mission') {
+      tutorialMovesLeft--;
+
+      if (captured && captured.side === 'b') {
+        // 적 기물 잡음 → 성공
+        tutorialPhase = 'success';
+        render();
+        renderTutorialSidePanel(tutorialScenario);
+        return;
+      }
+
+      if (tutorialMovesLeft <= 0) {
+        // 수 소진 → 실패
+        tutorialPhase = 'fail';
+        render();
+        renderTutorialSidePanel(tutorialScenario);
+        return;
+      }
+
+      // 남은 수 갱신
+      const movesLeftEl = document.getElementById('tutMovesLeft');
+      if (movesLeftEl) movesLeftEl.textContent = tt('tutMovesLeft', tutorialMovesLeft);
+      setStatus(tt('tutMovesLeft', tutorialMovesLeft));
+    }
+
+    render();
+  }
+
+  // 튜토리얼 종료 → 모드 메뉴로
+  function exitTutorial() {
+    tutorialMode = false;
+    tutorialScenario = null;
+    tutorialPhase = 'practice';
+    tutorialMovesLeft = 0;
+    board = null;
+    tutorialPieceOverlay.style.display = 'none';
+
+    capR.style.display = '';
+    capB.style.display = '';
+    document.querySelector('.movelog-wrap').style.display = '';
+    document.querySelector('.controls').style.display = '';
+    document.querySelector('.resign-confirm').style.display = '';
+    const tutPanel = document.getElementById('tutorialSidePanel');
+    if (tutPanel) tutPanel.style.display = 'none';
+
+    piecesLayer.innerHTML = '';
+    applyStaticI18n();
+    reset();
+  }
+
   //   진입·재대국("처음부터") 모두: 강도 선택 → 진영 → 상차림 → 대국.
   //   "처음부터"는 글자 그대로 맨 처음(강도 선택)으로 돌아간다. 강도 선택은 "설정"이 아니라
   //   "오늘의 상대를 정하는 과정" — 매 대국 다시 골라도 카드 한 번이라 부담 없음.
@@ -289,13 +760,70 @@
     showLevelStep();
   }
 
-  // 강도 선택 화면 표시 (작은 현관)
+  // 모드 메뉴 화면 표시 (첫 진입점 — "오늘은 어떻게 두실까요?")
   function showLevelStep() {
-    levelPicked = false;   // 새 강도 선택 화면 — 강조 초기화
+    levelPicked = false;
     levelStep.style.display = '';
     factionStep.style.display = 'none';
     setupStep.style.display = 'none';
+    // 강도 서브패널 숨기고 모드 메뉴부터
+    modeGrid.style.display = '';
+    levelSubPanel.style.display = 'none';
+    renderModeGrid();
+    if (levelStepTitle) levelStepTitle.textContent = t('levelTitle');
+  }
+
+  // 강도 선택 서브패널 표시 ("컴퓨터와 두기" 선택 후)
+  function showLevelGrid() {
+    modeGrid.style.display = 'none';
+    levelSubPanel.style.display = '';
     renderLevelStep();
+  }
+
+  // 모드 메뉴 카드 렌더
+  const MODE_LIST = [
+    { id: 'cpu',      nameKey: 'modeCpu',      subKey: 'modeCpuSub',      icon: '弈', active: true  },
+    { id: 'tutorial', nameKey: 'modeTutorial', subKey: 'modeTutorialSub', icon: '學', active: true  },
+    { id: 'human',    nameKey: 'modeHuman',    subKey: 'modeHumanSub',    icon: '對', active: false },
+    { id: 'review',   nameKey: 'modeReview',   subKey: 'modeReviewSub',   icon: '譜', active: false },
+  ];
+  function renderModeGrid() {
+    modeGrid.innerHTML = '';
+    for (const m of MODE_LIST) {
+      const card = document.createElement('div');
+      card.className = 'mode-card' + (m.active ? '' : ' mode-coming');
+      card.innerHTML =
+        `<span class="mode-icon">${m.icon}</span>` +
+        `<span class="mode-text"><span class="mode-name">${t(m.nameKey)}</span>` +
+        `<span class="mode-sub">${t(m.subKey)}</span></span>`;
+      if (m.active) {
+        card.onclick = (e) => { e.stopPropagation(); onModeSelect(m.id); };
+      } else {
+        card.onclick = (e) => { e.stopPropagation(); showComingSoon(card); };
+      }
+      modeGrid.appendChild(card);
+    }
+  }
+
+  function showComingSoon(card) {
+    if (card.dataset.coming) return;
+    card.dataset.coming = '1';
+    const orig = card.querySelector('.mode-sub').textContent;
+    card.querySelector('.mode-sub').textContent = t('modeComing');
+    const tid = setTimeout(() => {
+      card.querySelector('.mode-sub').textContent = orig;
+      delete card.dataset.coming;
+    }, 2000);
+    card._comingTimer = tid;
+  }
+
+  function onModeSelect(id) {
+    if (id === 'cpu') {
+      showLevelGrid();
+    } else if (id === 'tutorial') {
+      enterTutorial();
+    }
+    // human / review: 추후 분기 추가
   }
 
   // 진영 선택 단계로 진입 (강도는 직전 강도 선택에서 정해진 상태)
@@ -317,15 +845,12 @@
   }
 
   // 강도 선택지 렌더 (진영 카드와 같은 패턴). AI_LEVEL_ORDER에 있는 것만 노출.
-  //   첫 진입(아직 미선택)엔 어떤 카드도 강조하지 않음 — 사용자가 직접 고르게.
-  //   (기본 추천 강조를 두지 않음: 초보 둘 다 못 이긴 데이터상 특정 강도를 권하기 애매.)
   function renderLevelStep() {
     levelGrid.innerHTML = '';
     for (const id of AI_LEVEL_ORDER) {
       const meta = AI_LEVEL_META[id];
       if (!meta) continue;
       const card = document.createElement('div');
-      // 이번 화면에서 아직 안 골랐으면 강조 없음. 골랐으면(언어전환 재렌더 등) 그 강도 표시.
       const isCurrent = levelPicked && id === aiLevel;
       card.className = 'level-card' + (isCurrent ? ' current' : '');
       card.innerHTML =
@@ -335,12 +860,9 @@
       card.onclick = (e) => { e.stopPropagation(); chooseLevel(id, card); };
       levelGrid.appendChild(card);
     }
-    const lt = levelStep.querySelector('.setup-title');
-    if (lt) lt.textContent = t('levelTitle');
-    const ln = levelStep.querySelector('.level-note');
-    if (ln) ln.textContent = t('levelNote');
-    const lc = levelStep.querySelector('.level-play-label');
-    if (lc) lc.textContent = t('levelPlayCpu');
+    if (levelStepTitle) levelStepTitle.textContent = t('levelTitle');
+    if (levelPlayLabel) levelPlayLabel.textContent = t('levelPlayCpu');
+    if (levelNote) levelNote.textContent = t('levelNote');
   }
 
   let levelPicking = false;   // 선택 피드백 진행 중 중복 클릭 방지
@@ -363,8 +885,8 @@
   function renderFactionStep(autoAssigned) {
     factionGrid.innerHTML = '';
     const cards = [
-      { id:'chu', name:t('chuName'), sub:t('chuSub'), img: PIECE_IMG.r.K, cls:'chu' },
-      { id:'han', name:t('hanName'), sub:t('hanSub'), img: PIECE_IMG.b.K, cls:'han' },
+      { id:'chu', name:t('chuName'), sub:t('chuSub'), img: TUT_PIECE_IMG.r.K, cls:'chu' },
+      { id:'han', name:t('hanName'), sub:t('hanSub'), img: TUT_PIECE_IMG.b.K, cls:'han' },
     ];
     for (const c of cards) {
       const card = document.createElement('div');
@@ -402,11 +924,10 @@
   }
 
   function miniBoardHTML(side, setupName) {
-    // 변별에 필요한 안쪽 馬·象 네 칸만 표시: [왼바깥, 왼안, 오른안, 오른바깥]
-    // SETUPS[name] = [열1, 열2, 열6, 열7] = [왼바깥, 왼안, 오른안, 오른바깥]
     const s = Eng.SETUPS[setupName];
+    const imgMap = TUT_PIECE_IMG[side] || TUT_PIECE_IMG.r;
     const cell = (t) =>
-      `<div class="cell filled"><img src="${PIECE_IMG[side][t]}" alt="${HANJA[side][t]}" draggable="false"></div>`;
+      `<div class="cell filled"><img src="${imgMap[t]}" alt="${HANJA[side][t]}" draggable="false"></div>`;
     return cell(s[0]) + cell(s[1]) + cell(s[2]) + cell(s[3]);
   }
 
@@ -608,7 +1129,7 @@
       dot.className = 'dot dot-' + turn + (isCap ? ' capture' : '');
       dot.style.left = x + '%';
       dot.style.top = y + '%';
-      dot.onclick = (e) => { e.stopPropagation(); doMove(rr, cc); };
+      dot.onclick = (e) => { e.stopPropagation(); tutorialMode ? doTutorialMove(rr, cc) : doMove(rr, cc); };
       piecesLayer.appendChild(dot);
     }
     renderCaptured();
@@ -632,6 +1153,25 @@
 
   function onPieceClick(r, c) {
     if (gameOver) return;
+    // ★ 튜토리얼 모드: AI 없음, turn 체크 없이 플레이어(r) 기물만 선택 가능
+    if (tutorialMode) {
+      const p = board[r][c];
+      if (selected && legalForSel.some(([rr, cc]) => rr === r && cc === c)) {
+        doTutorialMove(r, c);
+        return;
+      }
+      if (p && p.side === 'r') {
+        selected = [r, c];
+        // 튜토리얼: 왕 안전 검사 없이 순수 행마법만 표시 (왕이 없으니 legalMoves 쓰면 전부 차단됨)
+        legalForSel = Eng.pseudoMoves(board, r, c);
+        render();
+      } else {
+        selected = null;
+        legalForSel = [];
+        render();
+      }
+      return;
+    }
     // ★ AI 차례면 사람 입력 무시 (AI가 두는 중 또는 둘 차례).
     if (aiSide && turn === aiSide) return;
     const p = board[r][c];
@@ -1207,6 +1747,7 @@
   // fallback: 장군이 아닐 때 쓸 문구(예: 무르기 후 "물렀습니다"). 미지정 시 pickPiece.
   function refreshStatus(fallback) {
     if (!board || gameOver) return;
+    if (tutorialMode) return;   // 튜토리얼 중엔 장군 판정 안 함
     if (Eng.isInCheck(board, turn)) {
       setStatus(t('check', factionLabel(turn)));
     } else {
@@ -1237,11 +1778,26 @@
     if (next === lang) return;
     lang = next;
     applyStaticI18n();
+    // 튜토리얼 중이면 사이드 패널만 재렌더
+    if (tutorialMode) {
+      if (tutorialPieceOverlay.style.display !== 'none') {
+        if (tutorialPieceTitle) tutorialPieceTitle.textContent = tt('tutPieceTitle');
+        renderTutorialPieceGrid();
+      } else if (tutorialScenario) {
+        renderTutorialSidePanel(tutorialScenario);
+      }
+      return;
+    }
     // 현재 보이는 동적 영역 다시 그리기
     if (setupOverlay.classList.contains('show')) {
       // 셋업 중: 보이는 단계 갱신
       if (levelStep.style.display !== 'none') {
-        renderLevelStep();
+        if (levelSubPanel.style.display !== 'none') {
+          renderLevelStep();   // 강도 서브패널 중
+        } else {
+          renderModeGrid();    // 모드 메뉴 중
+          if (levelStepTitle) levelStepTitle.textContent = t('levelTitle');
+        }
       } else if (factionStep.style.display !== 'none') {
         renderFactionStep(factionAutoAssigned);
       } else {

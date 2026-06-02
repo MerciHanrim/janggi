@@ -306,7 +306,7 @@
   }
   .piece:hover { transform: translate(-50%, -52%); }
 
-  /* 합법수 표시점 — 큰 투명 히트박스 + 또렷한 시각 점 */
+  /* 합법수 표시 — 히트박스(투명) + 시각 표시 */
   .dot {
     position: absolute;
     width: 8.2%; aspect-ratio: 1;
@@ -315,20 +315,21 @@
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
+  /* 이동 가능: 작은 채워진 점 — 존재감 줄이고 판 정갈하게 */
   .dot::after {
     content: '';
-    width: 46%; aspect-ratio: 1;
+    width: 28%; aspect-ratio: 1;
     border-radius: 50%;
-    background: var(--dot-fill, rgba(158,43,37,0.18));
-    border: 3px solid var(--dot-line, rgba(158,43,37,0.7));
-    box-shadow: 0 0 9px var(--dot-glow, rgba(158,43,37,0.45)), 0 1px 3px rgba(43,39,36,0.4);
+    background: var(--dot-line, rgba(31,78,95,0.75));
+    border: none;
+    box-shadow: 0 0 6px var(--dot-glow, rgba(31,78,95,0.4));
     animation: pulse 1.3s ease-in-out infinite;
   }
+  /* 잡기 가능: 링 유지 — 적 기물 위에 강조 */
   .dot.capture::after {
     width: 96%;
     background: transparent;
-    border-width: 3.5px;
-    border-color: var(--dot-line, rgba(158,43,37,0.7));
+    border: 3.5px solid var(--dot-line, rgba(158,43,37,0.7));
     box-shadow: 0 0 14px var(--dot-glow, rgba(158,43,37,0.6)), inset 0 0 8px var(--dot-fill, rgba(158,43,37,0.25));
   }
   /* 초(楚) 차례 — 청먹 */
@@ -641,6 +642,8 @@
   @media (orientation: landscape) and (max-height: 680px) {
     .setup-panel { padding: 18px 22px; }
     .setup-title { font-size: 1.1rem; margin-bottom: 14px; }
+    .mode-grid   { gap: 6px; }
+    .mode-card   { padding: 9px 14px; }
     .level-play  { margin-bottom: 10px; }
     .level-grid  { gap: 7px; }
     .level-card  { padding: 10px 14px; }
@@ -760,6 +763,68 @@
     font-size: 0.76rem; color: var(--ink-soft);
     letter-spacing: 0.02em; line-height: 1.5;
   }
+  /* 모드 메뉴 (대국 방식 선택 현관) */
+  .mode-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mode-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.4);
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+    text-align: left;
+  }
+  .mode-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+    box-shadow: 0 6px 16px rgba(176,141,87,0.45);
+  }
+  .mode-card.mode-coming {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .mode-card.mode-coming:hover {
+    transform: none;
+    border-color: var(--line);
+    box-shadow: none;
+  }
+  .mode-icon {
+    font-family: 'Ma Shan Zheng', 'Noto Serif KR', serif;
+    font-size: 1.45rem;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 1.8rem;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+  .mode-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mode-name {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .mode-sub {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+  }
+  /* 강도 서브패널 — 모드 카드와 동일 스크롤 영역 안 */
+  .level-sub-panel { }
   /* 강도 선택 (작은 현관 — "오늘은 어떻게 두실까요?") */
   .level-play {
     text-align: center;
@@ -833,10 +898,147 @@
     font-size: 0.76rem; color: var(--ink-soft);
     letter-spacing: 0.02em; line-height: 1.5;
   }
-  /* 아주 좁은 화면에선 카드 1열로 */
-  @media (max-width: 380px) {
-    .setup-grid, .faction-grid { grid-template-columns: 1fr; }
+
+  /* ── 튜토리얼 ──────────────────────────────────────────── */
+  /* 기물 선택 오버레이 — board-frame 위 fixed */
+  .tutorial-piece-overlay {
+    position: fixed; inset: 0;
+    background: rgba(43,39,36,0.82);
+    display: flex;
+    align-items: center; justify-content: center;
+    z-index: 210;
+    backdrop-filter: blur(3px);
+    padding: 16px;
   }
+  .tutorial-piece-panel {
+    width: 100%; max-width: 420px;
+    background: linear-gradient(160deg, var(--paper), var(--paper-deep));
+    border: 2px solid var(--gold);
+    border-radius: 5px;
+    padding: 28px 24px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  }
+  .tutorial-piece-title {
+    text-align: center;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-bottom: 20px;
+    letter-spacing: 0.04em;
+  }
+  .tutorial-piece-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+  }
+  .tut-piece-card {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.4);
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 6px 8px;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+    text-align: center;
+  }
+  .tut-piece-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+    box-shadow: 0 5px 14px rgba(176,141,87,0.4);
+  }
+  .tut-piece-card.tut-coming {
+    opacity: 0.45; cursor: default;
+  }
+  .tut-piece-card.tut-coming:hover {
+    transform: none; border-color: var(--line); box-shadow: none;
+  }
+  .tut-piece-img {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 4px;
+  }
+  .tut-piece-img img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 3px rgba(43,39,36,0.28));
+  }
+  .tut-piece-name {
+    font-size: 0.7rem; color: var(--ink-soft);
+    letter-spacing: 0.01em; line-height: 1.3;
+  }
+  /* 튜토리얼 사이드 패널 */
+  .tutorial-side-panel {
+    display: flex; flex-direction: column;
+    gap: 14px;
+    padding: 14px 0 0;
+  }
+  .tut-desc {
+    font-size: 0.9rem;
+    color: var(--ink-read);
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+  }
+  .tut-buttons {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 4px;
+  }
+  .tut-btn {
+    width: 100%;
+    font-family: 'Gowun Batang', serif;
+    font-size: 0.9rem;
+    padding: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .tut-next-piece {
+    background: rgba(176,141,87,0.12);
+    border: 1.5px solid var(--gold);
+    color: var(--ink);
+  }
+  .tut-next-piece:hover { background: rgba(176,141,87,0.25); }
+  .tut-reset {
+    background: rgba(176,141,87,0.15);
+    border: 1.5px solid var(--gold);
+    color: var(--ink);
+  }
+  .tut-reset:hover { background: rgba(176,141,87,0.3); }
+  .tut-moves-left {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    padding: 10px 0 4px;
+    letter-spacing: 0.06em;
+  }
+  .tut-result {
+    padding: 14px 0 8px;
+    text-align: center;
+  }
+  .tut-result-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .tut-result-success .tut-result-title { color: var(--blue-deep); }
+  .tut-result-fail .tut-result-title { color: var(--ink-soft); }
+  .tut-result-msg {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .tut-exit {
+    background: rgba(43,39,36,0.07);
+    border: 1px dashed var(--line);
+    color: var(--ink-soft);
+  }
+  .tut-exit:hover { background: rgba(43,39,36,0.14); }
   /* 설정 버튼 — 타이틀바 우측 */
   .settings-btn {
     position: absolute;

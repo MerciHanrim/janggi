@@ -33,14 +33,26 @@
           <h2 id="winTitle"></h2>
           <p id="winHint">다시 두려면 ‘처음부터’를 누르세요</p>
         </div>
+        <!-- 튜토리얼: 기물 선택 오버레이 -->
+        <div class="tutorial-piece-overlay" id="tutorialPieceOverlay" style="display:none">
+          <div class="tutorial-piece-panel">
+            <div class="tutorial-piece-title" id="tutorialPieceTitle">기물을 골라 행마법을 배워보세요</div>
+            <div class="tutorial-piece-grid" id="tutorialPieceGrid"></div>
+          </div>
+        </div>
       </div>
       <div class="setup-overlay show" id="setupOverlay">
         <div class="setup-panel">
           <div class="setup-step" id="levelStep">
-            <div class="setup-title">오늘은 어떻게 두실까요?</div>
-            <div class="level-play"><span class="level-play-label">컴퓨터와 두기</span></div>
-            <div class="level-grid" id="levelGrid"></div>
-            <div class="level-note">마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다</div>
+            <div class="setup-title" id="levelStepTitle">오늘은 어떻게 두실까요?</div>
+            <!-- 모드 메뉴 (첫 화면) -->
+            <div class="mode-grid" id="modeGrid"></div>
+            <!-- 강도 선택 (컴퓨터와 두기 선택 후) -->
+            <div class="level-sub-panel" id="levelSubPanel" style="display:none">
+              <div class="level-play"><span class="level-play-label" id="levelPlayLabel">컴퓨터와 두기</span></div>
+              <div class="level-grid" id="levelGrid"></div>
+              <div class="level-note" id="levelNote">마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다</div>
+            </div>
           </div>
           <div class="setup-step" id="factionStep" style="display:none">
             <div class="setup-title">진영을 고르세요</div>
