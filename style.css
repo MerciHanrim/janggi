@@ -336,7 +336,7 @@
   .dot-r { --dot-fill: rgba(31,78,95,0.2); --dot-line: rgba(31,78,95,0.75); --dot-glow: rgba(31,78,95,0.5); }
   /* 한(漢) 차례 — 적먹 */
   .dot-b { --dot-fill: rgba(158,43,37,0.18); --dot-line: rgba(158,43,37,0.72); --dot-glow: rgba(158,43,37,0.45); }
-  @keyframes pulse { 0%,100%{opacity:0.8; transform: scale(0.94);} 50%{opacity:1; transform: scale(1.06);} }
+  @keyframes pulse { 0%,100%{opacity:0.55; transform: scale(0.94);} 50%{opacity:0.62; transform: scale(1.06);} }
 
   /* 잡기 연출: 먹 번짐 */
   .ink-splat {
