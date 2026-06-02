@@ -328,13 +328,13 @@
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  /* 이동 가능: 35% 채워진 점 + 밝은 외곽선으로 배경과 분리 */
+  /* 이동 가능: 50% 채워진 점 + 밝은 외곽선으로 배경과 분리 */
   .dot::after {
     content: '';
-    width: 35%; aspect-ratio: 1;
+    width: 50%; aspect-ratio: 1;
     border-radius: 50%;
     background: var(--move-dot-color);
-    border: 1px solid var(--move-dot-outline);
+    border: 2px solid rgba(255,255,255,0.65);
     box-shadow: 0 0 6px var(--move-dot-glow);
     animation: pulse 1.3s ease-in-out infinite;
   }
@@ -345,7 +345,7 @@
     border: 3.5px solid var(--cap-dot-color);
     box-shadow: 0 0 14px var(--cap-dot-glow), inset 0 0 8px var(--cap-dot-inset);
   }
-  @keyframes pulse { 0%,100%{opacity:0.55; transform: scale(0.94);} 50%{opacity:0.62; transform: scale(1.06);} }
+  @keyframes pulse { 0%,100%{opacity:0.82; transform: scale(0.94);} 50%{opacity:1; transform: scale(1.06);} }
 
   /* 잡기 연출: 먹 번짐 */
   .ink-splat {
