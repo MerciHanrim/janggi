@@ -22,6 +22,9 @@
   const langEn = document.getElementById('langEn');
   const langZhHans = document.getElementById('langZhHans');
   const langZhHant = document.getElementById('langZhHant');
+  const langJa = document.getElementById('langJa');
+  const langDe = document.getElementById('langDe');
+  const langFr = document.getElementById('langFr');
   // langLabel은 타이틀바 ⚙ 드롭다운으로 이동 — HTML에 없음, null-safe 처리
   const langLabel = document.getElementById('langLabel');
   const settingsBtn = document.getElementById('settingsBtn');
@@ -74,8 +77,8 @@
   // 언어 선택 저장 키. 새로고침/재방문 시 이 값을 먼저 본다.
   const LANG_STORE_KEY = 'janggi.lang';
   // 지원 언어 목록 (저장값 검증용 — 모르는 값이 저장돼 있으면 무시).
-  const SUPPORTED_LANGS = ['ko', 'en', 'zh-Hans', 'zh-Hant'];
-  // 브라우저 언어 추측: 한국어→ko, 중국어→지역별 간체/번체, 그 외→en.
+  const SUPPORTED_LANGS = ['ko', 'en', 'zh-Hans', 'zh-Hant', 'ja', 'de', 'fr'];
+  // 브라우저 언어 추측: 한국어→ko, 중국어→지역별 간체/번체, 일·독·불→각 언어, 그 외→en.
   function detectLang() {
     const raw = (navigator.language || 'en').toLowerCase();
     if (raw.startsWith('ko')) return 'ko';
@@ -84,6 +87,9 @@
       if (/-(tw|hk|mo)\b/.test(raw) || raw.includes('hant')) return 'zh-Hant';
       return 'zh-Hans';
     }
+    if (raw.startsWith('ja')) return 'ja';
+    if (raw.startsWith('de')) return 'de';
+    if (raw.startsWith('fr')) return 'fr';
     return 'en';
   }
   // 시작 언어: 저장값이 있으면 그걸 쓰고, 없거나 모르는 값이면 브라우저 추측.
@@ -468,6 +474,282 @@
         },
       ],
     },
+    ja: {
+      sub: 'JANGGI · 韓国将棋（チャンギ）',
+      langLabel: '言語 :',
+      chooseFaction: '陣営を選んでください',
+      chuName: '楚（チョ）', hanName: '漢（ハン）',
+      chuSub: '先手 · 青緑', hanSub: '後手 · 朱',
+      factionNoteDefault: '選んだ陣営が画面の下側に配置されます · 先手は常に楚',
+      autoWon: '前局は勝利 — 今回は自動的に漢に割り当てられました。変更するには別の陣営を選んでください。',
+      autoLost: '前局は敗北 — 今回は自動的に楚に割り当てられました。変更するには別の陣営を選んでください。',
+      setupTitlePre: ' の駒組みを選んでください',   // <b>楚</b> の駒組みを選んでください
+      autoPick: '自動選択（ランダム）',
+      turnLabel: 'の手番', mistStart: '対局開始',
+      undo: '待った', reset: '最初から', flip: '盤を反転',
+      resign: '投了', resignConfirm: '本当に投了しますか？',
+      resignYes: 'はい', resignNo: 'いいえ',
+      resigned: (s) => `${s} 投了 — 負けを認めました`,
+      capByChu: '楚が取った', capByHan: '漢が取った',
+      capChuEmpty: '楚が取った駒', capHanEmpty: '漢が取った駒',
+      movelogTitle: '棋 譜', movelogEmpty: 'まだ手がありません',
+      pickPiece: '駒を選んでください',
+      pickDest: '移動先を選んでください', cantMove: 'この駒は動かせません',
+      notYourTurn: (s) => `今は ${s} の手番です`,
+      check: (s) => `王手！${s} の王を守る手を指してください`,
+      checkWord: '王手',
+      myFaction: (you, sR, sB) => `自分の陣営：${you} · 楚 ${sR} · 漢 ${sB}`,
+      chuFirst: '楚 · 先手', hanSecond: '漢 · 後手',
+      win: (s) => `${s} の勝ち`,
+      outcomeWin: '勝ち', outcomeLose: '負け',
+      factionWon: (s) => `${s} の勝ち`,
+      youWon: '勝ちました · 次局は漢を持ちます',
+      youLost: '負けました · 次局は楚を持ちます',
+      outcomeDraw: '引き分け', drawLine: '引き分け',
+      drawStalemate: '指す手がなく引き分けです',
+      byCheckmate: (s) => `詰み — ${s} の勝ち`,
+      byTimeout: (s) => `時間切れ — ${s} の勝ち`,
+      undone: '一手戻しました',
+      winHint: 'もう一度指すには「最初から」を押してください',
+      aiThinking: '相手が少し考えています',
+      aiWaking: 'AI 対戦相手を起動しています',
+      aiFailLong: 'AI 対戦相手を起動しています。ブラウザ環境によっては少し止まることがあります。今は一人で盤を眺めることができます。',
+      aiRetry: 'もう一度起動',
+      aiWatch: '盤だけ見る',
+      perspMine: 'あなたの手番です',
+      perspAi: '相手が手を選んでいます',
+      perspHuman: (s) => `${s} の手番です`,
+      levelTitle: '今日はどう指しますか？',
+      modeCpu: 'コンピュータと対局', modeCpuSub: 'AI 相手と対局',
+      modeTutorial: '将棋を学ぶ', modeTutorialSub: '駒の動かし方と勝ち方',
+      modeRules: 'ルール', modeRulesSub: '王手 · 詰み · 勝利条件',
+      modeHuman: '人と対局', modeHumanSub: '準備中です',
+      modeReview: '振り返り', modeReviewSub: '準備中です',
+      modeComing: 'このモードはまだ利用できません',
+      levelPlayCpu: 'コンピュータと対局',
+      lvBeginnerName: '初心者', lvBeginnerSub: '初めて学ぶ方のための相手',
+      lvFriendName: '気軽な相手', lvFriendSub: '気軽に一局楽しめる相手',
+      lvMasterName: '熟練の打ち手', lvMasterSub: 'なかなか隙を見せない相手',
+      lvExpertName: '名人', lvExpertSub: '一切の隙を許さない相手',
+      levelNote: 'お好みの相手を選んでください · 一局終わるごとに選び直せます',
+      settingsBgLabel: '盤の背景',
+      bgSansuHwa: '山水画', bgSimple: 'シンプル', bgWood: '木目', bgSipjangsaeng: '十長生', bgPaper: '韓紙',
+      rulesTitle: 'チャンギのルール',
+      rulesSubtitle: '対局を始める前に知っておきたい基本ルール',
+      rulesExLabel: '例',
+      rulesClose: '閉じる',
+      rulesSections: [
+        {
+          title: 'チャンギの目的',
+          body: 'チャンギは二つの陣営が対戦する韓国の伝統的なボードゲームです。相手の王（楚または漢）を詰みに追い込めば勝ちです。自分の王を守りながら相手の王を攻めるのが核心です。',
+          example: null,
+        },
+        {
+          title: '王手（Check）',
+          body: '相手の王を次の手で取れる状態を王手といいます。王手をかけられたら、必ず脅威から逃れなければなりません：王を安全な場所へ動かす、攻撃を遮る、または攻めている駒を取る、のいずれかです。',
+          example: '車（チャ）が相手の王を一直線に狙っている場合。',
+        },
+        {
+          title: '詰み（Checkmate）',
+          body: '王手をかけられ、どうやっても逃れられない状態を詰みといいます。王を動かすことも、攻撃を遮ることも、攻めている駒を取ることもできなければ詰みであり、この瞬間に対局が終わります。',
+          example: '王の逃げ場がすべて塞がれ、攻撃を遮る駒もない場合。',
+        },
+        {
+          title: '勝利条件',
+          body: '相手を詰みに追い込めば勝ちです。また、相手が自ら投了した場合もその時点で勝ちとなります。',
+          example: null,
+        },
+        {
+          title: '覚えておくこと',
+          body: '現在のバージョンは王手・詰み・基本的な勝敗ルールに対応しています。ビッカン（Bikjang）や点数制など一部の伝統ルールは今後のアップデートで追加予定です。',
+          example: null,
+        },
+      ],
+    },
+    de: {
+      sub: 'JANGGI · Koreanisches Schach',
+      langLabel: 'Sprache :',
+      chooseFaction: 'Wähle deine Seite',
+      chuName: 'Cho (楚)', hanName: 'Han (漢)',
+      chuSub: 'Anziehend · Türkis', hanSub: 'Nachziehend · Rot',
+      factionNoteDefault: 'Deine Seite steht unten · Cho (楚) zieht immer zuerst',
+      autoWon: 'Letzte Partie gewonnen — diesmal Han (漢) zugewiesen. Wähle die andere Seite, um zu wechseln.',
+      autoLost: 'Letzte Partie verloren — diesmal Cho (楚) zugewiesen. Wähle die andere Seite, um zu wechseln.',
+      setupTitlePre: ' — wähle die Aufstellung',   // <b>Cho (楚)</b> — wähle die Aufstellung
+      autoPick: 'Automatisch (zufällig)',
+      turnLabel: 'am Zug', mistStart: 'Spielbeginn',
+      undo: 'Zurücknehmen', reset: 'Neue Partie', flip: 'Brett drehen',
+      resign: 'Aufgeben', resignConfirm: 'Diese Partie aufgeben?',
+      resignYes: 'Ja', resignNo: 'Nein',
+      resigned: (s) => `${s} hat aufgegeben`,
+      capByChu: 'Cho hat geschlagen', capByHan: 'Han hat geschlagen',
+      capChuEmpty: 'Von Cho geschlagen', capHanEmpty: 'Von Han geschlagen',
+      movelogTitle: 'Züge', movelogEmpty: 'Noch keine Züge',
+      pickPiece: 'Wähle eine Figur',
+      pickDest: 'Wähle ein Zielfeld', cantMove: 'Diese Figur hat keine gültigen Züge',
+      notYourTurn: (s) => `${s} ist am Zug`,
+      check: (s) => `Schach! Rette den General von ${s}`,
+      checkWord: 'Schach',
+      myFaction: (you, sR, sB) => `Du: ${you} · Cho ${sR} · Han ${sB}`,
+      chuFirst: 'Cho (楚) · Anziehend', hanSecond: 'Han (漢) · Nachziehend',
+      win: (s) => `${s} gewinnt`,
+      outcomeWin: 'Sieg', outcomeLose: 'Niederlage',
+      factionWon: (s) => `${s} gewinnt`,
+      youWon: 'Du hast gewonnen · nächste Partie spielst du Han (漢)',
+      youLost: 'Du hast verloren · nächste Partie spielst du Cho (楚)',
+      outcomeDraw: 'Remis', drawLine: 'Patt',
+      drawStalemate: 'Keine gültigen Züge — die Partie endet remis',
+      byCheckmate: (s) => `Schachmatt — ${s} gewinnt`,
+      byTimeout: (s) => `Zeitüberschreitung — ${s} gewinnt`,
+      undone: 'Zug zurückgenommen',
+      winHint: 'Drücke „Neue Partie“, um erneut zu spielen',
+      aiThinking: 'Dein Gegner überlegt',
+      aiWaking: 'KI-Gegner wird gestartet',
+      aiFailLong: 'KI-Gegner wird gestartet. Je nach Browser kann es kurz stocken. Bis dahin kannst du das Brett allein studieren.',
+      aiRetry: 'Erneut starten',
+      aiWatch: 'Nur das Brett ansehen',
+      perspMine: 'Du bist am Zug',
+      perspAi: 'Dein Gegner wählt einen Zug',
+      perspHuman: (s) => `${s} ist am Zug`,
+      levelTitle: 'Wie möchtest du heute spielen?',
+      modeCpu: 'Gegen den Computer', modeCpuSub: 'Gegen die KI spielen',
+      modeTutorial: 'Janggi lernen', modeTutorialSub: 'Wie Figuren ziehen und wie man gewinnt',
+      modeRules: 'Regeln', modeRulesSub: 'Schach, Schachmatt, Siegbedingungen',
+      modeHuman: 'Gegen einen Freund', modeHumanSub: 'Demnächst verfügbar',
+      modeReview: 'Partie analysieren', modeReviewSub: 'Demnächst verfügbar',
+      modeComing: 'Dieser Modus ist noch nicht verfügbar',
+      levelPlayCpu: 'Gegen den Computer',
+      lvBeginnerName: 'Anfänger', lvBeginnerSub: 'Für alle, die Janggi zum ersten Mal lernen',
+      lvFriendName: 'Vertrauter Gegner', lvFriendSub: 'Ein entspannter Gegner für eine lockere Partie',
+      lvMasterName: 'Erfahrener Spieler', lvMasterSub: 'Lässt selten eine Lücke',
+      lvExpertName: 'Meister', lvExpertSub: 'Lässt nicht die kleinste Lücke zu',
+      levelNote: 'Wähle deinen Gegner · nach jeder Partie kannst du neu wählen',
+      settingsBgLabel: 'Bretthintergrund',
+      bgSansuHwa: 'Tuschmalerei', bgSimple: 'Schlicht', bgWood: 'Holz', bgSipjangsaeng: 'Sipjangsaeng', bgPaper: 'Hanji',
+      rulesTitle: 'Janggi-Regeln',
+      rulesSubtitle: 'Die Grundlagen, die du vor deiner ersten Partie kennen solltest',
+      rulesExLabel: 'Beispiel',
+      rulesClose: 'Schließen',
+      rulesSections: [
+        {
+          title: 'Das Ziel',
+          body: 'Janggi ist ein traditionelles koreanisches Brettspiel für zwei Seiten. Du gewinnst, indem du den General des Gegners (楚 oder 漢) schachmatt setzt. Der Kern besteht darin, den eigenen General zu schützen und zugleich den gegnerischen anzugreifen.',
+          example: null,
+        },
+        {
+          title: 'Schach (Check)',
+          body: 'Wenn der General des Gegners im nächsten Zug geschlagen werden könnte, steht er im Schach. Ein General im Schach muss der Bedrohung entkommen: auf ein sicheres Feld ziehen, den Angriff blockieren oder die angreifende Figur schlagen.',
+          example: 'Ein Wagen steht in direkter Linie dem gegnerischen General gegenüber.',
+        },
+        {
+          title: 'Schachmatt (Checkmate)',
+          body: 'Wenn ein General im Schach steht und auf keine Weise entkommen kann, ist es Schachmatt. Kann der General nicht ziehen, der Angriff nicht blockiert und die angreifende Figur nicht geschlagen werden, ist es Schachmatt und die Partie endet.',
+          example: 'Der General hat kein sicheres Feld zur Flucht, und keine Figur kann den Angriff blockieren.',
+        },
+        {
+          title: 'Wie man gewinnt',
+          body: 'Setze den Gegner schachmatt, um zu gewinnen. Du gewinnst auch sofort, wenn der Gegner aufgibt.',
+          example: null,
+        },
+        {
+          title: 'Gut zu wissen',
+          body: 'Diese Version unterstützt Schach, Schachmatt und grundlegende Siegbedingungen. Einige traditionelle Regeln wie Bikjang und das Punktesystem sind für ein künftiges Update geplant.',
+          example: null,
+        },
+      ],
+    },
+    fr: {
+      sub: 'JANGGI · Échecs coréens',
+      langLabel: 'Langue :',
+      chooseFaction: 'Choisissez votre camp',
+      chuName: 'Cho (楚)', hanName: 'Han (漢)',
+      chuSub: 'Premier · Turquoise', hanSub: 'Second · Rouge',
+      factionNoteDefault: 'Votre camp se place en bas · Cho (楚) joue toujours en premier',
+      autoWon: 'Partie précédente gagnée — Han (漢) attribué cette fois. Choisissez l’autre camp pour changer.',
+      autoLost: 'Partie précédente perdue — Cho (楚) attribué cette fois. Choisissez l’autre camp pour changer.',
+      setupTitlePre: ' — choisissez la formation',   // <b>Cho (楚)</b> — choisissez la formation
+      autoPick: 'Automatique (aléatoire)',
+      turnLabel: 'au trait', mistStart: 'Début de partie',
+      undo: 'Annuler', reset: 'Nouvelle partie', flip: 'Retourner le plateau',
+      resign: 'Abandonner', resignConfirm: 'Abandonner cette partie ?',
+      resignYes: 'Oui', resignNo: 'Non',
+      resigned: (s) => `${s} a abandonné`,
+      capByChu: 'Cho a capturé', capByHan: 'Han a capturé',
+      capChuEmpty: 'Capturé par Cho', capHanEmpty: 'Capturé par Han',
+      movelogTitle: 'Coups', movelogEmpty: 'Aucun coup pour l’instant',
+      pickPiece: 'Choisissez une pièce',
+      pickDest: 'Choisissez une destination', cantMove: 'Cette pièce n’a aucun coup légal',
+      notYourTurn: (s) => `C’est au tour de ${s}`,
+      check: (s) => `Échec ! Sauvez le général de ${s}`,
+      checkWord: 'Échec',
+      myFaction: (you, sR, sB) => `Vous : ${you} · Cho ${sR} · Han ${sB}`,
+      chuFirst: 'Cho (楚) · Premier', hanSecond: 'Han (漢) · Second',
+      win: (s) => `${s} gagne`,
+      outcomeWin: 'Victoire', outcomeLose: 'Défaite',
+      factionWon: (s) => `${s} gagne`,
+      youWon: 'Vous avez gagné · prochaine partie avec Han (漢)',
+      youLost: 'Vous avez perdu · prochaine partie avec Cho (楚)',
+      outcomeDraw: 'Nulle', drawLine: 'Pat',
+      drawStalemate: 'Aucun coup légal — la partie est nulle',
+      byCheckmate: (s) => `Échec et mat — ${s} gagne`,
+      byTimeout: (s) => `Temps écoulé — ${s} gagne`,
+      undone: 'Coup annulé',
+      winHint: 'Appuyez sur « Nouvelle partie » pour rejouer',
+      aiThinking: 'Votre adversaire réfléchit',
+      aiWaking: 'Réveil de l’adversaire IA',
+      aiFailLong: 'Réveil de l’adversaire IA. Selon le navigateur, cela peut se figer un instant. En attendant, vous pouvez étudier le plateau seul.',
+      aiRetry: 'Réveiller à nouveau',
+      aiWatch: 'Voir seulement le plateau',
+      perspMine: 'À vous de jouer',
+      perspAi: 'Votre adversaire choisit un coup',
+      perspHuman: (s) => `À ${s} de jouer`,
+      levelTitle: 'Comment voulez-vous jouer aujourd’hui ?',
+      modeCpu: 'Jouer contre l’ordinateur', modeCpuSub: 'Jouer contre l’IA',
+      modeTutorial: 'Apprendre le Janggi', modeTutorialSub: 'Déplacement des pièces et comment gagner',
+      modeRules: 'Règles', modeRulesSub: 'Échec, échec et mat, conditions de victoire',
+      modeHuman: 'Jouer avec un ami', modeHumanSub: 'Bientôt disponible',
+      modeReview: 'Analyser une partie', modeReviewSub: 'Bientôt disponible',
+      modeComing: 'Ce mode n’est pas encore disponible',
+      levelPlayCpu: 'Jouer contre l’ordinateur',
+      lvBeginnerName: 'Débutant', lvBeginnerSub: 'Pour qui apprend le Janggi pour la première fois',
+      lvFriendName: 'Adversaire familier', lvFriendSub: 'Un adversaire détendu pour une partie tranquille',
+      lvMasterName: 'Joueur aguerri', lvMasterSub: 'Laisse rarement une ouverture',
+      lvExpertName: 'Maître', lvExpertSub: 'Ne laisse pas la moindre ouverture',
+      levelNote: 'Choisissez votre adversaire · vous pouvez rechoisir après chaque partie',
+      settingsBgLabel: 'Fond du plateau',
+      bgSansuHwa: 'Lavis', bgSimple: 'Épuré', bgWood: 'Bois', bgSipjangsaeng: 'Sipjangsaeng', bgPaper: 'Hanji',
+      rulesTitle: 'Règles du Janggi',
+      rulesSubtitle: 'Les bases à connaître avant votre première partie',
+      rulesExLabel: 'Exemple',
+      rulesClose: 'Fermer',
+      rulesSections: [
+        {
+          title: 'Le but',
+          body: 'Le Janggi est un jeu de plateau traditionnel coréen opposant deux camps. Vous gagnez en mettant le général adverse (楚 ou 漢) échec et mat. L’essentiel est de protéger votre propre général tout en attaquant celui de l’adversaire.',
+          example: null,
+        },
+        {
+          title: 'Échec (Check)',
+          body: 'Lorsque le général adverse pourrait être capturé au coup suivant, il est en échec. Un général en échec doit échapper à la menace : se déplacer vers une case sûre, bloquer l’attaque, ou capturer la pièce attaquante.',
+          example: 'Un chariot aligné directement face au général adverse.',
+        },
+        {
+          title: 'Échec et mat (Checkmate)',
+          body: 'Lorsqu’un général est en échec et ne peut s’en échapper par aucun moyen, c’est échec et mat. Si le général ne peut pas bouger, si l’attaque ne peut être bloquée et si la pièce attaquante ne peut être capturée, c’est échec et mat et la partie se termine.',
+          example: 'Le général n’a aucune case sûre pour fuir, et aucune pièce ne peut bloquer l’attaque.',
+        },
+        {
+          title: 'Comment gagner',
+          body: 'Mettez l’adversaire échec et mat pour gagner. Vous gagnez aussi immédiatement si l’adversaire abandonne.',
+          example: null,
+        },
+        {
+          title: 'Bon à savoir',
+          body: 'Cette version prend en charge l’échec, l’échec et mat et les conditions de victoire de base. Certaines règles traditionnelles, comme le Bikjang et le système de points, sont prévues pour une future mise à jour.',
+          example: null,
+        },
+      ],
+    },
   };
   function t(key, ...args) {
     // 1순위: 현재 언어 → 2순위: 영어 폴백 → 3순위: 키 그대로(최후의 보루, 화면 안 깨짐)
@@ -501,10 +783,18 @@
     '마상마상': '馬象馬象', '상마상마': '象馬象馬',
     '마상상마': '馬象象馬', '상마마상': '象馬馬象',
   };
+  // 일본어 상차림 — 한자 표기(馬·象). 일본어권은 한자를 읽으므로 음역보다 직관적.
+  const SETUP_JA = {
+    '마상마상': '馬象馬象', '상마상마': '象馬象馬',
+    '마상상마': '馬象象馬', '상마마상': '象馬馬象',
+  };
   function setupLabel(name) {
     if (lang === 'en') return SETUP_ROMAN[name] || name;
     if (lang === 'zh-Hans') return SETUP_ZH_HANS[name] || name;
     if (lang === 'zh-Hant') return SETUP_ZH_HANT[name] || name;
+    if (lang === 'ja') return SETUP_JA[name] || name;
+    // 독일어·프랑스어는 한자가 낯서므로 영어와 동일한 로마자 음역을 사용.
+    if (lang === 'de' || lang === 'fr') return SETUP_ROMAN[name] || name;
     return name;
   }
 
@@ -2210,6 +2500,9 @@
     langEn.classList.toggle('active', lang === 'en');
     if (langZhHans) langZhHans.classList.toggle('active', lang === 'zh-Hans');
     if (langZhHant) langZhHant.classList.toggle('active', lang === 'zh-Hant');
+    if (langJa) langJa.classList.toggle('active', lang === 'ja');
+    if (langDe) langDe.classList.toggle('active', lang === 'de');
+    if (langFr) langFr.classList.toggle('active', lang === 'fr');
     document.documentElement.lang = lang;
     const settingsBgLabel = document.getElementById('settingsBgLabel');
     if (settingsBgLabel) settingsBgLabel.textContent = t('settingsBgLabel');
@@ -2334,6 +2627,9 @@
   langEn.onclick = () => { setLang('en'); closeSettings(); };
   if (langZhHans) langZhHans.onclick = () => { setLang('zh-Hans'); closeSettings(); };
   if (langZhHant) langZhHant.onclick = () => { setLang('zh-Hant'); closeSettings(); };
+  if (langJa) langJa.onclick = () => { setLang('ja'); closeSettings(); };
+  if (langDe) langDe.onclick = () => { setLang('de'); closeSettings(); };
+  if (langFr) langFr.onclick = () => { setLang('fr'); closeSettings(); };
 
   // ── 장기판 배경 선택 ──────────────────────────────────────
   // bg: 'sansuHwa'(기본) | 'simple'. 배경 추가 시 BG_LIST에만 추가하면 됨.
