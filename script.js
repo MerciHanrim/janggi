@@ -1960,13 +1960,15 @@
   // bg: 'sansuHwa'(기본) | 'simple'. 배경 추가 시 BG_LIST에만 추가하면 됨.
   let boardBg = 'sansuHwa';
   const BG_LIST = [
-    { id: 'sansuHwa', cls: '',          btnId: 'bgSansuHwa' },
+    { id: 'sansuHwa', cls: null,        btnId: 'bgSansuHwa' },
     { id: 'simple',   cls: 'bg-simple', btnId: 'bgSimple'   },
   ];
   function applyBoardBg(id) {
     boardBg = id;
-    // frame 클래스 교체
-    for (const b of BG_LIST) frame.classList.remove(b.cls);
+    // frame 클래스 교체 — cls가 null이면 제거만
+    for (const b of BG_LIST) {
+      if (b.cls) frame.classList.remove(b.cls);
+    }
     const target = BG_LIST.find(b => b.id === id);
     if (target && target.cls) frame.classList.add(target.cls);
     // 버튼 active 표시
