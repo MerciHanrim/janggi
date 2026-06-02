@@ -700,8 +700,12 @@
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     const captured = res.captured;
     board = res.board;
-    playMoveSound();
-    if (captured) spawnSplat(tr, tc);
+    if (captured) {
+      playCaptureSound();
+      spawnSplat(tr, tc);
+    } else {
+      playMoveSound();
+    }
     selected = null;
     legalForSel = [];
 
@@ -1202,6 +1206,7 @@
     if (p && p.side === turn) {
       selected = [r, c];
       legalForSel = Eng.legalMoves(board, r, c);
+      playPickSound();   // 기물 선택 소리
       setStatus(legalForSel.length ? t('pickDest') : t('cantMove'));
       render();
     } else if (p) {
@@ -1226,12 +1231,14 @@
     const target = board[tr][tc];
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     board = res.board;
-    playMoveSound();   // 백자알 놓는 "딱" — 매 수마다. (잡기 시 먹번짐은 아래에서 추가)
     let capType = null;
     if (res.captured) {
       captured[turn].push(res.captured.type);
       capType = res.captured.type;
+      playCaptureSound();   // 잡기 전용 소리
       spawnSplat(tr, tc);
+    } else {
+      playMoveSound();   // 일반 이동 소리
     }
     // 기보 기록
     moveLog.push({
@@ -1463,14 +1470,19 @@
 
   // ── 장군 청각/시각 연출 (★ 이벤트성 — doMove에서 새 장군 발생 시에만) ──
   // 소리: 파일이 있으면 파일, 없으면 Web Audio 합성(징 비슷한 금속 울림).
-  // 나중에 assets/sound/check.mp3 넣으면 자동으로 파일 사용으로 전환됨.
-  let _checkAudioEl = null;     // 파일 재생용 (있을 때)
+  let _checkAudioEl = null;
   let _checkAudioFailed = false;
   let _audioCtx = null;
-  const CHECK_SOUND_SRC = 'assets/sound/check.mp3';
+  const CHECK_SOUND_SRC      = 'assets/sound/janggi_sfx_checkmate.mp3';
   let _moveAudioEl = null;
   let _moveAudioFailed = false;
-  const MOVE_SOUND_SRC = 'assets/sound/move.mp3';
+  const MOVE_SOUND_SRC       = 'assets/sound/janggi_sfx_move.mp3';
+  let _captureAudioEl = null;
+  let _captureAudioFailed = false;
+  const CAPTURE_SOUND_SRC    = 'assets/sound/janggi_sfx_capture.mp3';
+  let _pickAudioEl = null;
+  let _pickAudioFailed = false;
+  const PICK_SOUND_SRC       = 'assets/sound/janggi_sfx_pick.mp3';
 
   function playCheckSound() {
     // 1순위: 음원 파일. 로드 실패 이력이 있으면 바로 합성으로.
@@ -1561,7 +1573,6 @@
   }
 
   // ── 기물 놓는 소리 (백자알 "딱") — 매 수마다. check와 동일한 파일-우선/합성-폴백 구조. ──
-  // 나중에 assets/sound/move.mp3 넣으면 자동으로 파일 사용으로 전환됨.
   function playMoveSound() {
     if (!_moveAudioFailed) {
       try {
@@ -1580,6 +1591,47 @@
       }
     }
     synthMoveSound();
+  }
+
+  // 기물 잡기 소리 — 파일 우선, 폴백은 moveSound 합성
+  function playCaptureSound() {
+    if (!_captureAudioFailed) {
+      try {
+        if (!_captureAudioEl) {
+          _captureAudioEl = new Audio(CAPTURE_SOUND_SRC);
+          _captureAudioEl.addEventListener('error', () => { _captureAudioFailed = true; });
+        }
+        if (!_captureAudioFailed) {
+          _captureAudioEl.currentTime = 0;
+          const pr = _captureAudioEl.play();
+          if (pr && pr.catch) pr.catch(() => { _captureAudioFailed = true; synthMoveSound(); });
+          return;
+        }
+      } catch (e) {
+        _captureAudioFailed = true;
+      }
+    }
+    synthMoveSound();
+  }
+
+  // 기물 선택 소리 — 파일 우선, 폴백은 moveSound 합성
+  function playPickSound() {
+    if (!_pickAudioFailed) {
+      try {
+        if (!_pickAudioEl) {
+          _pickAudioEl = new Audio(PICK_SOUND_SRC);
+          _pickAudioEl.addEventListener('error', () => { _pickAudioFailed = true; });
+        }
+        if (!_pickAudioFailed) {
+          _pickAudioEl.currentTime = 0;
+          const pr = _pickAudioEl.play();
+          if (pr && pr.catch) pr.catch(() => { _pickAudioFailed = true; });
+          return;
+        }
+      } catch (e) {
+        _pickAudioFailed = true;
+      }
+    }
   }
 
   // Web Audio 합성: 도자기가 나무에 닿는 짧은 "딱". 노이즈 버스트(고역) + 짧은 톤 클릭, 빠른 감쇠.
