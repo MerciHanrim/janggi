@@ -20,6 +20,8 @@
   const elMistText = document.getElementById('mistText');
   const langKo = document.getElementById('langKo');
   const langEn = document.getElementById('langEn');
+  const langZhHans = document.getElementById('langZhHans');
+  const langZhHant = document.getElementById('langZhHant');
   // langLabel은 타이틀바 ⚙ 드롭다운으로 이동 — HTML에 없음, null-safe 처리
   const langLabel = document.getElementById('langLabel');
   const settingsBtn = document.getElementById('settingsBtn');
@@ -72,10 +74,17 @@
   // 언어 선택 저장 키. 새로고침/재방문 시 이 값을 먼저 본다.
   const LANG_STORE_KEY = 'janggi.lang';
   // 지원 언어 목록 (저장값 검증용 — 모르는 값이 저장돼 있으면 무시).
-  const SUPPORTED_LANGS = ['ko', 'en'];
-  // 브라우저 언어 추측: 한국어면 ko, 아니면 en.
+  const SUPPORTED_LANGS = ['ko', 'en', 'zh-Hans', 'zh-Hant'];
+  // 브라우저 언어 추측: 한국어→ko, 중국어→지역별 간체/번체, 그 외→en.
   function detectLang() {
-    return (navigator.language || 'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en';
+    const raw = (navigator.language || 'en').toLowerCase();
+    if (raw.startsWith('ko')) return 'ko';
+    if (raw.startsWith('zh')) {
+      // 번체권: 대만(tw)·홍콩(hk)·마카오(mo). 그 외 중국어는 간체 기본.
+      if (/-(tw|hk|mo)\b/.test(raw) || raw.includes('hant')) return 'zh-Hant';
+      return 'zh-Hans';
+    }
+    return 'en';
   }
   // 시작 언어: 저장값이 있으면 그걸 쓰고, 없거나 모르는 값이면 브라우저 추측.
   let lang = detectLang();
@@ -275,6 +284,190 @@
         },
       ],
     },
+    'zh-Hans': {
+      sub: 'JANGGI · 韩国象棋',
+      langLabel: '语言 :',
+      chooseFaction: '请选择阵营',
+      chuName: '楚', hanName: '汉',
+      chuSub: '先手 · 青绿', hanSub: '后手 · 朱红',
+      factionNoteDefault: '所选阵营位于棋盘下方 · 楚方始终先行',
+      autoWon: '上一局获胜 — 本局自动分配为汉方。如需更改，请选择另一阵营。',
+      autoLost: '上一局落败 — 本局自动分配为楚方。如需更改，请选择另一阵营。',
+      setupTitlePre: ' 的布阵',   // <b>楚</b> 的布阵
+      autoPick: '自动选择（随机）',
+      turnLabel: '行棋', mistStart: '对局开始',
+      undo: '悔棋', reset: '重新开始', flip: '翻转棋盘',
+      resign: '认输', resignConfirm: '确定要认输吗？',
+      resignYes: '是', resignNo: '否',
+      resigned: (s) => `${s} 认输 — 已投子`,
+      capByChu: '楚方吃子', capByHan: '汉方吃子',
+      capChuEmpty: '楚方吃掉的棋子', capHanEmpty: '汉方吃掉的棋子',
+      movelogTitle: '棋 谱', movelogEmpty: '尚无棋步',
+      pickPiece: '请选择棋子',
+      pickDest: '请选择落点', cantMove: '该棋子无合法走法',
+      notYourTurn: (s) => `现在轮到 ${s} 行棋`,
+      check: (s) => `将军！请走子保护 ${s} 方的将`,
+      checkWord: '将军',
+      myFaction: (you, sR, sB) => `我的阵营：${you} · 楚 ${sR} · 汉 ${sB}`,
+      chuFirst: '楚 · 先手', hanSecond: '汉 · 后手',
+      win: (s) => `${s} 方获胜`,
+      outcomeWin: '胜', outcomeLose: '负',
+      factionWon: (s) => `${s} 方获胜`,
+      youWon: '你获胜了 · 下一局执汉',
+      youLost: '你落败了 · 下一局执楚',
+      outcomeDraw: '和棋', drawLine: '和局',
+      drawStalemate: '无子可动 — 本局为和棋',
+      byCheckmate: (s) => `将死 — ${s} 方获胜`,
+      byTimeout: (s) => `超时 — ${s} 方获胜`,
+      undone: '已悔一步',
+      winHint: '若要再下一局，请点击“重新开始”',
+      aiThinking: '对面正在思考',
+      aiWaking: '正在唤醒 AI 对手',
+      aiFailLong: '正在唤醒 AI 对手。视浏览器环境可能会短暂停顿。此刻你可以先自行研究棋局。',
+      aiRetry: '重新唤醒',
+      aiWatch: '只看棋盘',
+      perspMine: '轮到你行棋',
+      perspAi: '对手正在选择走法',
+      perspHuman: (s) => `轮到 ${s} 行棋`,
+      levelTitle: '今天想怎么下？',
+      modeCpu: '与电脑对弈', modeCpuSub: '与 AI 对手对局',
+      modeTutorial: '学习象棋', modeTutorialSub: '棋子走法与取胜之道',
+      modeRules: '象棋规则', modeRulesSub: '将军 · 将死 · 取胜条件',
+      modeHuman: '与人对弈', modeHumanSub: '敬请期待',
+      modeReview: '复盘', modeReviewSub: '敬请期待',
+      modeComing: '该模式尚未开放',
+      levelPlayCpu: '与电脑对弈',
+      lvBeginnerName: '初学者', lvBeginnerSub: '为初次学习象棋的人准备的对手',
+      lvFriendName: '熟悉的棋友', lvFriendSub: '轻松对弈一局的对手',
+      lvMasterName: '老练的棋客', lvMasterSub: '不轻易露出破绽的对手',
+      lvExpertName: '国手', lvExpertSub: '不容许一丝破绽的对手',
+      levelNote: '请选择心仪的对手 · 每局结束后可重新选择',
+      settingsBgLabel: '棋盘背景',
+      bgSansuHwa: '山水画', bgSimple: '简约', bgWood: '原木', bgSipjangsaeng: '十长生', bgPaper: '韩纸',
+      rulesTitle: '象棋规则',
+      rulesSubtitle: '开局前值得了解的基本规则',
+      rulesExLabel: '示例',
+      rulesClose: '关闭',
+      rulesSections: [
+        {
+          title: '象棋的目标',
+          body: '韩国象棋是两方对弈的韩国传统棋类游戏。将对方的将（楚或汉）逼入将死即可获胜。核心在于守护己方的将，同时攻击对方的将。',
+          example: null,
+        },
+        {
+          title: '将军 (Check)',
+          body: '当对方的将在下一步可能被吃掉时，称为将军。被将军时，必须解除威胁：将移到安全之处、挡住攻击，或吃掉发动攻击的棋子。',
+          example: '车在一条直线上正对对方的将。',
+        },
+        {
+          title: '将死 (Checkmate)',
+          body: '被将军且无论如何都无法解除时，称为将死。若将无法移动、攻击无法阻挡、攻击的棋子也无法吃掉，即为将死，此刻对局结束。',
+          example: '将无安全格可逃，也没有棋子能挡住攻击。',
+        },
+        {
+          title: '取胜条件',
+          body: '将对方逼入将死即可获胜。此外，对方主动认输时立即取胜。',
+          example: null,
+        },
+        {
+          title: '须知',
+          body: '当前版本支持将军、将死及基本胜负规则。逼将（Bikjang）与计分制等部分传统规则将在日后更新中加入。',
+          example: null,
+        },
+      ],
+    },
+    'zh-Hant': {
+      sub: 'JANGGI · 韓國象棋',
+      langLabel: '語言 :',
+      chooseFaction: '請選擇陣營',
+      chuName: '楚', hanName: '漢',
+      chuSub: '先手 · 青綠', hanSub: '後手 · 朱紅',
+      factionNoteDefault: '所選陣營位於棋盤下方 · 楚方始終先行',
+      autoWon: '上一局獲勝 — 本局自動分配為漢方。如需更改，請選擇另一陣營。',
+      autoLost: '上一局落敗 — 本局自動分配為楚方。如需更改，請選擇另一陣營。',
+      setupTitlePre: ' 的佈陣',   // <b>楚</b> 的佈陣
+      autoPick: '自動選擇（隨機）',
+      turnLabel: '行棋', mistStart: '對局開始',
+      undo: '悔棋', reset: '重新開始', flip: '翻轉棋盤',
+      resign: '認輸', resignConfirm: '確定要認輸嗎？',
+      resignYes: '是', resignNo: '否',
+      resigned: (s) => `${s} 認輸 — 已投子`,
+      capByChu: '楚方吃子', capByHan: '漢方吃子',
+      capChuEmpty: '楚方吃掉的棋子', capHanEmpty: '漢方吃掉的棋子',
+      movelogTitle: '棋 譜', movelogEmpty: '尚無棋步',
+      pickPiece: '請選擇棋子',
+      pickDest: '請選擇落點', cantMove: '該棋子無合法走法',
+      notYourTurn: (s) => `現在輪到 ${s} 行棋`,
+      check: (s) => `將軍！請走子保護 ${s} 方的將`,
+      checkWord: '將軍',
+      myFaction: (you, sR, sB) => `我的陣營：${you} · 楚 ${sR} · 漢 ${sB}`,
+      chuFirst: '楚 · 先手', hanSecond: '漢 · 後手',
+      win: (s) => `${s} 方獲勝`,
+      outcomeWin: '勝', outcomeLose: '負',
+      factionWon: (s) => `${s} 方獲勝`,
+      youWon: '你獲勝了 · 下一局執漢',
+      youLost: '你落敗了 · 下一局執楚',
+      outcomeDraw: '和棋', drawLine: '和局',
+      drawStalemate: '無子可動 — 本局為和棋',
+      byCheckmate: (s) => `將死 — ${s} 方獲勝`,
+      byTimeout: (s) => `超時 — ${s} 方獲勝`,
+      undone: '已悔一步',
+      winHint: '若要再下一局，請點擊「重新開始」',
+      aiThinking: '對面正在思考',
+      aiWaking: '正在喚醒 AI 對手',
+      aiFailLong: '正在喚醒 AI 對手。視瀏覽器環境可能會短暫停頓。此刻你可以先自行研究棋局。',
+      aiRetry: '重新喚醒',
+      aiWatch: '只看棋盤',
+      perspMine: '輪到你行棋',
+      perspAi: '對手正在選擇走法',
+      perspHuman: (s) => `輪到 ${s} 行棋`,
+      levelTitle: '今天想怎麼下？',
+      modeCpu: '與電腦對弈', modeCpuSub: '與 AI 對手對局',
+      modeTutorial: '學習象棋', modeTutorialSub: '棋子走法與取勝之道',
+      modeRules: '象棋規則', modeRulesSub: '將軍 · 將死 · 取勝條件',
+      modeHuman: '與人對弈', modeHumanSub: '敬請期待',
+      modeReview: '覆盤', modeReviewSub: '敬請期待',
+      modeComing: '該模式尚未開放',
+      levelPlayCpu: '與電腦對弈',
+      lvBeginnerName: '初學者', lvBeginnerSub: '為初次學習象棋的人準備的對手',
+      lvFriendName: '熟悉的棋友', lvFriendSub: '輕鬆對弈一局的對手',
+      lvMasterName: '老練的棋客', lvMasterSub: '不輕易露出破綻的對手',
+      lvExpertName: '國手', lvExpertSub: '不容許一絲破綻的對手',
+      levelNote: '請選擇心儀的對手 · 每局結束後可重新選擇',
+      settingsBgLabel: '棋盤背景',
+      bgSansuHwa: '山水畫', bgSimple: '簡約', bgWood: '原木', bgSipjangsaeng: '十長生', bgPaper: '韓紙',
+      rulesTitle: '象棋規則',
+      rulesSubtitle: '開局前值得了解的基本規則',
+      rulesExLabel: '範例',
+      rulesClose: '關閉',
+      rulesSections: [
+        {
+          title: '象棋的目標',
+          body: '韓國象棋是兩方對弈的韓國傳統棋類遊戲。將對方的將（楚或漢）逼入將死即可獲勝。核心在於守護己方的將，同時攻擊對方的將。',
+          example: null,
+        },
+        {
+          title: '將軍 (Check)',
+          body: '當對方的將在下一步可能被吃掉時，稱為將軍。被將軍時，必須解除威脅：將移到安全之處、擋住攻擊，或吃掉發動攻擊的棋子。',
+          example: '車在一條直線上正對對方的將。',
+        },
+        {
+          title: '將死 (Checkmate)',
+          body: '被將軍且無論如何都無法解除時，稱為將死。若將無法移動、攻擊無法阻擋、攻擊的棋子也無法吃掉，即為將死，此刻對局結束。',
+          example: '將無安全格可逃，也沒有棋子能擋住攻擊。',
+        },
+        {
+          title: '取勝條件',
+          body: '將對方逼入將死即可獲勝。此外，對方主動認輸時立即取勝。',
+          example: null,
+        },
+        {
+          title: '須知',
+          body: '當前版本支援將軍、將死及基本勝負規則。逼將（Bikjang）與計分制等部分傳統規則將在日後更新中加入。',
+          example: null,
+        },
+      ],
+    },
   };
   function t(key, ...args) {
     // 1순위: 현재 언어 → 2순위: 영어 폴백 → 3순위: 키 그대로(최후의 보루, 화면 안 깨짐)
@@ -299,7 +492,21 @@
     '마상마상': 'Ma Sang-Ma Sang', '상마상마': 'Sang Ma-Sang Ma',
     '마상상마': 'Ma Sang-Sang Ma', '상마마상': 'Sang Ma-Ma Sang',
   };
-  function setupLabel(name) { return lang === 'en' ? (SETUP_ROMAN[name] || name) : name; }
+  // 중국어 상차림 표기 — 馬·象 배치를 한자로 직관화 (보드 위 기물 한자와 통일).
+  const SETUP_ZH_HANS = {
+    '마상마상': '马象马象', '상마상마': '象马象马',
+    '마상상마': '马象象马', '상마마상': '象马马象',
+  };
+  const SETUP_ZH_HANT = {
+    '마상마상': '馬象馬象', '상마상마': '象馬象馬',
+    '마상상마': '馬象象馬', '상마마상': '象馬馬象',
+  };
+  function setupLabel(name) {
+    if (lang === 'en') return SETUP_ROMAN[name] || name;
+    if (lang === 'zh-Hans') return SETUP_ZH_HANS[name] || name;
+    if (lang === 'zh-Hant') return SETUP_ZH_HANT[name] || name;
+    return name;
+  }
 
   let board, turn, selected, legalForSel, history, flipped, gameOver;
 
@@ -2001,6 +2208,8 @@
     elMistText.textContent = t('mistStart');
     langKo.classList.toggle('active', lang === 'ko');
     langEn.classList.toggle('active', lang === 'en');
+    if (langZhHans) langZhHans.classList.toggle('active', lang === 'zh-Hans');
+    if (langZhHant) langZhHant.classList.toggle('active', lang === 'zh-Hant');
     document.documentElement.lang = lang;
     const settingsBgLabel = document.getElementById('settingsBgLabel');
     if (settingsBgLabel) settingsBgLabel.textContent = t('settingsBgLabel');
@@ -2123,6 +2332,8 @@
   setupSkip.onclick = (e) => { e.stopPropagation(); skipSetup(); };
   langKo.onclick = () => { setLang('ko'); closeSettings(); };
   langEn.onclick = () => { setLang('en'); closeSettings(); };
+  if (langZhHans) langZhHans.onclick = () => { setLang('zh-Hans'); closeSettings(); };
+  if (langZhHant) langZhHant.onclick = () => { setLang('zh-Hant'); closeSettings(); };
 
   // ── 장기판 배경 선택 ──────────────────────────────────────
   // bg: 'sansuHwa'(기본) | 'simple'. 배경 추가 시 BG_LIST에만 추가하면 됨.
