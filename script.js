@@ -122,6 +122,7 @@
       levelTitle: '오늘은 어떻게 두실까요?',
       modeCpu: '컴퓨터와 두기', modeCpuSub: 'AI 상대와 대국',
       modeTutorial: '장기 배우기', modeTutorialSub: '기물 행마법과 이기는 방법',
+      modeRules: '장기 규칙', modeRulesSub: '장군·외통·승리 조건',
       modeHuman: '사람과 두기', modeHumanSub: '준비 중입니다',
       modeReview: '복기하기', modeReviewSub: '준비 중입니다',
       modeComing: '아직 준비 중입니다',
@@ -133,6 +134,37 @@
       levelNote: '마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다',
       settingsBgLabel: '장기판 배경',
       bgSansuHwa: '산수화', bgSimple: '심플', bgWood: '원목', bgSipjangsaeng: '십장생', bgPaper: '한지',
+      rulesTitle: '장기 규칙',
+      rulesSubtitle: '게임을 시작하기 전에 알아두면 좋은 기본 규칙',
+      rulesExLabel: '예시',
+      rulesClose: '닫기',
+      rulesSections: [
+        {
+          title: '장기의 목표',
+          body: '장기는 두 진영이 겨루는 한국의 전통 보드게임입니다. 상대의 왕(楚 또는 漢)을 외통으로 몰아넣으면 승리합니다. 내 왕을 지키면서 상대의 왕을 공격하는 것이 핵심입니다.',
+          example: null,
+        },
+        {
+          title: '장군 (Check)',
+          body: '상대의 왕을 다음 수에 잡을 수 있는 상태를 장군이라고 합니다. 장군을 받으면 반드시 왕을 안전한 곳으로 옮기거나, 공격을 막거나, 공격하는 기물을 잡아 위협에서 벗어나야 합니다.',
+          example: '차가 상대의 왕을 일직선으로 겨누고 있는 경우.',
+        },
+        {
+          title: '외통 (Checkmate)',
+          body: '장군을 받았지만 어떤 방법으로도 벗어날 수 없는 상태를 외통이라고 합니다. 왕을 옮길 수도, 공격을 막을 수도, 공격하는 기물을 잡을 수도 없으면 외통이며, 이 순간 대국이 끝납니다.',
+          example: '왕이 도망갈 칸이 모두 막혀 있고, 공격을 막을 기물도 없는 경우.',
+        },
+        {
+          title: '승리 조건',
+          body: '상대를 외통으로 몰면 승리합니다. 또한 상대가 스스로 돌을 던지면 그 즉시 이깁니다.',
+          example: null,
+        },
+        {
+          title: '알아두기',
+          body: '현재 버전은 장군, 외통, 기본 승패 규칙을 지원합니다. 빅장과 점수제 등 일부 전통 규칙은 향후 업데이트 예정입니다.',
+          example: null,
+        },
+      ],
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -185,6 +217,7 @@
       levelTitle: 'How would you like to play today?',
       modeCpu: 'Play with Computer', modeCpuSub: 'Play against the AI',
       modeTutorial: 'Learn Janggi', modeTutorialSub: 'How pieces move and how to win',
+      modeRules: 'Rules', modeRulesSub: 'Check, checkmate, how to win',
       modeHuman: 'Play with a Friend', modeHumanSub: 'Coming soon',
       modeReview: 'Review a Game', modeReviewSub: 'Coming soon',
       modeComing: 'This mode is not yet available',
@@ -196,6 +229,37 @@
       levelNote: 'Choose your opponent · you can pick again after each game',
       settingsBgLabel: 'Board Background',
       bgSansuHwa: 'Ink Wash', bgSimple: 'Simple', bgWood: 'Wood', bgSipjangsaeng: 'Sipjangsaeng', bgPaper: 'Hanji',
+      rulesTitle: 'How to Play Janggi',
+      rulesSubtitle: "The basics you'll want to know before your first game",
+      rulesExLabel: 'Example',
+      rulesClose: 'Close',
+      rulesSections: [
+        {
+          title: 'The Goal',
+          body: "Janggi is a traditional Korean board game played between two sides. You win by trapping your opponent's General (楚 or 漢) in checkmate. The key is to defend your own General while attacking your opponent's.",
+          example: null,
+        },
+        {
+          title: 'Check',
+          body: "When your opponent's General could be captured on the next move, it is in check. A General in check must escape the threat: move to a safe spot, block the attack, or capture the attacking piece.",
+          example: 'A Chariot lined up directly against the opposing General.',
+        },
+        {
+          title: 'Checkmate',
+          body: 'When a General is in check and cannot escape by any means, it is checkmate. If the General cannot move, the attack cannot be blocked, and the attacking piece cannot be captured, it is checkmate and the game ends.',
+          example: 'The General has no safe square to flee to, and no piece can block the attack.',
+        },
+        {
+          title: 'How to Win',
+          body: 'Trap your opponent in checkmate to win. You also win immediately if your opponent resigns.',
+          example: null,
+        },
+        {
+          title: 'Good to Know',
+          body: 'This version supports check, checkmate, and basic win conditions. Some traditional rules, such as Bikjang and the scoring system, are planned for a future update.',
+          example: null,
+        },
+      ],
     },
   };
   function t(key, ...args) {
@@ -812,6 +876,7 @@
   const MODE_LIST = [
     { id: 'cpu',      nameKey: 'modeCpu',      subKey: 'modeCpuSub',      icon: '弈', active: true  },
     { id: 'tutorial', nameKey: 'modeTutorial', subKey: 'modeTutorialSub', icon: '學', active: true  },
+    { id: 'rules',    nameKey: 'modeRules',    subKey: 'modeRulesSub',    icon: '則', active: true  },
     { id: 'human',    nameKey: 'modeHuman',    subKey: 'modeHumanSub',    icon: '對', active: false },
     { id: 'review',   nameKey: 'modeReview',   subKey: 'modeReviewSub',   icon: '譜', active: false },
   ];
@@ -850,9 +915,72 @@
       showLevelGrid();
     } else if (id === 'tutorial') {
       enterTutorial();
+    } else if (id === 'rules') {
+      openRulesOverlay();
     }
     // human / review: 추후 분기 추가
   }
+
+  // ── 장기 규칙 오버레이 ─────────────────────────────────────
+  const rulesOverlay = document.getElementById('rulesOverlay');
+  const rulesBackdrop = document.getElementById('rulesBackdrop');
+  const rulesPanelBody = document.getElementById('rulesBody');
+  const rulesCloseBtn = document.getElementById('rulesClose');
+
+  function renderRules() {
+    document.getElementById('rulesTitle').textContent = t('rulesTitle');
+    const subEl = document.getElementById('rulesSubtitle');
+    if (subEl) subEl.textContent = t('rulesSubtitle');
+    rulesCloseBtn.setAttribute('aria-label', t('rulesClose'));
+    const sections = t('rulesSections') || [];
+    rulesPanelBody.innerHTML = '';
+    sections.forEach((sec, i) => {
+      const card = document.createElement('div');
+      card.className = 'rules-section';
+      const num = document.createElement('span');
+      num.className = 'rules-num';
+      num.textContent = String(i + 1);
+      const title = document.createElement('h3');
+      title.className = 'rules-section-title';
+      title.textContent = sec.title;
+      const body = document.createElement('p');
+      body.className = 'rules-section-body';
+      body.textContent = sec.body;
+      card.appendChild(num);
+      card.appendChild(title);
+      card.appendChild(body);
+      if (sec.example) {
+        const ex = document.createElement('div');
+        ex.className = 'rules-section-ex';
+        const exLabel = document.createElement('span');
+        exLabel.className = 'rules-ex-label';
+        exLabel.textContent = t('rulesExLabel');
+        const exText = document.createElement('p');
+        exText.className = 'rules-ex-text';
+        exText.textContent = sec.example;
+        ex.appendChild(exLabel);
+        ex.appendChild(exText);
+        card.appendChild(ex);
+      }
+      rulesPanelBody.appendChild(card);
+    });
+  }
+
+  function openRulesOverlay() {
+    renderRules();
+    rulesOverlay.style.display = '';
+    rulesPanelBody.scrollTop = 0;
+    document.addEventListener('keydown', rulesEscHandler);
+  }
+  function closeRulesOverlay() {
+    rulesOverlay.style.display = 'none';
+    document.removeEventListener('keydown', rulesEscHandler);
+  }
+  function rulesEscHandler(e) {
+    if (e.key === 'Escape') closeRulesOverlay();
+  }
+  rulesCloseBtn.onclick = closeRulesOverlay;
+  rulesBackdrop.onclick = closeRulesOverlay;
 
   // 진영 선택 단계로 진입 (강도는 직전 강도 선택에서 정해진 상태)
   function startFactionStep() {
@@ -1867,6 +1995,10 @@
     if (next === lang) return;
     lang = next;
     applyStaticI18n();
+    // 규칙 오버레이가 열려 있으면 새 언어로 다시 그림
+    if (rulesOverlay && rulesOverlay.style.display !== 'none') {
+      renderRules();
+    }
     // 튜토리얼 중이면 사이드 패널만 재렌더
     if (tutorialMode) {
       if (tutorialPieceOverlay.style.display !== 'none') {

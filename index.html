@@ -20,9 +20,11 @@
       <div class="settings-divider"></div>
       <div class="settings-section-label" id="settingsBgLabel">장기판 배경</div>
       <button id="bgSansuHwa" class="lang-btn bg-btn active">산수화</button>
-      <button id="bgSimple" class="lang-btn bg-btn">심플</button>
       <button id="bgWood" class="lang-btn bg-btn">원목</button>
       <button id="bgSipjangsaeng" class="lang-btn bg-btn">십장생</button>
+      <button id="bgPaper" class="lang-btn bg-btn">한지</button>
+      <!-- 심플 배경은 접근성/고대비 모드용으로 잠시 보류. 필요 시 아래 주석 해제 + BG_LIST의 simple 항목 복구 -->
+      <!-- <button id="bgSimple" class="lang-btn bg-btn">심플</button> -->
     </div>
   </div>
 
@@ -104,6 +106,21 @@
         </div>
       </div>
     </aside>
+  </div>
+</div>
+
+<!-- 장기 규칙 오버레이 (모드 메뉴 "장기 규칙"에서 열림) -->
+<div class="rules-overlay" id="rulesOverlay" style="display:none">
+  <div class="rules-backdrop" id="rulesBackdrop"></div>
+  <div class="rules-panel" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <div class="rules-head">
+      <div class="rules-head-text">
+        <h2 class="rules-title" id="rulesTitle">장기 규칙</h2>
+        <p class="rules-subtitle" id="rulesSubtitle">게임을 시작하기 전에 알아두면 좋은 기본 규칙</p>
+      </div>
+      <button class="rules-close" id="rulesClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="rules-body" id="rulesBody"><!-- renderRules()가 채움 --></div>
   </div>
 </div>
 
