@@ -15,6 +15,7 @@ The assets fall into two categories: **(1) visual assets created by Hanrim**
 
 - `assets/board/` — ink-wash (Sansuhwa) board background images (upright / 180°)
 - `assets/pieces/` — Baekja-theme piece images (7 each for the teal and red sides)
+- `assets/screenshots/` — screenshots used in documentation (e.g. the README), which depict the assets above
 - any theme / background / UI images added later
 
 ### Rights

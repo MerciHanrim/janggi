@@ -1,11 +1,15 @@
 # Janggi · Korean Chess
 
-A browser-based Korean Janggi game with AI opponents, interactive tutorials, multilingual support, and traditional Korean board themes.
+Traditional Korean Janggi in your browser — AI opponents, interactive tutorials, multilingual support, and handcrafted Korean-inspired board themes.
 
 [![License: GPL v3](https://img.shields.io/badge/Code%20License-GPLv3-blue.svg)](LICENSE)
 [![Assets: All Rights Reserved](https://img.shields.io/badge/Assets-All%20Rights%20Reserved-lightgrey.svg)](ASSETS_LICENSE.md)
 
 **[▶ Play Online](https://korea-janggi.pages.dev)**
+
+![Janggi — Sansuhwa (ink-wash landscape) board at the starting position](assets/screenshots/janggi-screenshot.jpg)
+
+> The Sansuhwa (ink-wash landscape) board at the opening setup. Visual assets are All Rights Reserved — see [ASSETS_LICENSE.md](ASSETS_LICENSE.md).
 
 ---
 
