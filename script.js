@@ -233,9 +233,9 @@
   //     ★ 약한 AI라고 빨리 두지 않음(빠르면 약한 게 아니라 "계산기 느낌"). 초심자도 최소 2.5초.
   //     강할수록 살짝 더 신중(사람도 그러함). 셋 다 "다실에서 고민하는 호흡" 안에 머묾.
   const AI_LEVELS = {
-    beginner: { skill: 0,  depth: 3,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — 처음 두는 사람도 이겨볼 수 있는 바닥값 (skill2/depth5에서도 밀려서 하향)
-    friend:   { skill: 6,  depth: 8,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — 가끔 이기고 가끔 지는 중간(추측)
-    master:   { skill: 12, depth: 12, thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — ★검증된 현행 배포 강도(한림·mj님 둘 다 "못 이김")
+    beginner: { skill: 0,  depth: 1,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — depth 1로 하향. 앞을 거의 못 보는 수준. "이겨보는 경험" 우선.
+    friend:   { skill: 3,  depth: 4,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — 초심자↔노련한 기객 계단 유지용 하향(추측). 가끔 이기고 가끔 지는 중간.
+    master:   { skill: 6,  depth: 8,  thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — skill 6/depth 8. 계단 유지용(추측).
     expert:   { skill: 20, depth: 15, thinkMin: 4000, thinkMax: 5500 },   // 🎍 대국수 — (비공개 예약) 고수층 데이터 쌓이면 공개
   };
   // ★ UI에 노출할 강도 순서. expert는 의도적으로 제외(값만 살아있음).
