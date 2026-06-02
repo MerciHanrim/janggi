@@ -67,8 +67,22 @@
   };
 
   // ── i18n: UI 문구만 번역. 기물 한자·상차림 배치는 불변 ──────────
-  // 시작 언어: 브라우저가 한국어면 ko, 아니면 en
-  let lang = (navigator.language || 'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en';
+  // 개발 중에만 누락 키 경고를 띄우는 플래그. 배포 시 false 유지(콘솔 깨끗).
+  const DEBUG_I18N = false;
+  // 언어 선택 저장 키. 새로고침/재방문 시 이 값을 먼저 본다.
+  const LANG_STORE_KEY = 'janggi.lang';
+  // 지원 언어 목록 (저장값 검증용 — 모르는 값이 저장돼 있으면 무시).
+  const SUPPORTED_LANGS = ['ko', 'en'];
+  // 브라우저 언어 추측: 한국어면 ko, 아니면 en.
+  function detectLang() {
+    return (navigator.language || 'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en';
+  }
+  // 시작 언어: 저장값이 있으면 그걸 쓰고, 없거나 모르는 값이면 브라우저 추측.
+  let lang = detectLang();
+  try {
+    const saved = localStorage.getItem(LANG_STORE_KEY);
+    if (saved && SUPPORTED_LANGS.includes(saved)) lang = saved;
+  } catch (e) { /* localStorage 차단(사생활 모드 등) 시 추측값 그대로 */ }
 
   const I18N = {
     ko: {
@@ -263,9 +277,20 @@
     },
   };
   function t(key, ...args) {
-    const v = (I18N[lang] && I18N[lang][key]);
+    // 1순위: 현재 언어 → 2순위: 영어 폴백 → 3순위: 키 그대로(최후의 보루, 화면 안 깨짐)
+    let v = (I18N[lang] && I18N[lang][key]);
+    if (v == null && lang !== 'en') {
+      // 현재 언어에 키가 없음 → 영어로 폴백. 개발 중에는 어떤 키가 빠졌는지 알린다.
+      if (DEBUG_I18N) console.warn(`[i18n] Missing "${key}" for "${lang}" → en fallback`);
+      v = (I18N.en && I18N.en[key]);
+    }
+    if (v == null) {
+      // 영어에도 없음 → 키를 그대로 노출(눈에 띄게 해서 빠진 곳을 잡게 함).
+      if (DEBUG_I18N) console.warn(`[i18n] Missing "${key}" in all langs → key shown`);
+      return key;
+    }
     if (typeof v === 'function') return v(...args);
-    return v != null ? v : key;
+    return v;
   }
   // 진영 표기 (언어별). 자리(r/b) → 표기. 기물 한자와 무관한 UI 라벨.
   function factionLabel(side) { return side === 'r' ? t('chuName') : t('hanName'); }
@@ -1994,6 +2019,9 @@
   function setLang(next) {
     if (next === lang) return;
     lang = next;
+    // 선택을 저장 → 새로고침·재방문 시 navigator 추측 대신 이 값을 먼저 쓴다.
+    try { localStorage.setItem(LANG_STORE_KEY, next); }
+    catch (e) { /* localStorage 차단 시 저장만 생략, 동작은 그대로 */ }
     applyStaticI18n();
     // 규칙 오버레이가 열려 있으면 새 언어로 다시 그림
     if (rulesOverlay && rulesOverlay.style.display !== 'none') {
