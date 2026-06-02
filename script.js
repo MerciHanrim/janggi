@@ -553,7 +553,6 @@
     tutorialMovesLeft = 0;
     tutorialPieceOverlay.style.display = 'none';
     loadTutorialBoard(scenario);
-    frame.classList.add('tut-intro');   // intro 중 보드 클릭 차단 시각화
     renderTutorialSidePanel(id);
   }
 
@@ -570,14 +569,7 @@
     legalForSel = [];
     moveLog = [];
     drawGrid();
-    // setupOverlay가 닫힌 직후라 frame 폭이 reflow 전일 수 있음.
-    // rAF 2회로 레이아웃이 실제로 적용된 뒤 크기를 재계산하고 render.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        sizeBoard();
-        render();
-      });
-    });
+    render();
   }
 
   // 미션 시작 (자유연습 → 미션 phase)
@@ -670,7 +662,6 @@
     const introStartBtn = document.getElementById('tutIntroStartBtn');
     if (introStartBtn) introStartBtn.onclick = () => {
       tutorialPhase = 'practice';
-      frame.classList.remove('tut-intro');   // 클릭 차단 해제
       renderTutorialSidePanel(tutorialScenario);
     };
 
@@ -685,7 +676,6 @@
       tutorialScenario = null;
       tutorialPhase = 'practice';
       board = null;
-      frame.classList.remove('tut-intro');   // intro 차단 클래스 정리
       piecesLayer.innerHTML = '';
       showTutorialPieceSelect();
     };
@@ -752,7 +742,6 @@
     tutorialMovesLeft = 0;
     board = null;
     tutorialPieceOverlay.style.display = 'none';
-    frame.classList.remove('tut-intro');   // intro 차단 클래스 정리
 
     capR.style.display = '';
     capB.style.display = '';
@@ -1921,6 +1910,25 @@
   settingsBackdrop.onclick = closeSettings;
 
   window.addEventListener('resize', () => { sizeBoard(); });
+
+  // ── 모바일 AudioContext unlock ──────────────────────────────
+  // 모바일 브라우저는 사용자 제스처 없이 AudioContext를 시작하지 않음.
+  // 첫 터치/클릭 시 AudioContext를 미리 생성·resume해두면 이후 소리가 정상 재생됨.
+  function unlockAudio() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    if (!_audioCtx) _audioCtx = new Ctx();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    // 무음 버퍼를 한 번 재생해 unlock (구형 iOS Safari 대응)
+    const buf = _audioCtx.createBuffer(1, 1, 22050);
+    const src = _audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(_audioCtx.destination);
+    src.start(0);
+  }
+  document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+  document.addEventListener('touchend',   unlockAudio, { once: true, passive: true });
+  document.addEventListener('click',      unlockAudio, { once: true });
 
   applyStaticI18n();   // 시작 언어(브라우저 기준) 정적 문구 적용
   reset();
