@@ -628,13 +628,27 @@
   .setup-panel {
     width: 100%;
     max-width: 500px;
-    max-height: 92vh;
+    max-height: calc(100vh - 32px);   /* overlay padding(16px×2) 제외 */
     overflow-y: auto;
     background: linear-gradient(160deg, var(--paper), var(--paper-deep));
     border: 2px solid var(--gold);
     border-radius: 5px;
     padding: 30px 28px;
     box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  }
+  /* 가로 모드: 뷰포트 높이가 짧으므로 패널 padding 축소 + 제목 margin 축소 */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .setup-panel { padding: 18px 22px; }
+    .setup-title { font-size: 1.1rem; margin-bottom: 14px; }
+    .level-play  { margin-bottom: 10px; }
+    .level-grid  { gap: 7px; }
+    .level-card  { padding: 10px 14px; }
+    .level-note  { margin-top: 10px; }
+    .faction-grid { gap: 9px; }
+    .faction-card { padding: 14px 10px 12px; }
+    .setup-grid  { gap: 9px; }
+    .setup-card  { padding: 9px 10px 8px; }
+    .setup-skip  { margin-top: 12px; padding: 9px; }
   }
   .setup-title {
     text-align: center;
