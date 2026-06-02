@@ -665,7 +665,9 @@
     // 버튼 핸들러 바인딩
     const introStartBtn = document.getElementById('tutIntroStartBtn');
     if (introStartBtn) introStartBtn.onclick = () => {
+      playPickSound();
       tutorialPhase = 'practice';
+      frame.classList.remove('tut-intro');
       renderTutorialSidePanel(tutorialScenario);
     };
 
@@ -673,7 +675,7 @@
     if (missionStartBtn) missionStartBtn.onclick = () => startTutorialMission();
 
     const retryBtn = document.getElementById('tutRetryBtn');
-    if (retryBtn) retryBtn.onclick = () => startTutorialScenario(tutorialScenario);
+    if (retryBtn) retryBtn.onclick = () => { playPickSound(); startTutorialScenario(tutorialScenario); };
 
     const nextPieceBtn = document.getElementById('tutNextPieceBtn');
     if (nextPieceBtn) nextPieceBtn.onclick = () => {
@@ -823,7 +825,7 @@
         `<span class="mode-text"><span class="mode-name">${t(m.nameKey)}</span>` +
         `<span class="mode-sub">${t(m.subKey)}</span></span>`;
       if (m.active) {
-        card.onclick = (e) => { e.stopPropagation(); onModeSelect(m.id); };
+        card.onclick = (e) => { e.stopPropagation(); playPickSound(); onModeSelect(m.id); };
       } else {
         card.onclick = (e) => { e.stopPropagation(); showComingSoon(card); };
       }
@@ -883,7 +885,7 @@
         `<div class="lv-emoji">${meta.emoji}</div>` +
         `<div class="lv-text"><div class="lv-name">${t(meta.nameKey)}</div>` +
         `<div class="lv-sub">${t(meta.subKey)}</div></div>`;
-      card.onclick = (e) => { e.stopPropagation(); chooseLevel(id, card); };
+      card.onclick = (e) => { e.stopPropagation(); playPickSound(); chooseLevel(id, card); };
       levelGrid.appendChild(card);
     }
     if (levelStepTitle) levelStepTitle.textContent = t('levelTitle');
@@ -920,7 +922,7 @@
       card.innerHTML =
         `<div class="fc-piece"><img src="${c.img}" alt="${c.name}" draggable="false"></div>` +
         `<div class="fc-name">${c.name}<span class="fc-sub">${c.sub}</span></div>`;
-      card.onclick = (e) => { e.stopPropagation(); chooseFaction(c.id); };
+      card.onclick = (e) => { e.stopPropagation(); playPickSound(); chooseFaction(c.id); };
       factionGrid.appendChild(card);
     }
     if (autoAssigned) {
@@ -974,7 +976,7 @@
       card.innerHTML =
         `<div class="mini">${miniBoardHTML(side, name)}</div>` +
         `<div class="name">${setupLabel(name)}</div>`;
-      card.onclick = (e) => { e.stopPropagation(); chooseSetup(side, name); };
+      card.onclick = (e) => { e.stopPropagation(); playPickSound(); chooseSetup(side, name); };
       setupGrid.appendChild(card);
     }
     setupSkip.textContent = t('autoPick');
@@ -1941,9 +1943,9 @@
   };
   elResignNo.onclick = () => { resignConfirmBox.classList.remove('show'); };
   elResignYes.onclick = () => {
+    playPickSound();
     resignConfirmBox.classList.remove('show');
     if (gameOver) return;
-    // 현재 차례(turn) 쪽이 항복 → 상대가 승리
     const loser = turn;
     const winner = (turn === 'r') ? 'b' : 'r';
     setStatus(t('resigned', factionLabel(loser)));
