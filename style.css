@@ -1148,6 +1148,20 @@
     z-index: 299;
   }
   .settings-backdrop.open { display: block; }
+  /* 설정 드롭다운 구분선 */
+  .settings-divider {
+    height: 1px;
+    background: rgba(107,93,72,0.2);
+    margin: 6px 0;
+  }
+  /* 장기판 배경 테마 — board-frame에 클래스로 전환 */
+  /* 기본(산수화)은 기존 ::before 그대로 */
+  .board-frame.bg-simple::before {
+    background: #f3eee3;
+  }
+  .board-frame.bg-simple.flipped::before {
+    background: #f3eee3;
+  }
   /* 항복 확인 */
   .resign-confirm {
     display: none;

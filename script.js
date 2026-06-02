@@ -131,6 +131,8 @@
       lvMasterName: '노련한 기객', lvMasterSub: '쉽게 빈틈을 보이지 않는 상대',
       lvExpertName: '대국수', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
       levelNote: '마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다',
+      settingsBgLabel: '장기판 배경',
+      bgSansuHwa: '산수화', bgSimple: '심플',
     },
     en: {
       sub: 'JANGGI · Korean Chess',
@@ -192,6 +194,8 @@
       lvMasterName: 'Seasoned Player', lvMasterSub: 'Rarely leaves an opening',
       lvExpertName: 'Master', lvExpertSub: 'Allows not a single opening',
       levelNote: 'Choose your opponent · you can pick again after each game',
+      settingsBgLabel: 'Board Background',
+      bgSansuHwa: 'Ink Wash', bgSimple: 'Simple',
     },
   };
   function t(key, ...args) {
@@ -1843,6 +1847,12 @@
     langKo.classList.toggle('active', lang === 'ko');
     langEn.classList.toggle('active', lang === 'en');
     document.documentElement.lang = lang;
+    const settingsBgLabel = document.getElementById('settingsBgLabel');
+    if (settingsBgLabel) settingsBgLabel.textContent = t('settingsBgLabel');
+    const bgSansuHwaBtn = document.getElementById('bgSansuHwa');
+    if (bgSansuHwaBtn) bgSansuHwaBtn.textContent = t('bgSansuHwa');
+    const bgSimpleBtn = document.getElementById('bgSimple');
+    if (bgSimpleBtn) bgSimpleBtn.textContent = t('bgSimple');
   }
 
   function setLang(next) {
@@ -1945,6 +1955,28 @@
   setupSkip.onclick = (e) => { e.stopPropagation(); skipSetup(); };
   langKo.onclick = () => { setLang('ko'); closeSettings(); };
   langEn.onclick = () => { setLang('en'); closeSettings(); };
+
+  // ── 장기판 배경 선택 ──────────────────────────────────────
+  // bg: 'sansuHwa'(기본) | 'simple'. 배경 추가 시 BG_LIST에만 추가하면 됨.
+  let boardBg = 'sansuHwa';
+  const BG_LIST = [
+    { id: 'sansuHwa', cls: '',          btnId: 'bgSansuHwa' },
+    { id: 'simple',   cls: 'bg-simple', btnId: 'bgSimple'   },
+  ];
+  function applyBoardBg(id) {
+    boardBg = id;
+    // frame 클래스 교체
+    for (const b of BG_LIST) frame.classList.remove(b.cls);
+    const target = BG_LIST.find(b => b.id === id);
+    if (target && target.cls) frame.classList.add(target.cls);
+    // 버튼 active 표시
+    for (const b of BG_LIST) {
+      const btn = document.getElementById(b.btnId);
+      if (btn) btn.classList.toggle('active', b.id === id);
+    }
+  }
+  document.getElementById('bgSansuHwa').onclick = () => { applyBoardBg('sansuHwa'); };
+  document.getElementById('bgSimple').onclick   = () => { applyBoardBg('simple'); };
 
   // ⚙ 설정 드롭다운 토글
   function openSettings() {
