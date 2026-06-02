@@ -291,10 +291,10 @@
 
   // ── 튜토리얼 모드 ────────────────────────────────────────
   //   tutorialMode: true면 대국 상태(turn/aiSide/history/moveLog)와 완전 분리.
-  //   phase: 'practice'(자유연습) → 'mission'(미션) → 'success'/'fail'
+  //   phase: 'intro'(설명) → 'practice'(자유연습) → 'mission'(미션) → 'success'/'fail'
   let tutorialMode = false;
   let tutorialScenario = null;
-  let tutorialPhase = 'practice';   // 'practice' | 'mission' | 'success' | 'fail'
+  let tutorialPhase = 'intro';   // 'intro' | 'practice' | 'mission' | 'success' | 'fail'
   let tutorialMovesLeft = 0;        // 미션 남은 수
 
   // 기물 선택 오버레이 DOM
@@ -436,6 +436,7 @@
       tutSoldierMission: '3수 안에 적 병을 잡아보세요.',
       // 공통 UI
       tutPracticeStart: '연습했어요',
+      tutIntroStart: '직접 움직여 보기',
       tutMovesLeft: (n) => `남은 수: ${n}`,
       tutSuccess: '성공!',
       tutSuccessMsg: (n) => `${n}수 안에 적 기물을 잡았습니다.`,
@@ -474,6 +475,7 @@
       tutKingMission: 'Capture the enemy soldier within 4 moves.',
       tutSoldierMission: 'Capture the enemy soldier within 3 moves.',
       tutPracticeStart: 'Start Mission',
+      tutIntroStart: 'Try Moving It',
       tutMovesLeft: (n) => `Moves left: ${n}`,
       tutSuccess: 'Success!',
       tutSuccessMsg: (n) => `You captured the enemy piece within ${n} moves.`,
@@ -542,12 +544,12 @@
     }
   }
 
-  // 시나리오 시작 (자유연습 phase로)
+  // 시나리오 시작 (intro phase로 — 설명 확인 후 연습 진입)
   function startTutorialScenario(id) {
     const scenario = TUTORIAL_SCENARIOS[id];
     if (!scenario) return;
     tutorialScenario = id;
-    tutorialPhase = 'practice';
+    tutorialPhase = 'intro';
     tutorialMovesLeft = 0;
     tutorialPieceOverlay.style.display = 'none';
     loadTutorialBoard(scenario);
@@ -604,6 +606,14 @@
     let html = '';
     if (!scenario) {
       // 기물 선택 전 빈 상태
+    } else if (phase === 'intro') {
+      html =
+        `<div class="tut-desc">${tt(scenario.descKey)}</div>` +
+        `<div class="tut-buttons">` +
+        `<button class="tut-btn tut-mission-start" id="tutIntroStartBtn">${tt('tutIntroStart')}</button>` +
+        `<button class="tut-btn tut-next-piece" id="tutNextPieceBtn">${tt('tutNextPiece')}</button>` +
+        `<button class="tut-btn tut-exit" id="tutExitBtn">${tt('tutExit')}</button>` +
+        `</div>`;
     } else if (phase === 'practice') {
       html =
         `<div class="tut-desc">${tt(scenario.descKey)}</div>` +
@@ -649,6 +659,12 @@
     tutPanel.innerHTML = html;
 
     // 버튼 핸들러 바인딩
+    const introStartBtn = document.getElementById('tutIntroStartBtn');
+    if (introStartBtn) introStartBtn.onclick = () => {
+      tutorialPhase = 'practice';
+      renderTutorialSidePanel(tutorialScenario);
+    };
+
     const missionStartBtn = document.getElementById('tutMissionStartBtn');
     if (missionStartBtn) missionStartBtn.onclick = () => startTutorialMission();
 
@@ -671,14 +687,15 @@
     turnLabel.textContent = '';
     elTurnSuffix.textContent = '';
     turnPersp.textContent = '';
-    if (phase === 'practice' && scenario) setStatus(tt(scenario.practiceActionKey));
+    if (phase === 'intro' && scenario) setStatus(tt(scenario.practiceActionKey));
+    else if (phase === 'practice' && scenario) setStatus(tt(scenario.practiceActionKey));
     else if (phase === 'mission') setStatus(tt('tutMovesLeft', tutorialMovesLeft));
     else setStatus('');
   }
 
   // 튜토리얼 전용 이동
   function doTutorialMove(tr, tc) {
-    const [fr, fc] = selected;
+    if (tutorialPhase === 'intro') return;
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     const captured = res.captured;
     board = res.board;
@@ -1155,6 +1172,7 @@
     if (gameOver) return;
     // ★ 튜토리얼 모드: AI 없음, turn 체크 없이 플레이어(r) 기물만 선택 가능
     if (tutorialMode) {
+      if (tutorialPhase === 'intro') return;    // intro 중엔 기물 선택 차단
       const p = board[r][c];
       if (selected && legalForSel.some(([rr, cc]) => rr === r && cc === c)) {
         doTutorialMove(r, c);
