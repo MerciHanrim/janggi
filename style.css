@@ -623,6 +623,7 @@
     z-index: 200;
     backdrop-filter: blur(3px);
     padding: 16px;
+    overflow-y: auto;   /* 패널이 viewport보다 길 때 overlay 자체가 스크롤 */
   }
   .setup-overlay.show { display: flex; animation: fadein 0.35s; }
   .setup-panel {
@@ -637,7 +638,7 @@
     box-shadow: 0 16px 40px rgba(0,0,0,0.5);
   }
   /* 가로 모드: 뷰포트 높이가 짧으므로 패널 padding 축소 + 제목 margin 축소 */
-  @media (orientation: landscape) and (max-height: 500px) {
+  @media (orientation: landscape) and (max-height: 680px) {
     .setup-panel { padding: 18px 22px; }
     .setup-title { font-size: 1.1rem; margin-bottom: 14px; }
     .level-play  { margin-bottom: 10px; }
