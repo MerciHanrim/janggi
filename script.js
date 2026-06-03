@@ -179,6 +179,11 @@
           example: '차가 상대의 왕을 일직선으로 겨누고 있는 경우.',
         },
         {
+          title: '양수겸장 (Double Check)',
+          body: '한 수로 두 기물이 동시에 왕을 노리는 경우를 양수겸장이라고 합니다. 두 위협을 한 번에 막을 수는 없으므로, 두 공격을 모두 피하려면 왕을 안전한 칸으로 옮기는 길밖에 없습니다. 옮길 곳마저 없으면 외통입니다.',
+          example: '왕을 막고 있던 기물이 비켜서며, 그 자리 뒤의 기물과 비켜선 기물이 함께 왕을 겨누는 경우.',
+        },
+        {
           title: '외통 (Checkmate)',
           body: '장군을 받았지만 어떤 방법으로도 벗어날 수 없는 상태를 외통이라고 합니다. 왕을 옮길 수도, 공격을 막을 수도, 공격하는 기물을 잡을 수도 없으면 외통이며, 이 순간 대국이 끝납니다.',
           example: '왕이 도망갈 칸이 모두 막혀 있고, 공격을 막을 기물도 없는 경우.',
@@ -274,6 +279,11 @@
           example: 'A Chariot lined up directly against the opposing General.',
         },
         {
+          title: 'Double Check',
+          body: 'When a single move puts two pieces in attack on the General at once, it is a double check. No single block or capture can answer both threats, so the only escape is to move the General to a safe square. If it has nowhere to go, it is checkmate.',
+          example: 'A piece shielding the General steps aside, so that it and the piece behind it both attack the General at the same time.',
+        },
+        {
           title: 'Checkmate',
           body: 'When a General is in check and cannot escape by any means, it is checkmate. If the General cannot move, the attack cannot be blocked, and the attacking piece cannot be captured, it is checkmate and the game ends.',
           example: 'The General has no safe square to flee to, and no piece can block the attack.',
@@ -364,6 +374,11 @@
           title: '将军 (Check)',
           body: '当对方的将在下一步可能被吃掉时，称为将军。被将军时，必须解除威胁：将移到安全之处、挡住攻击，或吃掉发动攻击的棋子。',
           example: '车在一条直线上正对对方的将。',
+        },
+        {
+          title: '双将 (Double Check)',
+          body: '一步之内有两枚棋子同时将军，称为双将。由于无法一次挡住或吃掉两个威胁，唯一的解法是把将移到安全格。若无处可移，即为将死。',
+          example: '原本挡在将前的棋子让开，使它与其身后的棋子同时正对将。',
         },
         {
           title: '将死 (Checkmate)',
@@ -458,6 +473,11 @@
           example: '車在一條直線上正對對方的將。',
         },
         {
+          title: '雙將 (Double Check)',
+          body: '一步之內有兩枚棋子同時將軍，稱為雙將。由於無法一次擋住或吃掉兩個威脅，唯一的解法是把將移到安全格。若無處可移，即為將死。',
+          example: '原本擋在將前的棋子讓開，使它與其身後的棋子同時正對將。',
+        },
+        {
           title: '將死 (Checkmate)',
           body: '被將軍且無論如何都無法解除時，稱為將死。若將無法移動、攻擊無法阻擋、攻擊的棋子也無法吃掉，即為將死，此刻對局結束。',
           example: '將無安全格可逃，也沒有棋子能擋住攻擊。',
@@ -548,6 +568,11 @@
           title: '王手（Check）',
           body: '相手の王を次の手で取れる状態を王手といいます。王手をかけられたら、必ず脅威から逃れなければなりません：王を安全な場所へ動かす、攻撃を遮る、または攻めている駒を取る、のいずれかです。',
           example: '車（チャ）が相手の王を一直線に狙っている場合。',
+        },
+        {
+          title: '両王手（Double Check）',
+          body: '一手で二つの駒が同時に王を狙う状態を両王手といいます。二つの脅威を一度に遮ったり取ったりはできないため、唯一の逃れ方は王を安全な升へ動かすことです。動かす先もなければ詰みです。',
+          example: '王の前を遮っていた駒がどき、その駒と背後の駒が同時に王を狙う場合。',
         },
         {
           title: '詰み（Checkmate）',
@@ -642,6 +667,11 @@
           example: 'Ein Wagen steht in direkter Linie dem gegnerischen General gegenüber.',
         },
         {
+          title: 'Doppelschach (Double Check)',
+          body: 'Wenn ein einziger Zug zwei Figuren zugleich den General angreifen lässt, ist es ein Doppelschach. Da man nicht beide Bedrohungen auf einmal blockieren oder schlagen kann, bleibt nur, den General auf ein sicheres Feld zu ziehen. Hat er kein Feld mehr, ist es Schachmatt.',
+          example: 'Eine Figur, die den General deckte, zieht beiseite, sodass sie und die Figur dahinter den General gleichzeitig angreifen.',
+        },
+        {
           title: 'Schachmatt (Checkmate)',
           body: 'Wenn ein General im Schach steht und auf keine Weise entkommen kann, ist es Schachmatt. Kann der General nicht ziehen, der Angriff nicht blockiert und die angreifende Figur nicht geschlagen werden, ist es Schachmatt und die Partie endet.',
           example: 'Der General hat kein sicheres Feld zur Flucht, und keine Figur kann den Angriff blockieren.',
@@ -732,6 +762,11 @@
           title: 'Échec (Check)',
           body: 'Lorsque le général adverse pourrait être capturé au coup suivant, il est en échec. Un général en échec doit échapper à la menace : se déplacer vers une case sûre, bloquer l’attaque, ou capturer la pièce attaquante.',
           example: 'Un chariot aligné directement face au général adverse.',
+        },
+        {
+          title: 'Double échec (Double Check)',
+          body: 'Lorsqu’un seul coup met deux pièces à attaquer le général en même temps, c’est un double échec. Comme on ne peut ni bloquer ni capturer les deux menaces d’un coup, la seule issue est de déplacer le général vers une case sûre. S’il n’a nulle part où aller, c’est échec et mat.',
+          example: 'Une pièce qui protégeait le général s’écarte, de sorte qu’elle et la pièce derrière elle attaquent le général en même temps.',
         },
         {
           title: 'Échec et mat (Checkmate)',
@@ -1011,7 +1046,7 @@
       tutKingSub: '楚 · 漢', tutSoldierSub: '兵',
       // 설명
       tutRookDesc: '차는 직선으로 얼마든지 이동할 수 있습니다. 아군 기물은 지나갈 수 없고, 적 기물은 잡으며 멈춥니다.',
-      tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선 방향(멱)에 기물이 있으면 그쪽으로는 이동할 수 없습니다.',
+      tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선으로 내딛는 첫 칸이 멱(다리)인데, 그 자리에 다른 기물이 있으면 그 방향으로는 갈 수 없습니다. 막힌 멱은 붉게 표시됩니다.',
       tutElephantDesc: '상은 직선 한 칸 + 대각선 두 칸으로 이동합니다. 가는 길에는 멱(다리)이 둘 있는데, 직선 한 칸과 그다음 대각선 한 칸입니다. 둘 중 하나라도 다른 기물에 막히면 그 방향으로는 갈 수 없습니다. 막힌 멱은 붉게 표시됩니다.',
       tutCannonDesc: '포는 반드시 다른 기물 하나를 넘어서 이동하거나 잡습니다. 이때 넘는 기물을 받침이라고 합니다. 받침이 없으면 움직일 수 없습니다. 단, 다른 포는 받침으로 쓸 수 없고 잡을 수도 없습니다.',
       tutGuardDesc: '사는 궁성 안에서만 이동할 수 있습니다. 직선 한 칸, 그리고 대각선 연결점에서는 대각선으로도 이동합니다.',
@@ -1054,7 +1089,7 @@
       tutCannonName: 'Cannon', tutGuardName: 'Guard', tutSoldierName: 'Soldier', tutKingName: 'General',
       tutKingSub: 'Chu · Han', tutSoldierSub: 'Bing',
       tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
-      tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
+      tutHorseDesc: 'The Horse moves one step straight then one step diagonally. The first straight step is its blocking point; if a piece sits there, the Horse cannot move that way. Blocked points are marked in red.',
       tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. Its path has two blocking points: the straight step and the first diagonal step. If a piece sits on either one, the Elephant cannot move that way. Blocked points are marked in red.',
       tutCannonDesc: 'The Cannon must jump over exactly one other piece to move or capture. That piece is called the screen. Without a screen, it cannot move. Note: another Cannon cannot serve as a screen and cannot be captured.',
       tutGuardDesc: 'The Guard can only move within the palace — one step straight, or diagonally along the marked lines.',
@@ -1872,8 +1907,10 @@
         selected = [r, c];
         // 튜토리얼: 왕 안전 검사 없이 순수 행마법만 표시 (왕이 없으니 legalMoves 쓰면 전부 차단됨)
         legalForSel = Eng.pseudoMoves(board, r, c);
-        // ★ [D] 상(象)일 때만 멱이 막혀 못 가는 칸을 함께 계산(학습용 표시)
-        blockedForSel = (p.type === 'E') ? elephantBlockedLegs(board, r, c) : [];
+        // ★ [D] 상(象)·마(馬)일 때 멱이 막혀 못 가는 칸을 함께 계산(학습용 표시)
+        blockedForSel = (p.type === 'E') ? elephantBlockedLegs(board, r, c)
+                      : (p.type === 'H') ? horseBlockedLegs(board, r, c)
+                      : [];
         render();
       } else {
         selected = null;
@@ -1934,6 +1971,40 @@
       // 막힌 멱 칸을 표시 대상에 추가(중복 제거는 호출부에서)
       if (b1) blocked.push({ r: m1r, c: m1c });
       else if (b2) blocked.push({ r: m2r, c: m2c }); // 직진은 뚫렸는데 대각이 막힌 경우
+    }
+    // 중복 좌표 제거
+    const seen = new Set();
+    return blocked.filter(({ r, c }) => {
+      const k = `${r},${c}`;
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+  }
+
+  // ★ [D] 마(馬) 멱 막힘 계산 (튜토리얼 학습용)
+  //   엔진(engine.js)의 H case와 동일한 4개 멱을 미러링한다.
+  //   마는 상과 달리 멱이 하나(직진 한 칸)뿐 — 그 멱이 막히면 그 방향
+  //   도착 두 곳이 모두 막힌다. 막힌 멱 칸을 표시 대상으로 모은다.
+  //   ※ engine.js를 건드리지 않기 위해 행마 정의만 여기서 복제한다.
+  //     엔진 H legs가 바뀌면 이 표도 함께 맞춰야 한다(주석으로 연동 표시).
+  const HORSE_LEGS = [
+    // [멱(직진 한 칸), 도착1, 도착2]
+    [[-1,0],[-2,-1],[-2,1]],
+    [[1,0],[2,-1],[2,1]],
+    [[0,-1],[-1,-2],[1,-2]],
+    [[0,1],[-1,2],[1,2]],
+  ];
+  function horseBlockedLegs(bd, r, c) {
+    const inB = (rr, cc) => rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS;
+    const blocked = [];   // 막힌 멱 칸들 {r,c}
+    for (const [leg, d1, d2] of HORSE_LEGS) {
+      const mr = r + leg[0], mc = c + leg[1];   // 멱 자리
+      if (!inB(mr, mc)) continue;               // 멱이 판 밖이면 후보 아님
+      if (!bd[mr][mc]) continue;                // 멱이 비었으면 갈 수 있는 길 → 표시 안 함
+      // 멱이 막힌 경우, 그 방향 도착 둘 중 하나라도 판 안이면 "막혀서 못 가는 길"
+      const dests = [d1, d2];
+      const reachable = dests.some(([dr, dc]) => inB(r + dr, c + dc));
+      if (reachable) blocked.push({ r: mr, c: mc });
     }
     // 중복 좌표 제거
     const seen = new Set();
