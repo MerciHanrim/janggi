@@ -417,6 +417,57 @@ function gameStatus(board, sideToMove) {
   return { over: false };
 }
 
+// ============================================================================
+// [6-3a] 반복수(만년장) 감지 기반 — 국면 식별 키 + 출현 횟수 helper.
+//   ★ 이 단계는 "기반 공사"만: 국면을 식별하고 세는 도구만 추가한다.
+//     gameStatus/doMove/undo 연결, 4회째 실격 판정, 만년장 vs 전체동일국면 구분,
+//     누가 패자인지, UI 문구는 전부 [6-3b] 이후로 미룸 — 여기선 건드리지 않는다.
+//   ★ 규정 해석이 나중에 어느 쪽(만년장만 / 전체 반복)으로 가도 "국면을 세는 기반"은
+//     공통으로 필요하므로, 규정 미확정 상태에서도 안전하게 추가 가능.
+// ============================================================================
+
+// 국면 식별 키: board 배치 + 둘 차례를 하나의 결정적(deterministic) 문자열로.
+//   장기 반복수는 "같은 배치 + 같은 차례"라야 동일 국면 — 그래서 sideToMove를 prefix에 포함.
+//   직렬화: 각 칸을 row-major로 순회. 빈칸='.', 기물=side(r/b)+type(K/R/C/H/E/A/P) 2글자.
+//   행 구분자 '/'로 가독성·충돌 방지(같은 글자열이 다른 배치로 겹치지 않게).
+//   ※ 상차림·기보 등 board 외 상태는 키에 안 넣음 — 반복수는 "판 위 국면"만 본다.
+function positionKey(board, sideToMove) {
+  const rows = [];
+  for (let r = 0; r < ROWS; r++) {
+    let row = '';
+    for (let c = 0; c < COLS; c++) {
+      const p = board[r][c];
+      row += p ? (p.side + p.type) : '.';
+    }
+    rows.push(row);
+  }
+  return sideToMove + ':' + rows.join('/');
+}
+
+// repetition map(국면 키 → 출현 횟수)에 한 국면을 기록하고, 기록 후 누적 횟수를 돌려준다.
+//   map은 호출자(추후 script.js 대국 상태)가 들고 다닌다 — 엔진은 무상태 유지.
+//   Map 또는 평범한 객체 둘 다 허용(호출부 편의). 반환 = 이 국면이 지금까지 나온 총 횟수.
+//   예) 처음 보면 1, 같은 국면 또 오면 2, 3, 4...
+function recordPosition(map, board, sideToMove) {
+  const key = positionKey(board, sideToMove);
+  if (map instanceof Map) {
+    const n = (map.get(key) || 0) + 1;
+    map.set(key, n);
+    return n;
+  }
+  // 평범한 객체 폴백
+  const n = (map[key] || 0) + 1;
+  map[key] = n;
+  return n;
+}
+
+// 기록하지 않고 현재 누적 횟수만 조회(판정 분기에서 "지금 몇 회째인가"만 보고 싶을 때).
+function positionCount(map, board, sideToMove) {
+  const key = positionKey(board, sideToMove);
+  if (map instanceof Map) return map.get(key) || 0;
+  return map[key] || 0;
+}
+
 // Node 환경 테스트용 export
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -424,6 +475,7 @@ if (typeof module !== 'undefined' && module.exports) {
     allLegalMoves, applyMove, isInCheck, kingsFaceEachOther, gameStatus,
     findKing, inPalace, isDiagNode, SETUPS, SETUP_NAMES, randomSetup,
     scoreBoard, PIECE_SCORE,
+    positionKey, recordPosition, positionCount,
   };
 }
 
@@ -434,5 +486,6 @@ if (typeof window !== 'undefined') {
     allLegalMoves, applyMove, isInCheck, kingsFaceEachOther, gameStatus,
     findKing, inPalace, isDiagNode, SETUPS, SETUP_NAMES, randomSetup,
     scoreBoard, PIECE_SCORE,
+    positionKey, recordPosition, positionCount,
   };
 }
