@@ -144,6 +144,11 @@
       // ★ [6-3b] 임시 키 (한국어만) — 7개 언어는 [7]에서 한 번에. 다른 언어는 영어 폴백.
       //   반복수는 무승부가 아니라 실격패(연맹 규정) → 승/패 화면. "반복수 — {승자} 승리".
       byRepetition: (s) => `반복수 — ${s} 승리`,
+      //   ★ [6-3c] 반복수 종료 부제 — 빅장 점수줄처럼 화면이 스스로 사유를 설명(왜 끝났는지).
+      //   winScore(결과 보조 설명 줄)를 점수가 아닌 사유 한 줄로 재사용.
+      //   ★ 톤: 사람은 컴퓨터 대국에서 반복수 시 거의 항상 패배 쪽을 봄. 순수 중립("반복되었습니다")은
+      //   패배와 연결이 약하고, 책임 추궁("당신이 반복")은 다실 톤이 깨짐 → 가운데("…종료되었습니다").
+      repetitionReason: '같은 국면이 네 번 반복되어 대국이 종료되었습니다',
       undone: '한 수 물렀습니다',
       winHint: '다시 두려면 ‘처음부터’를 누르세요',
       // ★ AI 대국 문구 (루미 톤: 보이지 않는 기객, 조용한 안내)
@@ -259,6 +264,7 @@
       byTimeout: (s) => `Timeout — ${s} wins`,
       // ★ [6-3b] Repetition is a forfeit loss (federation rule), not a draw → win/lose screen.
       byRepetition: (s) => `Repetition — ${s} wins`,
+      repetitionReason: 'The same position occurred four times, ending the game',
       undone: 'Move undone',
       winHint: 'Press “New Game” to play again',
       // AI opponent strings (quiet, unseen-player tone)
@@ -2788,6 +2794,11 @@
       return;
     }
     winScore.textContent = '';   // 승/패 화면엔 점수 줄 없음 (기존 레이아웃 유지)
+    // ★ [6-3c] 단, 반복수 종료는 사유가 안 보이면 갑작스러워 winScore를 "사유 보조 줄"로 재사용.
+    //   빅장 점수줄과 같은 위계(ws-lead)로 "왜 끝났는지"를 화면이 스스로 설명. score 줄 아님.
+    if (reason === 'repetition') {
+      winScore.innerHTML = `<span class="ws-lead">${t('repetitionReason')}</span>`;
+    }
     const winnerFaction = (winner === 'r') ? 'chu' : 'han';
     const iWon = (winnerFaction === playerFaction);
     // 작은 줄: 누가 이겼나 (진영 + 진영색). 외통/시간패면 사유 명시
@@ -3081,3 +3092,4 @@
     document.fonts.ready.then(() => { sizeBoard(); render(); });
   }
 })();
+
