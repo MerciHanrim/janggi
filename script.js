@@ -799,6 +799,9 @@
   }
 
   let board, turn, selected, legalForSel, history, flipped, gameOver;
+  // ★ 튜토리얼 전용: 상(象) 선택 시 멱이 막혀 못 가는 칸 정보. [{r,c}] 형태.
+  //   대국 화면은 깨끗하게 두기 위해 튜토리얼 + 상에서만 채운다. 그 외엔 항상 [].
+  let blockedForSel = [];
 
   // ── 대국 룰 옵션 (★ 확장 지점) ──────────────────────────────
   // 향후 입주 예정: 무르기 횟수 제한, 빅장(대궁 무승부) 처리, 점수제 등.
@@ -1003,7 +1006,7 @@
       // 설명
       tutRookDesc: '차는 직선으로 얼마든지 이동할 수 있습니다. 아군 기물은 지나갈 수 없고, 적 기물은 잡으며 멈춥니다.',
       tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선 방향(멱)에 기물이 있으면 그쪽으로는 이동할 수 없습니다.',
-      tutElephantDesc: '상은 직선 한 칸 + 대각선 두 칸으로 이동합니다. 경로에 기물이 하나라도 있으면 그 방향으로 이동할 수 없습니다.',
+      tutElephantDesc: '상은 직선 한 칸 + 대각선 두 칸으로 이동합니다. 가는 길에는 멱(다리)이 둘 있는데, 직선 한 칸과 그다음 대각선 한 칸입니다. 둘 중 하나라도 다른 기물에 막히면 그 방향으로는 갈 수 없습니다. 막힌 멱은 붉게 표시됩니다.',
       tutCannonDesc: '포는 반드시 기물 하나(받침)를 넘어서 이동하거나 잡을 수 있습니다. 받침이 없으면 이동도 잡기도 안 됩니다. 포로 포를 잡을 수 없습니다.',
       tutGuardDesc: '사는 궁성 안에서만 이동할 수 있습니다. 직선 한 칸, 그리고 대각선 연결점에서는 대각선으로도 이동합니다.',
       tutKingDesc: '장은 사와 같은 방식으로 궁성 안에서만 이동합니다. 장을 잡히면 패배합니다.',
@@ -1045,7 +1048,7 @@
       tutCannonName: 'Cannon (包)', tutGuardName: 'Guard (士)', tutSoldierName: 'Soldier (卒)', tutKingName: 'General (將)',
       tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
       tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
-      tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. If any piece blocks the path, it cannot move in that direction.',
+      tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. Its path has two blocking points: the straight step and the first diagonal step. If a piece sits on either one, the Elephant cannot move that way. Blocked points are marked in red.',
       tutCannonDesc: 'The Cannon must jump over exactly one piece (a screen) to move or capture. Without a screen, it cannot move. It cannot capture another Cannon.',
       tutGuardDesc: 'The Guard can only move within the palace — one step straight, or diagonally along the marked lines.',
       tutKingDesc: 'The General moves like the Guard within the palace. If the General is captured, the game is lost.',
@@ -1095,6 +1098,7 @@
     endState = null;
     selected = null;
     legalForSel = [];
+    blockedForSel = [];
     winOverlay.classList.remove('show');
     setupOverlay.classList.remove('show');
     stopClock();
@@ -1157,6 +1161,7 @@
     turn = 'r';
     selected = null;
     legalForSel = [];
+    blockedForSel = [];
     moveLog = [];
     drawGrid();
     render();
@@ -1300,6 +1305,7 @@
     }
     selected = null;
     legalForSel = [];
+    blockedForSel = [];
 
     // 미션 phase: 수 차감 + 성공/실패 판정
     if (tutorialPhase === 'mission') {
@@ -1666,6 +1672,7 @@
     turn = 'r';                       // 선수는 언제나 초(r). 엔진 불변.
     selected = null;
     legalForSel = [];
+    blockedForSel = [];
     history = [];
     // 진영 선택 반영: 플레이어가 고른 세력이 화면 아래.
     // chu → flipped=false(초 아래), han → flipped=true(한 아래, 위쪽 초가 선수)
@@ -1810,6 +1817,18 @@
       dot.onclick = (e) => { e.stopPropagation(); tutorialMode ? doTutorialMove(rr, cc) : doMove(rr, cc); };
       piecesLayer.appendChild(dot);
     }
+    // ★ [D] 상(象) 멱 막힘 표시 — 튜토리얼에서만. 길을 가로막은 돌 위에 붉은 표식.
+    if (tutorialMode && blockedForSel.length) {
+      for (const { r: br, c: bc } of blockedForSel) {
+        const { x, y } = posToXY(br, bc);
+        const mk = document.createElement('div');
+        mk.className = 'block-mark';
+        mk.style.left = x + '%';
+        mk.style.top = y + '%';
+        // 표식은 안내용이라 클릭을 가로채지 않음(아래 기물 클릭이 그대로 동작)
+        piecesLayer.appendChild(mk);
+      }
+    }
     renderCaptured();
   }
 
@@ -1843,10 +1862,13 @@
         selected = [r, c];
         // 튜토리얼: 왕 안전 검사 없이 순수 행마법만 표시 (왕이 없으니 legalMoves 쓰면 전부 차단됨)
         legalForSel = Eng.pseudoMoves(board, r, c);
+        // ★ [D] 상(象)일 때만 멱이 막혀 못 가는 칸을 함께 계산(학습용 표시)
+        blockedForSel = (p.type === 'E') ? elephantBlockedLegs(board, r, c) : [];
         render();
       } else {
         selected = null;
         legalForSel = [];
+        blockedForSel = [];
         render();
       }
       return;
@@ -1862,12 +1884,54 @@
     if (p && p.side === turn) {
       selected = [r, c];
       legalForSel = Eng.legalMoves(board, r, c);
+      blockedForSel = [];   // 대국 화면은 막힘 표시 안 함(튜토리얼 전용)
       playPickSound();   // 기물 선택 소리
       setStatus(legalForSel.length ? t('pickDest') : t('cantMove'));
       render();
     } else if (p) {
       setStatus(t('notYourTurn', factionLabel(turn)));
     }
+  }
+
+  // ★ [D] 상(象) 멱 막힘 계산 (튜토리얼 학습용)
+  //   엔진(engine.js)의 E case와 동일한 8개 경로를 미러링한다.
+  //   각 경로는 [직진 멱, 대각 멱, 도착]. 도착칸이 보드 안인데
+  //   멱(직진 또는 대각)이 막혀서 갈 수 없는 경우, 그 "막힌 멱 칸"을 모은다.
+  //   ※ engine.js를 건드리지 않기 위해 행마 정의만 여기서 복제한다.
+  //     엔진 E legs가 바뀌면 이 표도 함께 맞춰야 한다(주석으로 연동 표시).
+  const ELEPHANT_LEGS = [
+    [[-1,0],[-2,-1],[-3,-2]],
+    [[-1,0],[-2,1],[-3,2]],
+    [[1,0],[2,-1],[3,-2]],
+    [[1,0],[2,1],[3,2]],
+    [[0,-1],[-1,-2],[-2,-3]],
+    [[0,-1],[1,-2],[2,-3]],
+    [[0,1],[-1,2],[-2,3]],
+    [[0,1],[1,2],[2,3]],
+  ];
+  function elephantBlockedLegs(bd, r, c) {
+    const inB = (rr, cc) => rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS;
+    const blocked = [];   // 막힌 멱 칸들 {r,c}
+    for (const [s1, s2, dest] of ELEPHANT_LEGS) {
+      const m1r = r + s1[0], m1c = c + s1[1];
+      const m2r = r + s2[0], m2c = c + s2[1];
+      const dr = r + dest[0], dc = c + dest[1];
+      if (!inB(dr, dc)) continue;            // 도착칸이 판 밖이면 애초에 후보 아님
+      if (!inB(m1r, m1c) || !inB(m2r, m2c)) continue;
+      const b1 = !!bd[m1r][m1c];             // 첫 멱(직진) 막힘?
+      const b2 = !!bd[m2r][m2c];             // 둘째 멱(대각) 막힘?
+      if (!b1 && !b2) continue;              // 둘 다 비었으면 갈 수 있는 길 → 표시 안 함
+      // 막힌 멱 칸을 표시 대상에 추가(중복 제거는 호출부에서)
+      if (b1) blocked.push({ r: m1r, c: m1c });
+      else if (b2) blocked.push({ r: m2r, c: m2c }); // 직진은 뚫렸는데 대각이 막힌 경우
+    }
+    // 중복 좌표 제거
+    const seen = new Set();
+    return blocked.filter(({ r, c }) => {
+      const k = `${r},${c}`;
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
   }
 
   function coordName(r, c) {
@@ -1906,6 +1970,7 @@
     });
     selected = null;
     legalForSel = [];
+    blockedForSel = [];
     turn = turn === 'r' ? 'b' : 'r';
     render();
     renderMovelog();
@@ -2587,7 +2652,7 @@
     if (aiSide && turn === aiSide && history.length) {
       popOne();
     }
-    selected = null; legalForSel = [];
+    selected = null; legalForSel = []; blockedForSel = [];
     gameOver = false;
     endState = null;
     clearAiFailUI();
@@ -2620,7 +2685,7 @@
     endGame(winner, 'resign');
   };
   document.getElementById('frame').onclick = () => {
-    if (selected) { selected = null; legalForSel = []; render(); }
+    if (selected) { selected = null; legalForSel = []; blockedForSel = []; render(); }
   };
   setupSkip.onclick = (e) => { e.stopPropagation(); skipSetup(); };
   langKo.onclick = () => { setLang('ko'); closeSettings(); };
