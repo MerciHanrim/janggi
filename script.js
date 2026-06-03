@@ -944,10 +944,14 @@
       missionKey: 'tutCannonMission',
       missionMoves: 3,
       pieces: [
-        { side: 'r', type: 'C', r: 6, c: 4 },
-        { side: 'r', type: 'P', r: 3, c: 4 },
-        { side: 'b', type: 'P', r: 1, c: 4 },
-        { side: 'b', type: 'P', r: 6, c: 7 },
+        { side: 'r', type: 'C', r: 6, c: 4 },   // 포(주인공)
+        // (1) 위쪽: 받침(아군 졸) 넘어 적 병 잡기 — 미션 경로
+        { side: 'r', type: 'P', r: 4, c: 4 },    // 받침
+        { side: 'b', type: 'P', r: 2, c: 4 },    // 받침 너머 적 병
+        // (2) 왼쪽: 적 포는 받침이 될 수 없음 — 넘지도 못하고 그 너머 병도 못 잡음
+        { side: 'b', type: 'C', r: 6, c: 2 },    // 적 포(받침 불가)
+        { side: 'b', type: 'P', r: 6, c: 0 },    // 그 너머 적 병(그래서 못 잡음)
+        // (3) 오른쪽·아래쪽은 비움 → 받침이 없어 그 방향으론 움직일 수 없음
       ],
     },
     guard: {
@@ -1007,7 +1011,7 @@
       tutRookDesc: '차는 직선으로 얼마든지 이동할 수 있습니다. 아군 기물은 지나갈 수 없고, 적 기물은 잡으며 멈춥니다.',
       tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선 방향(멱)에 기물이 있으면 그쪽으로는 이동할 수 없습니다.',
       tutElephantDesc: '상은 직선 한 칸 + 대각선 두 칸으로 이동합니다. 가는 길에는 멱(다리)이 둘 있는데, 직선 한 칸과 그다음 대각선 한 칸입니다. 둘 중 하나라도 다른 기물에 막히면 그 방향으로는 갈 수 없습니다. 막힌 멱은 붉게 표시됩니다.',
-      tutCannonDesc: '포는 반드시 기물 하나(받침)를 넘어서 이동하거나 잡을 수 있습니다. 받침이 없으면 이동도 잡기도 안 됩니다. 포로 포를 잡을 수 없습니다.',
+      tutCannonDesc: '포는 반드시 다른 기물 하나를 넘어서 이동하거나 잡습니다. 이때 넘는 기물을 받침이라고 합니다. 받침이 없으면 움직일 수 없습니다. 단, 다른 포는 받침으로 쓸 수 없고 잡을 수도 없습니다.',
       tutGuardDesc: '사는 궁성 안에서만 이동할 수 있습니다. 직선 한 칸, 그리고 대각선 연결점에서는 대각선으로도 이동합니다.',
       tutKingDesc: '장은 사와 같은 방식으로 궁성 안에서만 이동합니다. 장을 잡히면 패배합니다.',
       tutSoldierDesc: '졸/병은 앞으로 한 칸, 또는 옆으로 한 칸 이동할 수 있습니다. 뒤로는 물러날 수 없습니다.',
@@ -1049,7 +1053,7 @@
       tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
       tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
       tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. Its path has two blocking points: the straight step and the first diagonal step. If a piece sits on either one, the Elephant cannot move that way. Blocked points are marked in red.',
-      tutCannonDesc: 'The Cannon must jump over exactly one piece (a screen) to move or capture. Without a screen, it cannot move. It cannot capture another Cannon.',
+      tutCannonDesc: 'The Cannon must jump over exactly one other piece to move or capture. That piece is called the screen. Without a screen, it cannot move. Note: another Cannon cannot serve as a screen and cannot be captured.',
       tutGuardDesc: 'The Guard can only move within the palace — one step straight, or diagonally along the marked lines.',
       tutKingDesc: 'The General moves like the Guard within the palace. If the General is captured, the game is lost.',
       tutSoldierDesc: 'The Soldier can move one step forward or sideways. It cannot retreat.',
