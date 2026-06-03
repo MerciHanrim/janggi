@@ -1128,7 +1128,9 @@
       card.innerHTML =
         `<div class="tut-piece-img"><img src="${TUT_PIECE_IMG.r[p.type]}" alt="${tt(p.nameKey)}" draggable="false"></div>` +
         `<span class="tut-piece-name">${tt(p.nameKey)}</span>` +
-        (p.subKey ? `<span class="tut-piece-sub">${tt(p.subKey)}</span>` : '');
+        (p.subKey
+          ? `<span class="tut-piece-sub">${tt(p.subKey)}</span>`
+          : `<span class="tut-piece-sub is-empty" aria-hidden="true">·</span>`);  // 빈 placeholder: 높이 유지용
       if (p.active) {
         card.onclick = (e) => { e.stopPropagation(); startTutorialScenario(p.id); };
       } else {

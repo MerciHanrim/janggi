@@ -1014,7 +1014,11 @@
     transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     text-align: center;
     min-width: 0;   /* grid 셀이 콘텐츠 폭에 밀려 overflow되는 것 방지 */
+    overflow: hidden;   /* 내용이 카드 밖으로 새지 않게 (보조 줄 넘침 방지) */
   }
+  /* 그리드 셀: 같은 행 카드가 같은 높이가 되도록 stretch. 카드 내부에서 보조 줄 공간을 예약하므로
+     장·졸(보조 있음)과 나머지(보조 없음)의 박스 높이가 일치한다. */
+  .tutorial-piece-grid { align-items: stretch; }
   .tut-piece-card:hover {
     transform: translateY(-2px);
     border-color: var(--gold);
@@ -1040,20 +1044,19 @@
   .tut-piece-name {
     font-size: 0.7rem; color: var(--ink-soft);
     letter-spacing: 0.01em; line-height: 1.3;
-    /* 이름표가 1줄(한국어)/2줄(영어 General 등) 섞여도 카드 간 기준선이 맞도록
-       최소 2줄 높이 예약 → 이미지 줄과 보조 줄 위치가 7개 카드 공통으로 정렬 */
-    min-height: 2.1em;
-    display: flex; align-items: center; justify-content: center;
   }
-  /* 기물 선택 카드 보조 라벨 — 진영별 다른 글자(장 楚·漢, 졸 兵). 작지만 읽히는 보조 정보(고연령 대비로 너무 흐리지 않게). */
+  /* 기물 선택 카드 보조 라벨 — 진영별 다른 글자(장 楚·漢, 졸 兵). 작지만 읽히는 보조 정보(고연령 대비로 너무 흐리지 않게).
+     ★ 모든 카드가 보조 줄 높이를 동일하게 차지(빈 placeholder 포함) → 7개 카드 높이·이미지 정렬 통일, 넘침 없음. */
   .tut-piece-sub {
     font-size: 0.64rem;
     color: var(--ink-soft);
     opacity: 0.82;
     letter-spacing: 0.04em;
     line-height: 1.2;
-    margin-top: 1px;
+    margin-top: 2px;
+    min-height: 1.2em;   /* 보조 줄 영역 높이 고정 — 빈 placeholder도 동일 높이 차지 */
   }
+  .tut-piece-sub.is-empty { visibility: hidden; }   /* 보조 글자 없는 카드: 공간은 유지, 글자만 숨김 */
   /* 튜토리얼 사이드 패널 */
   .tutorial-side-panel {
     display: flex; flex-direction: column;
