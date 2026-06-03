@@ -1,4 +1,4 @@
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Gowun+Batang:wght@400;700&family=Ma+Shan+Zheng&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Gowun+Batang:wght@400;700&family=Ma+Shan+Zheng&family=Noto+Serif+JP:wght@400&family=Noto+Serif+SC:wght@400&family=Noto+Serif+TC:wght@400&display=swap');
 
   :root {
     --ink: #2b2724;
@@ -13,7 +13,15 @@
     --blue-deep: #15323d;
     --gold: #b08d57;
     --glow: rgba(176,141,87,0.55);
+    /* 모달(규칙·About) 문장형 텍스트의 한자 자형 — 언어별로 갈림(아래 html[lang]).
+       보드·기물·기보는 한국 장기 정체성이라 Noto Serif KR 고정, 여기서 안 건드림. */
+    --cjk-font: 'Noto Serif KR';
   }
+  /* 언어별 CJK 자형 — <html lang>은 setLang()이 갱신. 문장형 모달에만 쓰임.
+     ko/en/de/fr은 기본값(KR) 사용: 라틴이 주이고 한자 섞이면 KR 자형이어도 무방. */
+  html[lang="ja"]      { --cjk-font: 'Noto Serif JP'; }
+  html[lang="zh-Hans"] { --cjk-font: 'Noto Serif SC'; }
+  html[lang="zh-Hant"] { --cjk-font: 'Noto Serif TC'; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1065,6 +1073,9 @@
     padding: 14px 0 0;
   }
   .tut-desc {
+    /* 튜토리얼 설명문 — 7개 언어 확장 대비 다국어 한자 자형 폴백.
+       기물 한자(.tut-piece-sub)·기보(.tut-moves-left)는 KR 고정, 여기 영향 없음. */
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.9rem;
     color: var(--ink-read);
     line-height: 1.7;
@@ -1119,6 +1130,7 @@
   .tut-result-success .tut-result-title { color: var(--blue-deep); }
   .tut-result-fail .tut-result-title { color: var(--ink-soft); }
   .tut-result-msg {
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.88rem;
     color: var(--ink-soft);
     line-height: 1.6;
@@ -1359,6 +1371,10 @@
     max-height: min(80vh, 720px);
     display: flex;
     flex-direction: column;
+    /* 문장형 모달(규칙·About) 폰트 체인: 라틴·한글은 Gowun Batang,
+       그 폰트에 없는 한자 글리프는 언어별 CJK 폰트로 폴백(--cjk-font, 위 html[lang]).
+       보드·기물·기보는 여기 영향 없음(별도 스코프). */
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     background: linear-gradient(160deg, var(--paper), var(--paper-deep));
     border: 1.5px solid var(--gold);
     border-radius: 8px;
