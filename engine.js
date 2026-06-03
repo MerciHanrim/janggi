@@ -345,10 +345,11 @@ function applyMove(board, fr, fc, tr, tc) {
 }
 
 // 게임 종료 판정: 합법수 없으면 외통(장군→패) 또는 수막힘(장군 아님→무승부).
+//   추가로 [6-1b] 빅장(대궁) 무승부 — 아래 reason 'bikjang' 참조.
 // 반환: { over, loser?, reason?, draw? }
-//   reason: 'checkmate'(외통) | 'stalemate'(외통 아닌 수막힘)
-//   외통 → loser = sideToMove (패). 수막힘 → draw = true (무승부, loser 없음).
-// ※ 빅장(대궁 무승부)·점수제·반복수는 별도 큰 작업으로 분리 — 여기선 미처리.
+//   reason: 'checkmate'(외통) | 'stalemate'(외통 아닌 수막힘) | 'bikjang'(빅장 무승부)
+//   외통 → loser = sideToMove (패). 수막힘/빅장 → draw = true (무승부, loser 없음).
+// ※ 점수제·반복수는 별도 작업([6-2]/[6-3])으로 분리 — 여기선 미처리.
 function gameStatus(board, sideToMove) {
   const moves = allLegalMoves(board, sideToMove);
   if (moves.length === 0) {
@@ -358,6 +359,25 @@ function gameStatus(board, sideToMove) {
     }
     // 장군은 아닌데 둘 수가 없음 = 수막힘 = 무승부
     return { over: true, draw: true, reason: 'stalemate' };
+  }
+  // ★ [6-1b] 빅장(대궁) 무승부 판정.
+  //   "두 왕이 지금 대면 중"이라는 사실만으로 끝내지 않는다 — 상대가 다음 수에 대면을
+  //   깰 수 있으면 빅장이 아니라 그냥 진행이기 때문(대면 합법화 [6-1]의 후속).
+  //   성립 조건: 현재 대면 상태이고, sideToMove(둘 차례=대면을 당한 쪽)의
+  //   어떤 합법수를 둬도 둔 뒤에도 여전히 대면이 유지되는 경우에만 무승부.
+  //   하나라도 대면을 깨는(왕 이동/사이에 기물 삽입 등) 합법수가 있으면 → 빅장 아님, 계속.
+  //   ※ kingsFaceEachOther가 false인 일반 국면에선 이 블록을 통째로 건너뛰므로
+  //     추가 board clone 비용이 들지 않는다(성능 영향 거의 없음).
+  if (kingsFaceEachOther(board)) {
+    const allStillFacing = moves.every(([fr, fc, tr, tc]) => {
+      const nb = cloneBoard(board);
+      nb[tr][tc] = nb[fr][fc];
+      nb[fr][fc] = null;
+      return kingsFaceEachOther(nb);
+    });
+    if (allStillFacing) {
+      return { over: true, draw: true, reason: 'bikjang' };
+    }
   }
   return { over: false };
 }
