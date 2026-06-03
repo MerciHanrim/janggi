@@ -80,6 +80,9 @@
   .title-bar {
     text-align: center;
     position: relative;
+    /* 셋업 오버레이(z-index:200) 위로 끌어올려, 모드 메뉴·진영·상차림 단계에서도
+       ⚙ 설정(언어·배경)에 닿게 한다. 드롭다운(300)·백드롭(299)은 이보다 위라 그대로 동작. */
+    z-index: 250;
   }
   .title-bar h1 {
     font-family: 'Noto Serif KR', serif;
