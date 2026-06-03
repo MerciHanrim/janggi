@@ -167,6 +167,19 @@
       rulesSubtitle: '게임을 시작하기 전에 알아두면 좋은 기본 규칙',
       rulesExLabel: '예시',
       rulesClose: '닫기',
+      aboutTitle: '소개',
+      aboutClose: '닫기',
+      aboutSections: [
+        {
+          title: '소개',
+          body: '장기는 한국의 전통 전략 보드게임으로, 흔히 Korean chess로 소개됩니다.',
+        },
+        {
+          title: '크레딧',
+          body: '기물과 장기판 이미지: 이 프로젝트를 위해 제작\n효과음: Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: '장기의 목표',
@@ -267,6 +280,19 @@
       rulesSubtitle: "The basics you'll want to know before your first game",
       rulesExLabel: 'Example',
       rulesClose: 'Close',
+      aboutTitle: 'About',
+      aboutClose: 'Close',
+      aboutSections: [
+        {
+          title: 'About',
+          body: 'Korean Janggi is a traditional Korean strategy board game, often described as Korean chess.',
+        },
+        {
+          title: 'Credits',
+          body: 'Piece & board artwork: created for this project\nSound effects: Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: 'The Goal',
@@ -364,6 +390,19 @@
       rulesSubtitle: '开局前值得了解的基本规则',
       rulesExLabel: '示例',
       rulesClose: '关闭',
+      aboutTitle: '关于',
+      aboutClose: '关闭',
+      aboutSections: [
+        {
+          title: '关于',
+          body: '韩国象棋（장기）是韩国传统的策略棋类游戏，常被介绍为韩国象棋（Korean chess）。',
+        },
+        {
+          title: '鸣谢',
+          body: '棋子与棋盘图像：为本项目制作\n音效：Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: '象棋的目标',
@@ -461,6 +500,19 @@
       rulesSubtitle: '開局前值得了解的基本規則',
       rulesExLabel: '範例',
       rulesClose: '關閉',
+      aboutTitle: '關於',
+      aboutClose: '關閉',
+      aboutSections: [
+        {
+          title: '關於',
+          body: '韓國象棋（장기）是韓國傳統的策略棋類遊戲，常被介紹為韓國象棋（Korean chess）。',
+        },
+        {
+          title: '鳴謝',
+          body: '棋子與棋盤圖像：為本專案製作\n音效：Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: '象棋的目標',
@@ -558,6 +610,19 @@
       rulesSubtitle: '対局を始める前に知っておきたい基本ルール',
       rulesExLabel: '例',
       rulesClose: '閉じる',
+      aboutTitle: 'このゲームについて',
+      aboutClose: '閉じる',
+      aboutSections: [
+        {
+          title: 'このゲームについて',
+          body: 'チャンギ（장기）は韓国の伝統的な戦略ボードゲームで、しばしば「韓国将棋（Korean chess）」として紹介されます。',
+        },
+        {
+          title: 'クレジット',
+          body: '駒と盤の画像：本プロジェクトのために制作\n効果音：Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: 'チャンギの目的',
@@ -655,6 +720,19 @@
       rulesSubtitle: 'Die Grundlagen, die du vor deiner ersten Partie kennen solltest',
       rulesExLabel: 'Beispiel',
       rulesClose: 'Schließen',
+      aboutTitle: 'Über',
+      aboutClose: 'Schließen',
+      aboutSections: [
+        {
+          title: 'Über',
+          body: 'Janggi ist ein traditionelles koreanisches Strategie-Brettspiel, oft als koreanisches Schach (Korean chess) bezeichnet.',
+        },
+        {
+          title: 'Mitwirkende',
+          body: 'Figuren- und Brettgrafik: für dieses Projekt erstellt\nSoundeffekte: Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: 'Das Ziel',
@@ -752,6 +830,19 @@
       rulesSubtitle: 'Les bases à connaître avant votre première partie',
       rulesExLabel: 'Exemple',
       rulesClose: 'Fermer',
+      aboutTitle: 'À propos',
+      aboutClose: 'Fermer',
+      aboutSections: [
+        {
+          title: 'À propos',
+          body: 'Le Janggi est un jeu de plateau stratégique traditionnel coréen, souvent présenté comme les échecs coréens (Korean chess).',
+        },
+        {
+          title: 'Crédits',
+          body: 'Images des pièces et du plateau : créées pour ce projet\nEffets sonores : Pixabay / taure',
+          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+        },
+      ],
       rulesSections: [
         {
           title: 'Le but',
@@ -1554,6 +1645,60 @@
   }
   rulesCloseBtn.onclick = closeRulesOverlay;
   rulesBackdrop.onclick = closeRulesOverlay;
+
+  // ── About / Credits 오버레이 ───────────────────────────────
+  // 설정 메뉴 하단 "About / Credits"에서 열림. 규칙 오버레이와 같은 패턴.
+  const aboutOverlay = document.getElementById('aboutOverlay');
+  const aboutBackdrop = document.getElementById('aboutBackdrop');
+  const aboutPanelBody = document.getElementById('aboutBody');
+  const aboutCloseBtn = document.getElementById('aboutClose');
+  const aboutBtn = document.getElementById('aboutBtn');
+
+  function renderAbout() {
+    document.getElementById('aboutTitle').textContent = t('aboutTitle');
+    aboutCloseBtn.setAttribute('aria-label', t('aboutClose'));
+    const sections = t('aboutSections') || [];
+    aboutPanelBody.innerHTML = '';
+    sections.forEach((sec) => {
+      const card = document.createElement('div');
+      card.className = 'rules-section about-section';
+      const title = document.createElement('h3');
+      title.className = 'rules-section-title';
+      title.textContent = sec.title;
+      const body = document.createElement('p');
+      body.className = 'rules-section-body';
+      body.textContent = sec.body;   // \n 줄바꿈은 CSS white-space로 살림
+      card.appendChild(title);
+      card.appendChild(body);
+      if (sec.link) {
+        const a = document.createElement('a');
+        a.className = 'about-link';
+        a.href = sec.link.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = sec.link.label;
+        card.appendChild(a);
+      }
+      aboutPanelBody.appendChild(card);
+    });
+  }
+
+  function openAboutOverlay() {
+    renderAbout();
+    aboutOverlay.style.display = '';
+    aboutPanelBody.scrollTop = 0;
+    document.addEventListener('keydown', aboutEscHandler);
+  }
+  function closeAboutOverlay() {
+    aboutOverlay.style.display = 'none';
+    document.removeEventListener('keydown', aboutEscHandler);
+  }
+  function aboutEscHandler(e) {
+    if (e.key === 'Escape') closeAboutOverlay();
+  }
+  aboutCloseBtn.onclick = closeAboutOverlay;
+  aboutBackdrop.onclick = closeAboutOverlay;
+  if (aboutBtn) aboutBtn.onclick = () => { closeSettings(); openAboutOverlay(); };
 
   // 진영 선택 단계로 진입 (강도는 직전 강도 선택에서 정해진 상태)
   function startFactionStep() {
@@ -2674,6 +2819,10 @@
     // 규칙 오버레이가 열려 있으면 새 언어로 다시 그림
     if (rulesOverlay && rulesOverlay.style.display !== 'none') {
       renderRules();
+    }
+    // About 오버레이가 열려 있으면 새 언어로 다시 그림
+    if (aboutOverlay && aboutOverlay.style.display !== 'none') {
+      renderAbout();
     }
     // 튜토리얼 중이면 사이드 패널만 재렌더
     if (tutorialMode) {

@@ -1226,6 +1226,46 @@
     background: rgba(107,93,72,0.2);
     margin: 6px 0;
   }
+  /* 설정 하단 About / Credits 링크 (드롭다운 안의 작은 버튼) */
+  .settings-about-link {
+    display: block; width: 100%;
+    font-family: 'Gowun Batang', serif;
+    font-size: 0.78rem;
+    padding: 7px 16px;
+    background: transparent;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-align: center;
+    opacity: 0.82;
+    transition: background 0.12s, color 0.12s, opacity 0.12s;
+  }
+  .settings-about-link:hover {
+    background: rgba(176,141,87,0.12);
+    color: var(--ink);
+    opacity: 1;
+  }
+  /* About 오버레이 — 규칙 오버레이(.rules-*) 스타일 재사용, 번호 없는 섹션만 보정 */
+  .about-section {
+    padding-left: 0;   /* 번호(.rules-num)가 없으므로 왼쪽 여백 제거 */
+  }
+  .about-section .rules-section-body {
+    white-space: pre-line;   /* 본문 \n 줄바꿈 살림(크레딧 2줄) */
+  }
+  .about-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.84rem;
+    color: var(--blue);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(31,78,95,0.4);
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .about-link:hover {
+    color: var(--blue-deep);
+    border-bottom-color: var(--blue-deep);
+  }
   /* 장기판 배경 테마 — board-frame에 클래스로 전환 */
   /* 기본(산수화)은 기존 ::before 그대로 */
   .board-frame.bg-simple::before {
@@ -1423,4 +1463,5 @@
     .rules-title { font-size: 1.12rem; }
     .rules-body { padding: 6px 16px 16px; }
     .rules-section { padding-left: 30px; }
+    .about-section { padding-left: 0; }
   }

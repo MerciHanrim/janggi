@@ -30,6 +30,8 @@
       <button id="bgPaper" class="lang-btn bg-btn">한지</button>
       <!-- 심플 배경은 접근성/고대비 모드용으로 잠시 보류. 필요 시 아래 주석 해제 + BG_LIST의 simple 항목 복구 -->
       <!-- <button id="bgSimple" class="lang-btn bg-btn">심플</button> -->
+      <div class="settings-divider"></div>
+      <button id="aboutBtn" class="settings-about-link">About / Credits</button>
     </div>
   </div>
 
@@ -126,6 +128,20 @@
       <button class="rules-close" id="rulesClose" aria-label="닫기">✕</button>
     </div>
     <div class="rules-body" id="rulesBody"><!-- renderRules()가 채움 --></div>
+  </div>
+</div>
+
+<!-- About / Credits 오버레이 (설정 메뉴 하단 "About / Credits"에서 열림) -->
+<div class="rules-overlay" id="aboutOverlay" style="display:none">
+  <div class="rules-backdrop" id="aboutBackdrop"></div>
+  <div class="rules-panel" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="rules-head">
+      <div class="rules-head-text">
+        <h2 class="rules-title" id="aboutTitle">소개</h2>
+      </div>
+      <button class="rules-close" id="aboutClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="rules-body" id="aboutBody"><!-- renderAbout()가 채움 --></div>
   </div>
 </div>
 
