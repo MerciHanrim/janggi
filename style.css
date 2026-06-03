@@ -678,6 +678,34 @@
   .win-overlay h2.win { color: #f5ecdb; }
   .win-overlay h2.lose { color: #c9bfae; }
   .win-overlay h2.draw { color: #e8dcc0; }
+  /* [6-2 UI] 무승부 점수 보조 줄. 어두운 오버레이(rgba 43,39,36) 위라 밝은 종이톤 사용
+     — 루미가 제안한 --ink-read는 밝은 배경용 어두운 색이라 이 맥락엔 안 맞음.
+     위계: title(2.1rem) 아래, winHint(0.85/opacity .85)보다 또렷하게 — 무승부 승부를
+     가르는 핵심 정보라 너무 흐리면 안 됨(고연령 대비). 빈 텍스트면 margin도 0이 되게 :empty 처리.
+     ★ 두 줄 구성: ws-row(점수, 한자 병기) / ws-lead(격차, 한자 없이 — "한 5.5점 우세").
+       한자 반복 제거 + 격차를 독립 줄로 올려 교육 효과("빅장은 점수로 가린다") 강조. */
+  .win-overlay .win-score {
+    font-family: 'Noto Serif KR', serif;
+    margin-bottom: 8px;
+  }
+  .win-overlay .win-score:empty { margin: 0; }
+  .win-overlay .win-score .ws-row {
+    display: block;
+    font-size: 0.96rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: #ece1c8;
+    opacity: 0.94;
+  }
+  .win-overlay .win-score .ws-lead {
+    display: block;
+    font-size: 0.80rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: #ddd0b4;
+    opacity: 0.85;
+    margin-top: 3px;
+  }
   .win-overlay p { font-size: 0.85rem; opacity: 0.85; }
 
   /* 상차림 선택 오버레이 — viewport 기준 중앙 (모바일 보드 높이 0 문제 해결) */

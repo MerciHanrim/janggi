@@ -41,6 +41,7 @@
   const winOverlay = document.getElementById('winOverlay');
   const winTitle = document.getElementById('winTitle');
   const winFactionLine = document.getElementById('winFactionLine');
+  const winScore = document.getElementById('winScore');   // [6-2 UI] 무승부 점수 보조 줄
   const setupOverlay = document.getElementById('setupOverlay');
   const setupStep = document.getElementById('setupStep');
   const setupGrid = document.getElementById('setupGrid');
@@ -133,6 +134,11 @@
       youLost: '패배했습니다 · 다음 판은 초(楚)로',
       outcomeDraw: '무승부', drawLine: '비김',
       drawStalemate: '둘 곳이 없어 무승부입니다',
+      // ★ [6-2 UI] 임시 키 (한국어만) — 7개 언어는 [7]에서 한 번에. DEBUG_I18N으로 누락 점검.
+      outcomeDrawBikjang: '무승부 (빅장)',
+      drawBikjang: '빅장 — 점수로 가립니다',
+      scoreLead: (s, n) => `${s} ${n}점 우세`,
+      chuShort: '초', hanShort: '한',   // 격차 줄용 — 한자 병기 없는 짧은 진영명(반복 회피)
       byCheckmate: (s) => `외통 — ${s} 승리`,
       byTimeout: (s) => `시간패 — ${s} 승리`,
       undone: '한 수 물렀습니다',
@@ -2207,7 +2213,9 @@
     if (st.over) {
       stopClock();
       if (st.draw) {
-        endGame(null, 'stalemate');   // 수막힘 무승부 (승자 없음)
+        // 무승부 — 빅장/수막힘 구분 위해 st.reason 그대로 전달(과거 'stalemate' 고정 버그 교정).
+        // [6-2] 점수: 엔진이 draw에 st.score({r,b,diff,winner})를 실어 보냄 → 종료 화면 표시용.
+        endGame(null, st.reason, st.score);   // 무승부 (승자 없음) — 점수는 endState에 보관
       } else {
         endGame(st.loser === 'r' ? 'b' : 'r', st.reason);   // 외통 등 — 승자 전달
       }
@@ -2710,17 +2718,18 @@
     }
   }
 
-  function endGame(winner, reason) {
+  function endGame(winner, reason, score) {
     gameOver = true;
     stopClock();
     if (winner === null) {
-      // 무승부 (수막힘 등) — 승자/패자 없음. 재대국 자동배정용 lastResult는 유지(직전 결과 보존).
-      endState = { winner: null, reason: reason || 'draw', loser: null, draw: true };
+      // 무승부 (수막힘·빅장) — 승자/패자 없음. 재대국 자동배정용 lastResult는 유지(직전 결과 보존).
+      // [6-2] score = { r, b, diff, winner } (무승부 때만 엔진이 첨부) → renderEndMessages가 보조 줄로 그림.
+      endState = { winner: null, reason: reason || 'draw', loser: null, draw: true, score: score || null };
     } else {
       // winner는 자리(r/b). r=초(chu), b=한(han) — flipped 무관.
       lastResult = (winner === 'r') ? 'chu' : 'han';
       const loser = (winner === 'r') ? 'b' : 'r';
-      endState = { winner, reason: reason || null, loser, draw: false };
+      endState = { winner, reason: reason || null, loser, draw: false, score: null };
     }
     winOverlay.classList.add('show');
     refreshPersp();   // gameOver면 관점 줄 비움
@@ -2730,16 +2739,24 @@
   // 종료 오버레이·상태창 문구를 현재 언어로 (그)리기 — endGame과 언어전환에서 공용
   function renderEndMessages() {
     if (!endState) return;
-    const { winner, reason, loser, draw } = endState;
+    const { winner, reason, loser, draw, score } = endState;
     if (draw) {
-      // 무승부: 진영 승리줄 대신 "비김", 큰 줄은 "무승부"
+      // 무승부: 진영 승리줄 대신 "비김", 큰 줄은 "무승부(+사유)"
       winFactionLine.textContent = t('drawLine');
       winFactionLine.className = 'win-faction draw';
-      winTitle.textContent = t('outcomeDraw');
+      // [6-2 UI] 빅장/수막힘 구분 — 과거 'stalemate' 고정 버그 교정 후 reason이 정확히 들어옴.
+      winTitle.textContent = (reason === 'bikjang') ? t('outcomeDrawBikjang') : t('outcomeDraw');
       winTitle.className = 'draw';
-      setStatus(reason === 'stalemate' ? t('drawStalemate') : t('outcomeDraw'));
+      // [6-2 UI] 점수 보조 줄: 엔진이 무승부에 실어 보낸 score를 옅게 표시.
+      //   메인은 무승부, 그 아래 "초 R · 한 B (X점 우세)"로 점수와 격차를 보여줘 학습 효과.
+      //   score 없으면(구버전 방어) 빈칸 유지.
+      renderScoreLine(score);
+      setStatus(reason === 'bikjang' ? t('drawBikjang')
+              : reason === 'stalemate' ? t('drawStalemate')
+              : t('outcomeDraw'));
       return;
     }
+    winScore.textContent = '';   // 승/패 화면엔 점수 줄 없음 (기존 레이아웃 유지)
     const winnerFaction = (winner === 'r') ? 'chu' : 'han';
     const iWon = (winnerFaction === playerFaction);
     // 작은 줄: 누가 이겼나 (진영 + 진영색). 외통/시간패면 사유 명시
@@ -2760,6 +2777,25 @@
   }
 
   function setStatus(msg) { msgEl.textContent = msg; }
+
+  // [6-2 UI] 무승부 점수 보조 줄을 그린다. score = { r, b, diff, winner }.
+  //   형식: "초 72 · 한 73.5 (한 1.5점 우세)". 점수 숫자는 언어 무관, 라벨만 t()로.
+  //   winner=null(동점, 덤 1.5라 수학상 불가하나 방어)면 격차 괄호 생략.
+  //   score 없으면(외통/구버전) 줄을 비운다.
+  function renderScoreLine(score) {
+    if (!score) { winScore.innerHTML = ''; return; }
+    const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(1);   // 5 / 73.5
+    // 1줄: 점수 (진영 한자 병기) — "초(楚) 0 · 한(漢) 5.5"
+    const scoreRow = `${factionLabel('r')} ${fmt(score.r)} · ${factionLabel('b')} ${fmt(score.b)}`;
+    let html = `<span class="ws-row">${scoreRow}</span>`;
+    // 2줄: 격차 — "한 5.5점 우세". 윗줄에서 이미 한(漢)을 봤으니 우세 줄엔 한자 병기 생략(반복 제거).
+    //   교육 효과: "빅장이 나면 점수로 가린다"를 독립 줄로 또렷이.
+    if (score.winner) {
+      const shortName = (score.winner === 'r') ? t('chuShort') : t('hanShort');
+      html += `<span class="ws-lead">${t('scoreLead', shortName, fmt(score.diff))}</span>`;
+    }
+    winScore.innerHTML = html;
+  }
 
   // 상태창 문구를 현재 판의 파생값으로 갱신. 장군이면 우선 "장군!", 아니면 기본 문구.
   // fallback: 장군이 아닐 때 쓸 문구(예: 무르기 후 "물렀습니다"). 미지정 시 pickPiece.
