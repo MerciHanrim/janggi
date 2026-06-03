@@ -220,8 +220,18 @@
           example: null,
         },
         {
+          title: '빅장 (점수제 무승부)',
+          body: '양쪽 왕이 같은 세로줄에서 마주 보고, 그 사이를 가로막는 기물이 하나도 없는 상태를 빅장이라고 합니다. 차례인 쪽이 이 마주 봄을 풀 수 있는 합법적인 수가 하나도 없으면 대국은 무승부로 끝납니다. 이때 승부는 남은 기물의 점수로 가립니다. 차는 13점, 포는 7점, 마는 5점, 상과 사는 각 3점, 병(졸)은 2점이며 왕은 0점입니다. 후수인 한(漢)은 먼저 두는 불리함을 보정받아 1.5점을 더 받습니다. 점수가 높은 쪽이 빅장 무승부에서 우세를 가져갑니다.',
+          example: '두 왕이 같은 줄에서 마주 본 채, 차례인 쪽이 그 줄을 벗어나거나 사이를 막을 방법이 전혀 없는 경우.',
+        },
+        {
+          title: '반복수',
+          body: '똑같은 배치가 같은 차례에 거듭 나타나는 것을 반복수라고 합니다. 같은 국면을 세 번까지는 둘 수 있지만, 같은 국면을 네 번째로 반복한 쪽이 실격패합니다. 빅장과 달리 반복수는 무승부가 아니라 승패가 갈리는 종료입니다. 한쪽이 계속 장군을 걸어 무한정 대국을 끄는 만년장을 막기 위한 규칙입니다.',
+          example: '한 기물로 같은 자리를 오가며 장군을 거듭 거는 경우, 네 번째 같은 국면에서 그 쪽이 패합니다.',
+        },
+        {
           title: '알아두기',
-          body: '현재 버전은 장군, 외통, 기본 승패 규칙을 지원합니다. 빅장과 점수제 등 일부 전통 규칙은 향후 업데이트 예정입니다.',
+          body: '이 게임은 장군과 외통, 돌던지기에 더해 빅장(점수제 무승부)과 반복수까지 적용합니다. 행마법과 상차림 등 더 자세한 내용은 장기를 직접 두며 익혀 보세요.',
           example: null,
         },
       ],
@@ -340,8 +350,18 @@
           example: null,
         },
         {
+          title: 'Bikjang (Scored Draw)',
+          body: "Bikjang occurs when both Generals face each other on the same file with no piece standing between them. If the side to move has no legal way to break this face-off, the game ends in a draw. The outcome is then decided by the points of the remaining pieces: the Chariot is worth 13, the Cannon 7, the Horse 5, the Elephant and Guard 3 each, the Soldier 2, and the General 0. Han (漢), moving second, receives an extra 1.5 points to offset the disadvantage of going later. The side with more points takes the edge in a Bikjang draw.",
+          example: 'The two Generals face each other on the same file, and the side to move has no way to leave that file or block the space between them.',
+        },
+        {
+          title: 'Repetition',
+          body: 'Repetition is when the same arrangement recurs with the same side to move. A position may be repeated up to three times, but the side that creates the same position for the fourth time loses by forfeit. Unlike Bikjang, repetition ends the game with a winner and a loser rather than a draw. The rule exists to stop a player from dragging the game on forever with perpetual check.',
+          example: 'A piece shuttles back and forth giving check again and again; on the fourth identical position, that side loses.',
+        },
+        {
           title: 'Good to Know',
-          body: 'This version supports check, checkmate, and basic win conditions. Some traditional rules, such as Bikjang and the scoring system, are planned for a future update.',
+          body: 'Alongside check, checkmate, and resignation, this game applies Bikjang (a scored draw) and repetition. For more on how the pieces move and the opening formations, the best way to learn is to play.',
           example: null,
         },
       ],
@@ -456,8 +476,18 @@
           example: null,
         },
         {
+          title: '逼将（计分和棋）',
+          body: '双方的将在同一纵线上相对，且两者之间没有任何棋子相隔，这种状态称为逼将。若轮到行棋的一方没有任何合法走法可以解除这种相对，本局即以和棋结束。此时胜负由剩余棋子的点数决定：车为13分，炮为7分，马为5分，象与士各3分，兵（卒）为2分，将为0分。后手的汉方为弥补后行的不利，额外获得1.5分。点数较高的一方在逼将和棋中占优。',
+          example: '双方的将在同一纵线上相对，轮到行棋的一方既无法离开该纵线，也无法在两者之间放子相隔。',
+        },
+        {
+          title: '重复局面',
+          body: '同一布局在同一方行棋时反复出现，称为重复局面。同一局面最多可重复三次，但第四次造成相同局面的一方判负。与逼将不同，重复局面并非和棋，而是分出胜负的结束方式。此规则用于防止一方以连续将军无限拖延对局。',
+          example: '一枚棋子来回移动反复将军，在第四次出现相同局面时，该方落败。',
+        },
+        {
           title: '须知',
-          body: '当前版本支持将军、将死及基本胜负规则。逼将（Bikjang）与计分制等部分传统规则将在日后更新中加入。',
+          body: '本游戏在将军、将死与认输之外，还采用逼将（计分和棋）与重复局面规则。关于各棋子的走法与布阵等更多内容，最好的学习方式就是亲自对弈。',
           example: null,
         },
       ],
@@ -572,8 +602,18 @@
           example: null,
         },
         {
+          title: '逼將（計分和棋）',
+          body: '雙方的將在同一縱線上相對，且兩者之間沒有任何棋子相隔，這種狀態稱為逼將。若輪到行棋的一方沒有任何合法走法可以解除這種相對，本局即以和棋結束。此時勝負由剩餘棋子的點數決定：車為13分，炮為7分，馬為5分，象與士各3分，兵（卒）為2分，將為0分。後手的漢方為彌補後行的不利，額外獲得1.5分。點數較高的一方在逼將和棋中占優。',
+          example: '雙方的將在同一縱線上相對，輪到行棋的一方既無法離開該縱線，也無法在兩者之間放子相隔。',
+        },
+        {
+          title: '重複局面',
+          body: '同一佈局在同一方行棋時反覆出現，稱為重複局面。同一局面最多可重複三次，但第四次造成相同局面的一方判負。與逼將不同，重複局面並非和棋，而是分出勝負的結束方式。此規則用於防止一方以連續將軍無限拖延對局。',
+          example: '一枚棋子來回移動反覆將軍，在第四次出現相同局面時，該方落敗。',
+        },
+        {
           title: '須知',
-          body: '當前版本支援將軍、將死及基本勝負規則。逼將（Bikjang）與計分制等部分傳統規則將在日後更新中加入。',
+          body: '本遊戲在將軍、將死與認輸之外，還採用逼將（計分和棋）與重複局面規則。關於各棋子的走法與佈陣等更多內容，最好的學習方式就是親自對弈。',
           example: null,
         },
       ],
@@ -688,8 +728,18 @@
           example: null,
         },
         {
+          title: 'ビッカン（点数で決める引き分け）',
+          body: '両陣営の王が同じ縦の列で向かい合い、その間を遮る駒が一つもない状態をビッカン（Bikjang）といいます。手番の側がこの向かい合いを解く合法手を一つも持たないとき、対局は引き分けとなります。このとき勝敗は残った駒の点数で決めます。車は13点、包は7点、馬は5点、象と士は各3点、兵（卒）は2点、王は0点です。後手の漢は後に指す不利を補うため、1.5点が加算されます。点数の高い側がビッカンの引き分けで優位となります。',
+          example: '両王が同じ列で向かい合い、手番の側がその列から離れることも、間を遮ることもできない場合。',
+        },
+        {
+          title: '局面反復',
+          body: '同じ配置が同じ手番で繰り返し現れることを局面反復といいます。同じ局面は三回まで許されますが、四回目に同じ局面を作った側が反則負けとなります。ビッカンと違い、局面反復は引き分けではなく勝敗の決まる終局です。一方が王手を繰り返して対局を無限に引き延ばすのを防ぐためのルールです。',
+          example: '一つの駒が同じ場所を行き来して王手を繰り返す場合、四回目の同一局面でその側が負けとなります。',
+        },
+        {
           title: '覚えておくこと',
-          body: '現在のバージョンは王手・詰み・基本的な勝敗ルールに対応しています。ビッカン（Bikjang）や点数制など一部の伝統ルールは今後のアップデートで追加予定です。',
+          body: 'このゲームは王手・詰み・投了に加えて、ビッカン（点数で決める引き分け）と局面反復にも対応しています。駒の動かし方や駒組みなど、さらに詳しい内容は、実際に指しながら覚えるのが一番です。',
           example: null,
         },
       ],
@@ -804,8 +854,18 @@
           example: null,
         },
         {
+          title: 'Bikjang (Remis nach Punkten)',
+          body: 'Bikjang liegt vor, wenn beide Generäle einander auf derselben Linie gegenüberstehen und kein Stein zwischen ihnen steht. Hat die Seite am Zug keinen legalen Weg, dieses Gegenüber aufzulösen, endet die Partie remis. Über den Ausgang entscheiden dann die Punkte der verbliebenen Steine: der Wagen zählt 13, die Kanone 7, das Pferd 5, Elefant und Wächter je 3, der Soldat 2 und der General 0. Han (漢), das als Zweiter zieht, erhält 1.5 Punkte zusätzlich als Ausgleich für den späteren Zug. Die Seite mit mehr Punkten geht aus dem Bikjang-Remis als überlegen hervor.',
+          example: 'Beide Generäle stehen einander auf derselben Linie gegenüber, und die Seite am Zug kann weder die Linie verlassen noch den Raum dazwischen versperren.',
+        },
+        {
+          title: 'Stellungswiederholung',
+          body: 'Von Stellungswiederholung spricht man, wenn dieselbe Stellung bei gleicher Zugseite erneut auftritt. Eine Stellung darf bis zu dreimal wiederholt werden; wer sie zum vierten Mal herstellt, verliert durch Regelverstoß. Anders als beim Bikjang endet die Partie hier mit Sieger und Verlierer statt remis. Die Regel verhindert, dass eine Seite die Partie durch Dauerschach endlos hinauszögert.',
+          example: 'Ein Stein pendelt hin und her und gibt immer wieder Schach; bei der vierten gleichen Stellung verliert diese Seite.',
+        },
+        {
           title: 'Gut zu wissen',
-          body: 'Diese Version unterstützt Schach, Schachmatt und grundlegende Siegbedingungen. Einige traditionelle Regeln wie Bikjang und das Punktesystem sind für ein künftiges Update geplant.',
+          body: 'Neben Schach, Schachmatt und Aufgabe wendet dieses Spiel auch Bikjang (ein Remis nach Punkten) und die Stellungswiederholung an. Wie die Steine ziehen und wie die Eröffnungsaufstellungen aussehen, lernt man am besten beim Spielen selbst.',
           example: null,
         },
       ],
@@ -920,8 +980,18 @@
           example: null,
         },
         {
+          title: 'Bikjang (nulle aux points)',
+          body: 'Le Bikjang se produit lorsque les deux Généraux se font face sur la même colonne sans aucune pièce entre eux. Si le camp au trait n’a aucun coup légal pour rompre ce face-à-face, la partie se termine par une nulle. L’issue est alors décidée aux points des pièces restantes : le Char vaut 13, le Canon 7, le Cheval 5, l’Éléphant et le Garde 3 chacun, le Soldat 2 et le Général 0. Han (漢), qui joue en second, reçoit 1.5 point de plus pour compenser le désavantage de jouer après. Le camp ayant le plus de points l’emporte dans la nulle par Bikjang.',
+          example: 'Les deux Généraux se font face sur la même colonne, et le camp au trait ne peut ni quitter cette colonne ni bloquer l’espace qui les sépare.',
+        },
+        {
+          title: 'Répétition',
+          body: 'On parle de répétition lorsque la même disposition revient avec le même camp au trait. Une position peut être répétée jusqu’à trois fois, mais le camp qui crée la même position pour la quatrième fois perd par forfait. Contrairement au Bikjang, la répétition met fin à la partie avec un vainqueur et un perdant plutôt qu’une nulle. Cette règle empêche un joueur de prolonger la partie indéfiniment par échec perpétuel.',
+          example: 'Une pièce fait des allers-retours en donnant échec encore et encore ; à la quatrième position identique, ce camp perd.',
+        },
+        {
           title: 'Bon à savoir',
-          body: 'Cette version prend en charge l’échec, l’échec et mat et les conditions de victoire de base. Certaines règles traditionnelles, comme le Bikjang et le système de points, sont prévues pour une future mise à jour.',
+          body: 'Outre l’échec, l’échec et mat et l’abandon, ce jeu applique aussi le Bikjang (une nulle aux points) et la répétition. Pour le déplacement des pièces et les dispositions d’ouverture, le mieux est encore d’apprendre en jouant.',
           example: null,
         },
       ],
