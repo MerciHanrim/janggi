@@ -59,6 +59,9 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    /* 사이드 패널 UI 텍스트 — 언어별 한자 자형(--cjk-font, html[lang] 기준).
+       단, 잡은 기물 한자(.cap-chip)·기보 행마기호(.mv-piece)는 아래에서 KR 고정. */
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
   }
   /* 좁은 화면(모바일/좁은 iframe): 세로로 접기 + 순서 재배치 */
   @media (max-width: 720px) {
@@ -567,7 +570,7 @@
     min-height: 0;
   }
   .movelog-title {
-    font-family: 'Noto Serif KR', serif;
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.86rem; letter-spacing: 0.2em;
     color: var(--ink-read);
     padding: 8px 12px 6px;
