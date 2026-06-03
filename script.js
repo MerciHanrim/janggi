@@ -141,6 +141,9 @@
       chuShort: '초', hanShort: '한',   // 격차 줄용 — 한자 병기 없는 짧은 진영명(반복 회피)
       byCheckmate: (s) => `외통 — ${s} 승리`,
       byTimeout: (s) => `시간패 — ${s} 승리`,
+      // ★ [6-3b] 임시 키 (한국어만) — 7개 언어는 [7]에서 한 번에. 다른 언어는 영어 폴백.
+      //   반복수는 무승부가 아니라 실격패(연맹 규정) → 승/패 화면. "반복수 — {승자} 승리".
+      byRepetition: (s) => `반복수 — ${s} 승리`,
       undone: '한 수 물렀습니다',
       winHint: '다시 두려면 ‘처음부터’를 누르세요',
       // ★ AI 대국 문구 (루미 톤: 보이지 않는 기객, 조용한 안내)
@@ -254,6 +257,8 @@
       drawStalemate: 'No legal moves — the game is a draw',
       byCheckmate: (s) => `Checkmate — ${s} wins`,
       byTimeout: (s) => `Timeout — ${s} wins`,
+      // ★ [6-3b] Repetition is a forfeit loss (federation rule), not a draw → win/lose screen.
+      byRepetition: (s) => `Repetition — ${s} wins`,
       undone: 'Move undone',
       winHint: 'Press “New Game” to play again',
       // AI opponent strings (quiet, unseen-player tone)
@@ -931,6 +936,12 @@
   }
 
   let board, turn, selected, legalForSel, history, flipped, gameOver;
+  // ★ [6-3b] 반복수(만년장) 판정용 국면 카운트 맵. key=positionKey(차례 포함) → 출현 횟수.
+  //   엔진은 무상태(engine.js) — map은 호출자인 여기서 보유한다(recordPosition 설계).
+  //   undo 대비로 history 각 항목에 스냅샷(new Map 복사)을 같이 저장 → 무르면 그 스냅샷으로 복원.
+  //   beginGame/reset에서 새 Map 생성 + 초기 국면 1회 기록.
+  //   판정: doMove에서 수 둔 뒤 recordPosition 반환이 4면 "방금 둔 쪽" 실격패(연맹 규정: 4회 반복 실격).
+  let repMap = new Map();
   // ★ 튜토리얼 전용: 상(象) 선택 시 멱이 막혀 못 가는 칸 정보. [{r,c}] 형태.
   //   대국 화면은 깨끗하게 두기 위해 튜토리얼 + 상에서만 채운다. 그 외엔 항상 [].
   let blockedForSel = [];
@@ -1870,6 +1881,11 @@
     legalForSel = [];
     blockedForSel = [];
     history = [];
+    // ★ [6-3b] 반복수 맵 초기화 + 시작 국면 1회 기록.
+    //   turn='r'(초 선수)이 둘 차례인 초기 배치를 첫 국면으로 센다. 이후 같은 배치+같은 차례가
+    //   다시 오면 카운트가 누적돼 4회째에 실격 판정이 걸린다.
+    repMap = new Map();
+    Eng.recordPosition(repMap, board, turn);
     // 진영 선택 반영: 플레이어가 고른 세력이 화면 아래.
     // chu → flipped=false(초 아래), han → flipped=true(한 아래, 위쪽 초가 선수)
     flipped = (playerFaction === 'han');
@@ -2179,6 +2195,9 @@
       board: Eng.cloneBoard(board), turn,
       capR: [...captured.r], capB: [...captured.b],
       logLen: moveLog.length,
+      // ★ [6-3b] 이 수를 두기 전의 반복수 맵 스냅샷. 값이 숫자뿐이라 new Map 얕은 복사로 충분.
+      //   undo가 이 항목을 pop하면 repMap을 이 스냅샷으로 되돌려 반복 카운트를 정확히 복원한다.
+      repSnapshot: new Map(repMap),
     });
     const target = board[tr][tc];
     const res = Eng.applyMove(board, fr, fc, tr, tc);
@@ -2208,6 +2227,9 @@
     renderMovelog();
     updateTurnUI();
     renderClock();   // 새 차례 강조 갱신
+    // ★ [6-3b] 반복수 기록: 방금 수를 둬서 만들어진 국면(+다음 차례 turn)을 카운트.
+    //   기록은 항상 한다(외통으로 끝나도 그 국면 자체는 출현한 것). 판정만 아래서 게임 미종료 시.
+    const repN = Eng.recordPosition(repMap, board, turn);
     // 종료/장군 판정
     const st = Eng.gameStatus(board, turn);
     if (st.over) {
@@ -2219,6 +2241,15 @@
       } else {
         endGame(st.loser === 'r' ? 'b' : 'r', st.reason);   // 외통 등 — 승자 전달
       }
+    } else if (repN >= 4) {
+      // ★ [6-3b] 반복수 실격패. 연맹 규정: 만년장/반복수는 3회 허용, 4회 반복 시 실격패.
+      //   "방금 수를 둔 쪽"이 같은 국면을 4번째로 만든 = 반복 주체 → 실격패(loser).
+      //   turn은 이미 다음 차례로 바뀐 상태라, 반복을 만든 쪽은 turn의 반대편이고 승자는 turn.
+      //   draw가 아니라 승패 종료(외통과 같은 결) → endGame이 score 미첨부 승/패 화면을 그림.
+      //   ※ 현재 구현은 전체 동일국면 반복 기준. 4회째 동일국면을 만든 쪽을 반복 주체로 보고 실격 처리.
+      //     만년장/장군 반복 특화 판정(공격측 추적)은 후속 작업에서 좁힐 수 있음.
+      stopClock();
+      endGame(turn, 'repetition');   // winner = turn(반복 안 한 쪽), loser = 방금 둔 쪽
     } else {
       refreshStatus();   // 장군이면 "장군!", 아니면 기물 고르세요 (파생 문구)
       // ★ 이벤트성 연출: 이번 수로 새로 장군이 걸린 경우에만. undo/setLang에선 안 울림.
@@ -2763,6 +2794,7 @@
     winFactionLine.textContent =
       (reason === 'checkmate') ? t('byCheckmate', factionLabel(winner))
       : (reason === 'timeout') ? t('byTimeout', factionLabel(winner))
+      : (reason === 'repetition') ? t('byRepetition', factionLabel(winner))
       : t('factionWon', factionLabel(winner));
     winFactionLine.className = 'win-faction ' + winnerFaction;
     // 큰 줄: 내 관점 승/패 (네트워크/AI 대비 — playerFaction이 이 화면의 주인)
@@ -2911,6 +2943,11 @@
       captured.r = prev.capR;
       captured.b = prev.capB;
       if (typeof prev.logLen === 'number') moveLog.length = prev.logLen;
+      // ★ [6-3b] 반복수 맵도 이 수 두기 전 스냅샷으로 되돌린다.
+      //   AI 대국에서 popOne이 두 번 불려도(아래) 각 prev가 자기 시점 스냅샷을 들고 있어
+      //   마지막 popOne의 스냅샷이 곧 복원될 정확한 상태가 된다.
+      //   (구버전 history 항목 방어: repSnapshot 없으면 현 맵 유지.)
+      if (prev.repSnapshot) repMap = new Map(prev.repSnapshot);
     };
     popOne();
     // ★ AI 대국: 되감은 결과가 AI 차례면, 사람 차례가 될 때까지 한 번 더 되감음.
