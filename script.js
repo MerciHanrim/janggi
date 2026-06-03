@@ -1436,8 +1436,8 @@
     },
     ja: {
       tutPieceTitle: '駒を選んで動かし方を学びましょう',
-      tutRookName: '車（チャ）', tutHorseName: '馬（マ）', tutElephantName: '象（サン）',
-      tutCannonName: '包（ポ）', tutGuardName: '士（サ）', tutSoldierName: '卒（チョル）', tutKingName: '将（チャン）',
+      tutRookName: '車', tutHorseName: '馬', tutElephantName: '象',
+      tutCannonName: '包', tutGuardName: '士', tutSoldierName: '卒', tutKingName: '将',
       tutKingSub: '楚 · 漢', tutSoldierSub: '兵',
       tutRookDesc: '車は直線に好きなだけ進めます。味方の駒は通り抜けられず、敵の駒は取ってそこで止まります。',
       tutHorseDesc: '馬は直線に一マス、続けて斜めに一マス進みます。直線の最初のマスが「足（あし）」で、そこに駒があるとその方向へは進めません。塞がれた足は赤く表示されます。',
