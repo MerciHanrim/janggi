@@ -1192,7 +1192,7 @@
   }
   .settings-dropdown.open { display: block; }
   .settings-section-label {
-    font-family: 'Gowun Batang', serif;
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.7rem;
     color: var(--ink-soft);
     letter-spacing: 0.08em;
@@ -1202,7 +1202,7 @@
   }
   .lang-btn {
     display: block; width: 100%;
-    font-family: 'Gowun Batang', serif;
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.84rem;
     padding: 8px 16px;
     background: transparent;
@@ -1241,7 +1241,7 @@
   /* 설정 하단 About / Credits 링크 (드롭다운 안의 작은 버튼) */
   .settings-about-link {
     display: block; width: 100%;
-    font-family: 'Gowun Batang', serif;
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
     font-size: 0.78rem;
     padding: 7px 16px;
     background: transparent;
