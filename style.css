@@ -80,9 +80,6 @@
   .title-bar {
     text-align: center;
     position: relative;
-    /* 셋업 오버레이(z-index:200) 위로 끌어올려, 모드 메뉴·진영·상차림 단계에서도
-       ⚙ 설정(언어·배경)에 닿게 한다. 드롭다운(300)·백드롭(299)은 이보다 위라 그대로 동작. */
-    z-index: 250;
   }
   .title-bar h1 {
     font-family: 'Noto Serif KR', serif;
@@ -1189,28 +1186,23 @@
     transform: translateY(-50%);
     width: 34px; height: 34px;
     display: flex; align-items: center; justify-content: center;
-    /* 옅은 종이톤 배경 + 또렷한 테두리 — 밝은 화면에서도 은은하고,
-       어두운 셋업 오버레이(rgba 43,39,36,0.78) 위에서도 동그라미가 묻히지 않게.
-       (이전엔 transparent + opacity .75라 오버레이 위에서 사실상 안 보였음 — v27 후속 수정) */
-    background: rgba(245,238,222,0.92);
-    border: 1.5px solid var(--gold);
+    background: transparent;
+    border: 1px solid rgba(107,93,72,0.14);
     border-radius: 50%;
     cursor: pointer;
-    color: var(--ink);
+    color: var(--ink-soft);
     font-size: 1rem;
-    opacity: 0.95;
-    box-shadow: 0 1px 4px rgba(43,39,36,0.18);
-    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, box-shadow 0.15s;
+    opacity: 0.75;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
     flex: none;
     padding: 0;
     letter-spacing: 0;
   }
   .settings-btn:hover {
-    background: var(--gold);
+    background: rgba(176,141,87,0.15);
     border-color: var(--gold);
-    color: #fff;
+    color: var(--ink);
     opacity: 1;
-    box-shadow: 0 2px 8px rgba(43,39,36,0.28);
   }
   /* 전역 button:active의 transform 간섭 차단 — top:50%+translateY(-50%) 와 충돌 방지 */
   .settings-btn:active { transform: translateY(-50%); }

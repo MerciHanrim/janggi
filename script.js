@@ -165,6 +165,7 @@
       modeCpu: '컴퓨터와 두기', modeCpuSub: 'AI 상대와 대국',
       modeTutorial: '장기 배우기', modeTutorialSub: '기물 행마법과 이기는 방법',
       modeRules: '장기 규칙', modeRulesSub: '장군·외통·승리 조건',
+      modeSettings: '환경 설정', modeSettingsSub: '언어 · 장기판 배경',
       modeHuman: '사람과 두기', modeHumanSub: '준비 중입니다',
       modeReview: '복기하기', modeReviewSub: '준비 중입니다',
       modeComing: '아직 준비 중입니다',
@@ -297,6 +298,7 @@
       modeCpu: 'Play with Computer', modeCpuSub: 'Play against the AI',
       modeTutorial: 'Learn Janggi', modeTutorialSub: 'How pieces move and how to win',
       modeRules: 'Rules', modeRulesSub: 'Check, checkmate, how to win',
+      modeSettings: 'Settings', modeSettingsSub: 'Language · board background',
       modeHuman: 'Play with a Friend', modeHumanSub: 'Coming soon',
       modeReview: 'Review a Game', modeReviewSub: 'Coming soon',
       modeComing: 'This mode is not yet available',
@@ -425,6 +427,7 @@
       modeCpu: '与电脑对弈', modeCpuSub: '与 AI 对手对局',
       modeTutorial: '学习象棋', modeTutorialSub: '棋子走法与取胜之道',
       modeRules: '象棋规则', modeRulesSub: '将军 · 将死 · 取胜条件',
+      modeSettings: '设置', modeSettingsSub: '语言 · 棋盘背景',
       modeHuman: '与人对弈', modeHumanSub: '敬请期待',
       modeReview: '复盘', modeReviewSub: '敬请期待',
       modeComing: '该模式尚未开放',
@@ -553,6 +556,7 @@
       modeCpu: '與電腦對弈', modeCpuSub: '與 AI 對手對局',
       modeTutorial: '學習象棋', modeTutorialSub: '棋子走法與取勝之道',
       modeRules: '象棋規則', modeRulesSub: '將軍 · 將死 · 取勝條件',
+      modeSettings: '設定', modeSettingsSub: '語言 · 棋盤背景',
       modeHuman: '與人對弈', modeHumanSub: '敬請期待',
       modeReview: '覆盤', modeReviewSub: '敬請期待',
       modeComing: '該模式尚未開放',
@@ -681,6 +685,7 @@
       modeCpu: 'コンピュータと対局', modeCpuSub: 'AI 相手と対局',
       modeTutorial: '将棋を学ぶ', modeTutorialSub: '駒の動かし方と勝ち方',
       modeRules: 'ルール', modeRulesSub: '王手 · 詰み · 勝利条件',
+      modeSettings: '設定', modeSettingsSub: '言語 · 盤の背景',
       modeHuman: '人と対局', modeHumanSub: '準備中です',
       modeReview: '振り返り', modeReviewSub: '準備中です',
       modeComing: 'このモードはまだ利用できません',
@@ -720,7 +725,7 @@
         {
           title: '王手（Check）',
           body: '相手の王を次の手で取れる状態を王手といいます。王手をかけられたら、必ず脅威から逃れなければなりません：王を安全な場所へ動かす、攻撃を遮る、または攻めている駒を取る、のいずれかです。',
-          example: '車（チャ）が相手の王を一直線に狙っている場合。',
+          example: '車が相手の王を一直線に狙っている場合。',
         },
         {
           title: '両王手（Double Check）',
@@ -809,6 +814,7 @@
       modeCpu: 'Gegen den Computer', modeCpuSub: 'Gegen die KI spielen',
       modeTutorial: 'Janggi lernen', modeTutorialSub: 'Wie Figuren ziehen und wie man gewinnt',
       modeRules: 'Regeln', modeRulesSub: 'Schach, Schachmatt, Siegbedingungen',
+      modeSettings: 'Einstellungen', modeSettingsSub: 'Sprache · Bretthintergrund',
       modeHuman: 'Gegen einen Freund', modeHumanSub: 'Demnächst verfügbar',
       modeReview: 'Partie analysieren', modeReviewSub: 'Demnächst verfügbar',
       modeComing: 'Dieser Modus ist noch nicht verfügbar',
@@ -937,6 +943,7 @@
       modeCpu: 'Jouer contre l’ordinateur', modeCpuSub: 'Jouer contre l’IA',
       modeTutorial: 'Apprendre le Janggi', modeTutorialSub: 'Déplacement des pièces et comment gagner',
       modeRules: 'Règles', modeRulesSub: 'Échec, échec et mat, conditions de victoire',
+      modeSettings: 'Paramètres', modeSettingsSub: 'Langue · fond du plateau',
       modeHuman: 'Jouer avec un ami', modeHumanSub: 'Bientôt disponible',
       modeReview: 'Analyser une partie', modeReviewSub: 'Bientôt disponible',
       modeComing: 'Ce mode n’est pas encore disponible',
@@ -1883,6 +1890,7 @@
     { id: 'rules',    nameKey: 'modeRules',    subKey: 'modeRulesSub',    icon: '則', active: true  },
     { id: 'human',    nameKey: 'modeHuman',    subKey: 'modeHumanSub',    icon: '對', active: false },
     { id: 'review',   nameKey: 'modeReview',   subKey: 'modeReviewSub',   icon: '譜', active: false },
+    { id: 'settings', nameKey: 'modeSettings', subKey: 'modeSettingsSub', icon: '設', active: true  },
   ];
   function renderModeGrid() {
     modeGrid.innerHTML = '';
@@ -1921,6 +1929,8 @@
       enterTutorial();
     } else if (id === 'rules') {
       openRulesOverlay();
+    } else if (id === 'settings') {
+      openSettings();   // 메인 메뉴에서도 기존 ⚙ 드롭다운(언어·배경)을 그대로 연다
     }
     // human / review: 추후 분기 추가
   }
