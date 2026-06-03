@@ -289,7 +289,10 @@ function isInCheck(board, side) {
   return false;
 }
 
-// 빅장(대면) 금지: 두 왕이 같은 열에서 사이에 기물 없이 마주보면 안 됨
+// 두 왕 대면(빅장) 판정: 두 왕이 같은 열에서 사이에 기물 없이 마주보면 true.
+//   ★ [6-1] 이전엔 이걸로 대면 수를 "금지"했으나, 한국 장기에서 대면은 합법(빅장)이라
+//   legalMoves의 차단을 제거함. 이 함수는 보존 — 빅장 무승부 판정([6-1b]/[6-2])에서
+//   "현재 대면 상태인가"를 검사하는 용도로 재사용한다(SF 동작 확인 후 gameStatus에 연결).
 function kingsFaceEachOther(board) {
   const kr = findKing(board, 'r');
   const kb = findKing(board, 'b');
@@ -302,7 +305,7 @@ function kingsFaceEachOther(board) {
   return true;
 }
 
-// 합법수(자기 왕이 잡히거나 빅장 되는 수 제외)
+// 합법수(자기 왕이 잡히는 수 제외). 두 왕 대면(빅장)은 한국 장기에서 합법 — 막지 않는다.
 function legalMoves(board, r, c) {
   const p = board[r][c];
   if (!p) return [];
@@ -311,7 +314,10 @@ function legalMoves(board, r, c) {
     nb[rr][cc] = nb[r][c];
     nb[r][c] = null;
     if (isInCheck(nb, p.side)) return false;
-    if (kingsFaceEachOther(nb)) return false;
+    // ★ [6-1] 왕 대면(빅장)은 합법으로 허용 — 과거 象棋식 금지(kingsFaceEachOther로 차단)를 제거.
+    //   Fairy-Stockfish janggi 변종은 대면을 합법수로 두므로, 여기서 막으면 AI가 추천한 수를
+    //   우리 엔진이 거부해 대국이 멈추는 충돌이 생겼었음(안전망 91443f8로 증상만 차단했던 원인).
+    //   kingsFaceEachOther 함수 자체는 보존 — 빅장 무승부 판정([6-1b]/[6-2])에서 "현재 대면 상태인가"로 재사용.
     return true;
   });
 }
