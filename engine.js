@@ -344,12 +344,46 @@ function applyMove(board, fr, fc, tr, tc) {
   return { board: nb, captured };
 }
 
+// ★ [6-2] 점수제 — (사)대한장기연맹 공식 점수표.
+//   차 13 · 포 7 · 마 5 · 상 3 · 사 3 · 병(졸) 2. 왕(궁)은 점수 없음(잡히면 외통이라 계산 무관).
+//   ⚠ 상(E)·사(A) 둘 다 3점 — 헷갈리기 쉬움.
+//   초기 한 진영 기물 합 = 차2·포2·마2·상2·사2·병5 = 26+14+10+6+6+10 = 72점.
+//   한(漢) 후수 덤 1.5점 → 시작 점수 초 72 / 한 73.5.
+const PIECE_SCORE = { R: 13, C: 7, H: 5, E: 3, A: 3, P: 2, K: 0 };
+const HAN_KOMI = 1.5;   // 후수(한) 덤
+
+// 현재 board의 양쪽 점수를 계산. 무승부(빅장·수막힘) 시 승부를 가르는 용도.
+//   반환: { r, b, diff, winner }
+//     r = 초 점수, b = 한 점수(덤 포함), diff = |r-b|,
+//     winner = 'r'|'b'|null(동점 — 덤 1.5로 수학상 불가하나 방어적으로 둠).
+//   ※ 점수는 "지금 board에 남은 기물"의 합 — 잡힌 기물은 자연히 빠짐(board에 없음).
+function scoreBoard(board) {
+  let r = 0, b = 0;
+  for (let row = 0; row < ROWS; row++) {
+    for (let c = 0; c < COLS; c++) {
+      const p = board[row][c];
+      if (!p) continue;
+      const v = PIECE_SCORE[p.type] || 0;
+      if (p.side === 'r') r += v;
+      else b += v;
+    }
+  }
+  b += HAN_KOMI;   // 한 후수 덤
+  // 동점 분기는 방어용 — 초는 정수, 한은 정수+1.5라 실제로는 같아질 수 없음.
+  let winner = null;
+  if (r > b) winner = 'r';
+  else if (b > r) winner = 'b';
+  return { r, b, diff: Math.abs(r - b), winner };
+}
+
 // 게임 종료 판정: 합법수 없으면 외통(장군→패) 또는 수막힘(장군 아님→무승부).
 //   추가로 [6-1b] 빅장(대궁) 무승부 — 아래 reason 'bikjang' 참조.
-// 반환: { over, loser?, reason?, draw? }
+// 반환: { over, loser?, reason?, draw?, score? }
 //   reason: 'checkmate'(외통) | 'stalemate'(외통 아닌 수막힘) | 'bikjang'(빅장 무승부)
 //   외통 → loser = sideToMove (패). 수막힘/빅장 → draw = true (무승부, loser 없음).
-// ※ 점수제·반복수는 별도 작업([6-2]/[6-3])으로 분리 — 여기선 미처리.
+//   ★ [6-2] 무승부(draw) 시 score = scoreBoard(board) 첨부 — 점수 승부 표시용.
+//     점수는 무승부가 났을 때만 계산(진행 중엔 안 함 — 실시간 점수판은 장기 정서와 안 맞음).
+// ※ 반복수(만년장)는 별도 작업([6-3])으로 분리 — 여기선 미처리.
 function gameStatus(board, sideToMove) {
   const moves = allLegalMoves(board, sideToMove);
   if (moves.length === 0) {
@@ -357,8 +391,8 @@ function gameStatus(board, sideToMove) {
       // 장군당한 채 합법수 없음 = 외통 = 둘 차례 쪽 패
       return { over: true, loser: sideToMove, reason: 'checkmate' };
     }
-    // 장군은 아닌데 둘 수가 없음 = 수막힘 = 무승부
-    return { over: true, draw: true, reason: 'stalemate' };
+    // 장군은 아닌데 둘 수가 없음 = 수막힘 = 무승부 → 점수 승부
+    return { over: true, draw: true, reason: 'stalemate', score: scoreBoard(board) };
   }
   // ★ [6-1b] 빅장(대궁) 무승부 판정.
   //   "두 왕이 지금 대면 중"이라는 사실만으로 끝내지 않는다 — 상대가 다음 수에 대면을
@@ -376,7 +410,8 @@ function gameStatus(board, sideToMove) {
       return kingsFaceEachOther(nb);
     });
     if (allStillFacing) {
-      return { over: true, draw: true, reason: 'bikjang' };
+      // ★ [6-2] 빅장 무승부도 점수 승부 — 연맹 규정상 빅장은 곧 점수로 가린다.
+      return { over: true, draw: true, reason: 'bikjang', score: scoreBoard(board) };
     }
   }
   return { over: false };
@@ -388,6 +423,7 @@ if (typeof module !== 'undefined' && module.exports) {
     ROWS, COLS, initialBoard, cloneBoard, pseudoMoves, legalMoves,
     allLegalMoves, applyMove, isInCheck, kingsFaceEachOther, gameStatus,
     findKing, inPalace, isDiagNode, SETUPS, SETUP_NAMES, randomSetup,
+    scoreBoard, PIECE_SCORE,
   };
 }
 
@@ -397,5 +433,6 @@ if (typeof window !== 'undefined') {
     ROWS, COLS, initialBoard, cloneBoard, pseudoMoves, legalMoves,
     allLegalMoves, applyMove, isInCheck, kingsFaceEachOther, gameStatus,
     findKing, inPalace, isDiagNode, SETUPS, SETUP_NAMES, randomSetup,
+    scoreBoard, PIECE_SCORE,
   };
 }
