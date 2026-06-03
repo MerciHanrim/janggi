@@ -1004,7 +1004,7 @@
   }
   .tut-piece-card {
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    align-items: center; justify-content: flex-start;  /* 위 기준 정렬: 이미지가 텍스트 양에 밀리지 않게 */
     gap: 4px;
     background: rgba(255,255,255,0.4);
     border: 1.5px solid var(--line);
@@ -1030,6 +1030,7 @@
     width: min(72px, 100%);
     height: min(72px, 100%);
     margin: 0 auto 4px;
+    flex-shrink: 0;   /* 텍스트가 길어도 이미지가 찌그러지지 않게 */
   }
   .tut-piece-img img {
     width: 100%; height: 100%;
@@ -1039,6 +1040,10 @@
   .tut-piece-name {
     font-size: 0.7rem; color: var(--ink-soft);
     letter-spacing: 0.01em; line-height: 1.3;
+    /* 이름표가 1줄(한국어)/2줄(영어 General 등) 섞여도 카드 간 기준선이 맞도록
+       최소 2줄 높이 예약 → 이미지 줄과 보조 줄 위치가 7개 카드 공통으로 정렬 */
+    min-height: 2.1em;
+    display: flex; align-items: center; justify-content: center;
   }
   /* 기물 선택 카드 보조 라벨 — 진영별 다른 글자(장 楚·漢, 졸 兵). 작지만 읽히는 보조 정보(고연령 대비로 너무 흐리지 않게). */
   .tut-piece-sub {

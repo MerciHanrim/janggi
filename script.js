@@ -1050,9 +1050,9 @@
     },
     en: {
       tutPieceTitle: 'Choose a piece to learn how it moves',
-      tutRookName: 'Chariot (車)', tutHorseName: 'Horse (馬)', tutElephantName: 'Elephant (象)',
-      tutCannonName: 'Cannon (包)', tutGuardName: 'Guard (士)', tutSoldierName: 'Soldier (卒)', tutKingName: 'General (將)',
-      tutKingSub: '楚 · 漢 (Chu · Han)', tutSoldierSub: '兵 (Bing)',
+      tutRookName: 'Chariot', tutHorseName: 'Horse', tutElephantName: 'Elephant',
+      tutCannonName: 'Cannon', tutGuardName: 'Guard', tutSoldierName: 'Soldier', tutKingName: 'General',
+      tutKingSub: 'Chu · Han', tutSoldierSub: 'Bing',
       tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
       tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
       tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. Its path has two blocking points: the straight step and the first diagonal step. If a piece sits on either one, the Elephant cannot move that way. Blocked points are marked in red.',
