@@ -997,8 +997,8 @@
     { id: 'elephant', type: 'E', nameKey: 'tutElephantName', active: true  },
     { id: 'cannon',   type: 'C', nameKey: 'tutCannonName',   active: true  },
     { id: 'guard',    type: 'A', nameKey: 'tutGuardName',    active: true  },
-    { id: 'king',     type: 'K', nameKey: 'tutKingName',     active: true  },
-    { id: 'soldier',  type: 'P', nameKey: 'tutSoldierName',  active: true  },
+    { id: 'king',     type: 'K', nameKey: 'tutKingName',     subKey: 'tutKingSub',    active: true  },
+    { id: 'soldier',  type: 'P', nameKey: 'tutSoldierName',  subKey: 'tutSoldierSub', active: true  },
   ];
 
   // i18n 튜토리얼 키
@@ -1007,6 +1007,8 @@
       tutPieceTitle: '기물을 골라 행마법을 배워보세요',
       tutRookName: '차(車)', tutHorseName: '마(馬)', tutElephantName: '상(象)',
       tutCannonName: '포(包)', tutGuardName: '사(士)', tutSoldierName: '졸(卒)', tutKingName: '장(將)',
+      // 기물 선택 카드 보조 라벨: 진영마다 글자가 다른 기물(장·졸)만. 같은 역할, 다른 글자.
+      tutKingSub: '楚 · 漢', tutSoldierSub: '兵',
       // 설명
       tutRookDesc: '차는 직선으로 얼마든지 이동할 수 있습니다. 아군 기물은 지나갈 수 없고, 적 기물은 잡으며 멈춥니다.',
       tutHorseDesc: '마는 직선 한 칸 + 대각선 한 칸으로 이동합니다. 직선 방향(멱)에 기물이 있으면 그쪽으로는 이동할 수 없습니다.',
@@ -1050,6 +1052,7 @@
       tutPieceTitle: 'Choose a piece to learn how it moves',
       tutRookName: 'Chariot (車)', tutHorseName: 'Horse (馬)', tutElephantName: 'Elephant (象)',
       tutCannonName: 'Cannon (包)', tutGuardName: 'Guard (士)', tutSoldierName: 'Soldier (卒)', tutKingName: 'General (將)',
+      tutKingSub: '楚 · 漢 (Chu · Han)', tutSoldierSub: '兵 (Bing)',
       tutRookDesc: 'The Chariot moves any number of squares in a straight line. It cannot pass through friendly pieces, and captures by landing on an enemy piece.',
       tutHorseDesc: 'The Horse moves one step straight then one step diagonally. If a piece is blocking the straight step, the Horse cannot move in that direction.',
       tutElephantDesc: 'The Elephant moves one step straight then two steps diagonally. Its path has two blocking points: the straight step and the first diagonal step. If a piece sits on either one, the Elephant cannot move that way. Blocked points are marked in red.',
@@ -1124,7 +1127,8 @@
       card.className = 'tut-piece-card' + (p.active ? '' : ' tut-coming');
       card.innerHTML =
         `<div class="tut-piece-img"><img src="${TUT_PIECE_IMG.r[p.type]}" alt="${tt(p.nameKey)}" draggable="false"></div>` +
-        `<span class="tut-piece-name">${tt(p.nameKey)}</span>`;
+        `<span class="tut-piece-name">${tt(p.nameKey)}</span>` +
+        (p.subKey ? `<span class="tut-piece-sub">${tt(p.subKey)}</span>` : '');
       if (p.active) {
         card.onclick = (e) => { e.stopPropagation(); startTutorialScenario(p.id); };
       } else {
