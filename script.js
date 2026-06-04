@@ -125,6 +125,7 @@
       notYourTurn: (s) => `지금은 ${s} 차례입니다`,
       check: (s) => `장군! ${s} 왕을 구하는 수를 두세요`,
       checkWord: '장군',
+      defendWord: '멍군',
       myFaction: (you, sR, sB) => `내 진영: ${you} · 초 ${sR} · 한 ${sB}`,
       chuFirst: '초(楚) 선수', hanSecond: '한(漢) 후수',
       win: (s) => `${s} 승리`,
@@ -263,6 +264,7 @@
       notYourTurn: (s) => `It's ${s}'s turn`,
       check: (s) => `Check! Save ${s}'s general`,
       checkWord: 'Check',
+      defendWord: 'Defend',
       myFaction: (you, sR, sB) => `You: ${you} · Cho ${sR} · Han ${sB}`,
       chuFirst: 'Cho (楚) · First', hanSecond: 'Han (漢) · Second',
       win: (s) => `${s} wins`,
@@ -396,6 +398,7 @@
       notYourTurn: (s) => `现在轮到 ${s} 行棋`,
       check: (s) => `将军！请走子保护 ${s} 方的将`,
       checkWord: '将军',
+      defendWord: '应将',
       myFaction: (you, sR, sB) => `我的阵营：${you} · 楚 ${sR} · 汉 ${sB}`,
       chuFirst: '楚 · 先手', hanSecond: '汉 · 后手',
       win: (s) => `${s} 方获胜`,
@@ -525,6 +528,7 @@
       notYourTurn: (s) => `現在輪到 ${s} 行棋`,
       check: (s) => `將軍！請走子保護 ${s} 方的將`,
       checkWord: '將軍',
+      defendWord: '應將',
       myFaction: (you, sR, sB) => `我的陣營：${you} · 楚 ${sR} · 漢 ${sB}`,
       chuFirst: '楚 · 先手', hanSecond: '漢 · 後手',
       win: (s) => `${s} 方獲勝`,
@@ -654,6 +658,7 @@
       notYourTurn: (s) => `今は ${s} の手番です`,
       check: (s) => `王手！${s} の王を守る手を指してください`,
       checkWord: '王手',
+      defendWord: '受け',
       myFaction: (you, sR, sB) => `自分の陣営：${you} · 楚 ${sR} · 漢 ${sB}`,
       chuFirst: '楚 · 先手', hanSecond: '漢 · 後手',
       win: (s) => `${s} の勝ち`,
@@ -783,6 +788,7 @@
       notYourTurn: (s) => `${s} ist am Zug`,
       check: (s) => `Schach! Rette den General von ${s}`,
       checkWord: 'Schach',
+      defendWord: 'Abwehr',
       myFaction: (you, sR, sB) => `Du: ${you} · Cho ${sR} · Han ${sB}`,
       chuFirst: 'Cho (楚) · Anziehend', hanSecond: 'Han (漢) · Nachziehend',
       win: (s) => `${s} gewinnt`,
@@ -912,6 +918,7 @@
       notYourTurn: (s) => `C’est au tour de ${s}`,
       check: (s) => `Échec ! Sauvez le général de ${s}`,
       checkWord: 'Échec',
+      defendWord: 'Parade',
       myFaction: (you, sR, sB) => `Vous : ${you} · Cho ${sR} · Han ${sB}`,
       chuFirst: 'Cho (楚) · Premier', hanSecond: 'Han (漢) · Second',
       win: (s) => `${s} gagne`,
@@ -1095,6 +1102,8 @@
   //   사람=chu → aiSide='b' / 사람=han → aiSide='r'(AI 선공).
   let aiSide = null;
   let aiThinking = false;   // 중복 호출 방지 플래그
+  let animating = false;    // ★ 기물 이동 애니메이션 진행 중 플래그 (입력 잠금)
+  const MOVE_ANIM_MS = 250; // 이동 미끄럼 지속(차분한 수묵 톤)
 
   // ── AI 강도 3단계 (★ 강도 다변화) ─────────────────────────
   //   pc vs ai 구조라 AI 강도가 곧 "상대 그 자체". 강도 폭이 게임성 필수 요소.
@@ -1851,6 +1860,7 @@
     stopClock();
     // ★ AI 상태 초기화 (새 판 시작 — 직전 판 설정 잔재 제거).
     aiThinking = false;
+    animating = false;   // ★ 이동 미끄럼 플래그도 해제(미끄럼 중 처음부터/새 판 대비)
     aiSide = null;
     clearAiFailUI();
     frame.classList.remove('ai-thinking');
@@ -2356,7 +2366,7 @@
       dot.className = 'dot dot-' + turn + (isCap ? ' capture' : '');
       dot.style.left = x + '%';
       dot.style.top = y + '%';
-      dot.onclick = (e) => { e.stopPropagation(); tutorialMode ? doTutorialMove(rr, cc) : doMove(rr, cc); };
+      dot.onclick = (e) => { e.stopPropagation(); if (animating) return; tutorialMode ? doTutorialMove(rr, cc) : doMove(rr, cc); };
       piecesLayer.appendChild(dot);
     }
     // ★ [D] 상(象) 멱 막힘 표시 — 튜토리얼에서만. 길을 가로막은 돌 위에 붉은 표식.
@@ -2392,6 +2402,7 @@
 
   function onPieceClick(r, c) {
     if (gameOver) return;
+    if (animating) return;   // ★ 이동 미끄럼 중에는 입력 무시(연쇄 수·고스트 꼬임 방지)
     // ★ 튜토리얼 모드: AI 없음, turn 체크 없이 플레이어(r) 기물만 선택 가능
     if (tutorialMode) {
       if (tutorialPhase === 'intro') return;    // intro 중엔 기물 선택 차단
@@ -2518,9 +2529,51 @@
     return colNames[c] + (r + 1);
   }
 
+  // ★ 기물 이동 미끄럼 연출. render()는 무변경 — 새 판을 그린 위에 "이동 기물 모양의
+  //   임시 고스트" 하나를 from에 띄워 to까지 transform으로 미끄러뜨린 뒤 제거한다.
+  //   spawnSplat와 같은 패턴(piecesLayer에 임시 요소 + 시간 뒤 remove). 사람·AI 공통(doMove 경유).
+  //   onDone: 미끄럼이 끝나는 순간 실행(잡기 splat·소리를 "도착 순간"으로 미뤄 당하는 느낌).
+  function animateMove(side, type, fr, fc, tr, tc, onDone) {
+    const from = posToXY(fr, fc);
+    const to = posToXY(tr, tc);
+    // ★ render()는 이미 도착칸에 새 기물을 그려둔 상태. 그대로 두면 미끄러지는 고스트와
+    //   도착칸 정적 기물이 "둘"로 보인다 → 미끄럼 동안 도착칸 실제 기물을 숨기고 끝나면 복원.
+    let hidden = null;
+    const toLeft = to.x + '%', toTop = to.y + '%';
+    for (const el of piecesLayer.querySelectorAll('.piece:not(.move-ghost)')) {
+      if (el.style.left === toLeft && el.style.top === toTop) { hidden = el; break; }
+    }
+    if (hidden) hidden.style.visibility = 'hidden';
+    const ghost = document.createElement('div');
+    ghost.className = `piece ${side} move-ghost`;
+    ghost.style.left = from.x + '%';
+    ghost.style.top = from.y + '%';
+    ghost.innerHTML = `<img class="piece-img" src="${PIECE_IMG[side][type]}" alt="${HANJA[side][type]}" draggable="false">`;
+    piecesLayer.appendChild(ghost);
+    // 다음 프레임에 목적지 좌표로 옮기면 CSS transition이 보간한다(rAF 2회로 초기 위치 확정 보장).
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      ghost.style.left = to.x + '%';
+      ghost.style.top = to.y + '%';
+    }));
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      ghost.remove();
+      if (hidden) hidden.style.visibility = '';   // 도착칸 실제 기물 복원
+      if (onDone) onDone();
+    };
+    ghost.addEventListener('transitionend', finish, { once: true });
+    // transitionend 누락 대비 안전망(탭 비활성 등). 약간 여유 둠.
+    setTimeout(finish, MOVE_ANIM_MS + 80);
+  }
+
   function doMove(tr, tc) {
     const [fr, fc] = selected;
     const mover = board[fr][fc];
+    // ★ 멍군 판정용: 이 수를 두기 전, 두는 쪽(mover.side)이 장군당해 있었는지.
+    //   수를 둔 뒤 그 쪽이 더 이상 장군이 아니면 = 장군을 푼 것 = 멍군.
+    const wasInCheckBeforeMove = Eng.isInCheck(board, mover.side);
     history.push({
       board: Eng.cloneBoard(board), turn,
       capR: [...captured.r], capB: [...captured.b],
@@ -2533,13 +2586,13 @@
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     board = res.board;
     let capType = null;
+    const isCapture = !!res.captured;
     if (res.captured) {
       captured[turn].push(res.captured.type);
       capType = res.captured.type;
-      playCaptureSound();   // 잡기 전용 소리
-      spawnSplat(tr, tc);
+      // ★ 잡기 소리·튐(splat)은 "도착 순간"으로 미룸(animateMove onDone) — 당하는 느낌.
     } else {
-      playMoveSound();   // 일반 이동 소리
+      playMoveSound();   // 일반 이동 소리는 즉시(미끄럼 시작과 함께)
     }
     // 기보 기록
     moveLog.push({
@@ -2554,6 +2607,16 @@
     blockedForSel = [];
     turn = turn === 'r' ? 'b' : 'r';
     render();
+    // ★ 이동 미끄럼 연출 — render()로 새 판을 그린 위에 고스트가 from→to로 미끄러진다.
+    //   render는 무변경. mover.side는 turn 전환 전 값이라 위에서 잡아둔 것을 쓴다.
+    animating = true;
+    animateMove(mover.side, mover.type, fr, fc, tr, tc, () => {
+      animating = false;
+      if (isCapture) {
+        playCaptureSound();   // 잡기 소리 — 도착 순간
+        spawnSplat(tr, tc);   // 먹 튐 — 도착 순간(적 기물이 덮이며 사라지는 느낌)
+      }
+    });
     renderMovelog();
     updateTurnUI();
     renderClock();   // 새 차례 강조 갱신
@@ -2583,7 +2646,13 @@
     } else {
       refreshStatus();   // 장군이면 "장군!", 아니면 기물 고르세요 (파생 문구)
       // ★ 이벤트성 연출: 이번 수로 새로 장군이 걸린 경우에만. undo/setLang에선 안 울림.
-      if (Eng.isInCheck(board, turn)) fireCheckFx();
+      if (Eng.isInCheck(board, turn)) {
+        fireCheckFx();
+      } else if (wasInCheckBeforeMove) {
+        // ★ 멍군: 두기 전 내가 장군당해 있었고, 이 수로 풀었고(지금 상대를 새로 장군 건 것도 아님).
+        //   장군(공격)이 동시에 나면 장군을 우선(위 분기). 순수하게 받아낸 경우만 멍군 연출.
+        fireDefendFx(tr, tc);
+      }
       startClock();   // 새 차례 쪽 시계 시작 (none이면 무동작)
       // ★ 다음 차례가 AI면 AI에게 위임 (연출·소리·장군은 doMove 경유라 자동 적용).
       maybeAiMove();
@@ -2886,6 +2955,35 @@
     spawnCheckBurst();
     spawnCheckAnnounce();
     playCheckSound();
+  }
+
+  // ★ 멍군 연출 — 장군당해 있던 쪽이 이번 수로 장군을 푼 경우. 장군(붉은 공격)의 짝(청록 응수).
+  //   소리는 그 수의 성격(이동/잡기)을 따라 doMove에서 이미 울리므로 여기선 시각만.
+  //   버스트는 궁이 아니라 "멍군을 둔 기물"(방금 움직인 to)에 — "여기로 받았다"는 의미.
+  function fireDefendFx(tr, tc) {
+    spawnDefendBurst(tr, tc);
+    spawnDefendAnnounce();
+  }
+  function spawnDefendBurst(tr, tc) {
+    const { x, y } = posToXY(tr, tc);
+    const burst = document.createElement('div');
+    burst.className = 'defend-burst';
+    burst.style.left = x + '%';
+    burst.style.top = y + '%';
+    piecesLayer.appendChild(burst);
+    setTimeout(() => burst.remove(), 900);
+  }
+  function spawnDefendAnnounce() {
+    const old = frame.querySelector('.defend-announce');
+    if (old) old.remove();
+    const ov = document.createElement('div');
+    ov.className = 'defend-announce';
+    const span = document.createElement('span');
+    span.className = 'defend-announce-text';
+    span.textContent = t('defendWord');
+    ov.appendChild(span);
+    frame.appendChild(ov);
+    setTimeout(() => ov.remove(), 850);
   }
 
   // ── 기물 놓는 소리 (백자알 "딱") — 매 수마다. check와 동일한 파일-우선/합성-폴백 구조. ──
@@ -3277,6 +3375,7 @@
     if (gameOver) return;
     // ★ AI가 생각 중이면 무르기 막음 (수가 들어오는 중 되감으면 꼬임).
     if (aiThinking) return;
+    if (animating) return;   // ★ 이동 미끄럼 중 무르기 막음(고스트·도착칸 숨김 상태 꼬임 방지)
     if (!history.length) return;
     // 한 수 되감기 (공통).
     const popOne = () => {

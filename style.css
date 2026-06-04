@@ -332,6 +332,15 @@
   }
   .piece:hover { transform: translate(-50%, -52%); }
 
+  /* ★ 이동 미끄럼 고스트 — render()가 그린 새 판 위에서 from→to로 미끄러지는 임시 기물.
+     기존 .piece의 top/left transition(끝에서 튕기는 곡선)을 차분한 ease-out으로 덮어쓴다.
+     클릭을 가로채지 않도록 pointer-events 차단(아래 실제 기물/점이 살아있게). */
+  .piece.move-ghost {
+    pointer-events: none;
+    z-index: 6;   /* 일반 기물(2)·선택(5)보다 위로 — 미끄러지는 동안 가장 앞 */
+    transition: left 0.25s ease-out, top 0.25s ease-out;
+  }
+
   /* 합법수 표시 — 히트박스(투명) + 시각 표시 */
   /* 이동점 CSS 변수 — 테마별로 :root 또는 .board-frame.bg-* 에서 재정의 가능 */
   :root {
@@ -476,6 +485,48 @@
     28%  { opacity: 1; transform: scale(1); letter-spacing: 0.3em; }
     65%  { opacity: 1; }
     100% { opacity: 0; transform: scale(0.96); }
+  }
+
+  /* ★ 멍군 연출 — 장군(붉은 공격)의 짝. 청록(--blue) 응수. 구조는 장군과 동일, 색만 다름.
+     버스트는 멍군을 둔 기물(to) 위에서 퍼진다("여기로 받았다"). */
+  .defend-burst {
+    position: absolute;
+    width: 12%; aspect-ratio: 1;
+    transform: translate(-50%,-50%) scale(0.3);
+    border-radius: 50%;
+    border: 4px solid rgba(31,78,95,0.9);
+    box-shadow:
+      0 0 18px rgba(31,78,95,0.8),
+      0 0 36px var(--glow),
+      inset 0 0 16px rgba(31,78,95,0.45);
+    pointer-events: none;
+    z-index: 6;
+    animation: checkBurst 0.9s cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  .defend-announce {
+    position: absolute; inset: 0;
+    z-index: 9;
+    border-radius: 3px;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    background:
+      radial-gradient(110% 80% at 50% 45%, rgba(31,78,95,0.16), rgba(31,78,95,0) 55%),
+      radial-gradient(120% 80% at 35% 30%, rgba(248,244,236,0.82), rgba(248,244,236,0) 62%),
+      linear-gradient(rgba(244,236,228,0.7), rgba(238,228,216,0.7));
+    backdrop-filter: blur(4px);
+    animation: checkMist 0.85s ease-out forwards;
+  }
+  .defend-announce-text {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 8vw, 3.6rem);
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    color: var(--blue-deep);
+    text-shadow: 0 2px 10px rgba(31,78,95,0.4), 0 0 20px var(--glow);
+    opacity: 0;
+    animation: checkMistText 0.85s ease-out forwards;
   }
 
   .controls { display: flex; gap: 10px; }
