@@ -1888,8 +1888,6 @@
     { id: 'cpu',      nameKey: 'modeCpu',      subKey: 'modeCpuSub',      icon: '弈', active: true  },
     { id: 'tutorial', nameKey: 'modeTutorial', subKey: 'modeTutorialSub', icon: '學', active: true  },
     { id: 'rules',    nameKey: 'modeRules',    subKey: 'modeRulesSub',    icon: '則', active: true  },
-    { id: 'human',    nameKey: 'modeHuman',    subKey: 'modeHumanSub',    icon: '對', active: false },
-    { id: 'review',   nameKey: 'modeReview',   subKey: 'modeReviewSub',   icon: '譜', active: false },
     { id: 'settings', nameKey: 'modeSettings', subKey: 'modeSettingsSub', icon: '設', active: true  },
   ];
   function renderModeGrid() {
