@@ -1885,10 +1885,10 @@
 
   // 모드 메뉴 카드 렌더
   const MODE_LIST = [
-    { id: 'cpu',      nameKey: 'modeCpu',      subKey: 'modeCpuSub',      icon: 'assets/menu/main-menu_solo-play.webp', active: true  },
-    { id: 'tutorial', nameKey: 'modeTutorial', subKey: 'modeTutorialSub', icon: 'assets/menu/main-menu_pen.webp',       active: true  },
-    { id: 'rules',    nameKey: 'modeRules',    subKey: 'modeRulesSub',    icon: 'assets/menu/main-menu_scroll.webp',     active: true  },
-    { id: 'settings', nameKey: 'modeSettings', subKey: 'modeSettingsSub', icon: 'assets/menu/main-menu_setting.webp',    active: true  },
+    { id: 'cpu',      nameKey: 'modeCpu',      subKey: 'modeCpuSub',      active: true  },
+    { id: 'tutorial', nameKey: 'modeTutorial', subKey: 'modeTutorialSub', active: true  },
+    { id: 'rules',    nameKey: 'modeRules',    subKey: 'modeRulesSub',    active: true  },
+    { id: 'settings', nameKey: 'modeSettings', subKey: 'modeSettingsSub', active: true  },
   ];
   function renderModeGrid() {
     modeGrid.innerHTML = '';
@@ -1896,7 +1896,6 @@
       const card = document.createElement('div');
       card.className = 'mode-card' + (m.active ? '' : ' mode-coming');
       card.innerHTML =
-        `<span class="mode-icon"><img src="${m.icon}" alt="" draggable="false"></span>` +
         `<span class="mode-text"><span class="mode-name">${t(m.nameKey)}</span>` +
         `<span class="mode-sub">${t(m.subKey)}</span></span>`;
       if (m.active) {
