@@ -889,13 +889,20 @@
     box-shadow: none;
   }
   .mode-icon {
-    font-family: 'Ma Shan Zheng', 'Noto Serif KR', serif;
-    font-size: 1.45rem;
-    line-height: 1;
     flex-shrink: 0;
-    width: 1.8rem;
-    text-align: center;
-    color: var(--ink-soft);
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mode-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    -webkit-user-drag: none;
+    user-select: none;
   }
   .mode-text {
     flex: 1;
