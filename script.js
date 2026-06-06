@@ -121,7 +121,7 @@
       capChuEmpty: '초가 잡은 기물', capHanEmpty: '한이 잡은 기물',
       movelogTitle: '기 보', movelogEmpty: '아직 둔 수가 없습니다',
       pickPiece: '기물을 골라 두세요',
-      pickDest: '둘 곳을 고르세요', cantMove: '둘 수 없는 기물입니다',
+      pickDest: '둘 곳을 고르세요', cantMove: '둘 수 없는 기물입니다', cantMovePinned: '장을 지키고 있어 움직일 수 없습니다', cantMoveInCheck: '지금은 장군을 막아야 합니다',
       notYourTurn: (s) => `지금은 ${s} 차례입니다`,
       check: (s) => `장군! ${s} 왕을 구하는 수를 두세요`,
       checkWord: '장군',
@@ -260,7 +260,7 @@
       capChuEmpty: 'Captured by Cho', capHanEmpty: 'Captured by Han',
       movelogTitle: 'Moves', movelogEmpty: 'No moves yet',
       pickPiece: 'Select a piece',
-      pickDest: 'Choose a destination', cantMove: 'This piece has no legal moves',
+      pickDest: 'Choose a destination', cantMove: 'This piece has no legal moves', cantMovePinned: 'It is guarding the general and cannot move', cantMoveInCheck: 'You must respond to the check first',
       notYourTurn: (s) => `It's ${s}'s turn`,
       check: (s) => `Check! Save ${s}'s general`,
       checkWord: 'Check',
@@ -394,7 +394,7 @@
       capChuEmpty: '楚方吃掉的棋子', capHanEmpty: '汉方吃掉的棋子',
       movelogTitle: '棋 谱', movelogEmpty: '尚无棋步',
       pickPiece: '请选择棋子',
-      pickDest: '请选择落点', cantMove: '该棋子无合法走法',
+      pickDest: '请选择落点', cantMove: '该棋子无合法走法', cantMovePinned: '该棋子正护卫将帅，无法移动', cantMoveInCheck: '现在必须先应将',
       notYourTurn: (s) => `现在轮到 ${s} 行棋`,
       check: (s) => `将军！请走子保护 ${s} 方的将`,
       checkWord: '将军',
@@ -524,7 +524,7 @@
       capChuEmpty: '楚方吃掉的棋子', capHanEmpty: '漢方吃掉的棋子',
       movelogTitle: '棋 譜', movelogEmpty: '尚無棋步',
       pickPiece: '請選擇棋子',
-      pickDest: '請選擇落點', cantMove: '該棋子無合法走法',
+      pickDest: '請選擇落點', cantMove: '該棋子無合法走法', cantMovePinned: '該棋子正護衛將帥，無法移動', cantMoveInCheck: '現在必須先應將',
       notYourTurn: (s) => `現在輪到 ${s} 行棋`,
       check: (s) => `將軍！請走子保護 ${s} 方的將`,
       checkWord: '將軍',
@@ -654,7 +654,7 @@
       capChuEmpty: '楚が取った駒', capHanEmpty: '漢が取った駒',
       movelogTitle: '棋 譜', movelogEmpty: 'まだ手がありません',
       pickPiece: '駒を選んでください',
-      pickDest: '移動先を選んでください', cantMove: 'この駒は動かせません',
+      pickDest: '移動先を選んでください', cantMove: 'この駒は動かせません', cantMovePinned: '王を守っているため動かせません', cantMoveInCheck: '今は王手を防がなければなりません',
       notYourTurn: (s) => `今は ${s} の手番です`,
       check: (s) => `王手！${s} の王を守る手を指してください`,
       checkWord: '王手',
@@ -784,7 +784,7 @@
       capChuEmpty: 'Von Cho geschlagen', capHanEmpty: 'Von Han geschlagen',
       movelogTitle: 'Züge', movelogEmpty: 'Noch keine Züge',
       pickPiece: 'Wähle eine Figur',
-      pickDest: 'Wähle ein Zielfeld', cantMove: 'Diese Figur hat keine gültigen Züge',
+      pickDest: 'Wähle ein Zielfeld', cantMove: 'Diese Figur hat keine gültigen Züge', cantMovePinned: 'Sie deckt den General und kann nicht ziehen', cantMoveInCheck: 'Du musst zuerst das Schach abwehren',
       notYourTurn: (s) => `${s} ist am Zug`,
       check: (s) => `Schach! Rette den General von ${s}`,
       checkWord: 'Schach',
@@ -914,7 +914,7 @@
       capChuEmpty: 'Capturé par Cho', capHanEmpty: 'Capturé par Han',
       movelogTitle: 'Coups', movelogEmpty: 'Aucun coup pour l’instant',
       pickPiece: 'Choisissez une pièce',
-      pickDest: 'Choisissez une destination', cantMove: 'Cette pièce n’a aucun coup légal',
+      pickDest: 'Choisissez une destination', cantMove: 'Cette pièce n’a aucun coup légal', cantMovePinned: 'Elle protège le général et ne peut pas bouger', cantMoveInCheck: 'Vous devez d’abord parer l’échec',
       notYourTurn: (s) => `C’est au tour de ${s}`,
       check: (s) => `Échec ! Sauvez le général de ${s}`,
       checkWord: 'Échec',
@@ -1082,6 +1082,9 @@
   // ★ 튜토리얼 전용: 상(象) 선택 시 멱이 막혀 못 가는 칸 정보. [{r,c}] 형태.
   //   대국 화면은 깨끗하게 두기 위해 튜토리얼 + 상에서만 채운다. 그 외엔 항상 [].
   let blockedForSel = [];
+  // ★ 핀(장군 노출) 표시용: 행마는 되지만 두면 자기 將이 장군 맞아 모두 막힌 도착칸들.
+  //   blockedForSel(튜토리얼 멱 막힘)과 의미가 달라 변수 분리. 실제 대국에서도 표시.
+  let pinnedDests = [];
 
   // ── 대국 룰 옵션 (★ 확장 지점) ──────────────────────────────
   // 향후 입주 예정: 무르기 횟수 제한, 빅장(대궁 무승부) 처리, 점수제 등.
@@ -1700,7 +1703,7 @@
     endState = null;
     selected = null;
     legalForSel = [];
-    blockedForSel = [];
+    blockedForSel = []; pinnedDests = [];
     winOverlay.classList.remove('show');
     setupOverlay.classList.remove('show');
     stopClock();
@@ -1766,7 +1769,7 @@
     turn = 'r';
     selected = null;
     legalForSel = [];
-    blockedForSel = [];
+    blockedForSel = []; pinnedDests = [];
     moveLog = [];
     drawGrid();
     render();
@@ -1911,7 +1914,7 @@
     }
     selected = null;
     legalForSel = [];
-    blockedForSel = [];
+    blockedForSel = []; pinnedDests = [];
 
     // 미션 phase: 수 차감 + 성공/실패 판정
     if (tutorialPhase === 'mission') {
@@ -2333,7 +2336,7 @@
     turn = 'r';                       // 선수는 언제나 초(r). 엔진 불변.
     selected = null;
     legalForSel = [];
-    blockedForSel = [];
+    blockedForSel = []; pinnedDests = [];
     history = [];
     // ★ [6-3b] 반복수 맵 초기화 + 시작 국면 1회 기록.
     //   turn='r'(초 선수)이 둘 차례인 초기 배치를 첫 국면으로 센다. 이후 같은 배치+같은 차례가
@@ -2483,17 +2486,23 @@
       dot.onclick = (e) => { e.stopPropagation(); if (animating) return; tutorialMode ? doTutorialMove(rr, cc) : doMove(rr, cc); };
       piecesLayer.appendChild(dot);
     }
-    // ★ [D] 상(象) 멱 막힘 표시 — 튜토리얼에서만. 길을 가로막은 돌 위에 붉은 표식.
-    if (tutorialMode && blockedForSel.length) {
-      for (const { r: br, c: bc } of blockedForSel) {
-        const { x, y } = posToXY(br, bc);
-        const mk = document.createElement('div');
-        mk.className = 'block-mark';
-        mk.style.left = x + '%';
-        mk.style.top = y + '%';
-        // 표식은 안내용이라 클릭을 가로채지 않음(아래 기물 클릭이 그대로 동작)
-        piecesLayer.appendChild(mk);
-      }
+    // ★ "이동 불가" 표식 — 붉은 빈 링(.pinned-dot)으로 전 상황 통일.
+    //   금색 채운 점(.dot)=이동 가능  ↔  붉은 빈 링=이동 불가, 한 쌍의 시각 언어.
+    //   합치는 두 출처:
+    //    1) blockedForSel — 튜토리얼에서 상·마의 멱(길목)을 가로막은 돌 위 (학습용)
+    //    2) pinnedDests   — 대국/튜토리얼에서 행마는 되지만 두면 將이 잡혀 막힌 도착칸(핀·장군)
+    //   (옛 큰 ⊘ block-mark는 산수화/백자 톤에 과해 폐기 — 붉은 링으로 일원화.)
+    const blockMarks = [];
+    if (tutorialMode) for (const cell of blockedForSel) blockMarks.push(cell);
+    for (const cell of pinnedDests) blockMarks.push(cell);
+    for (const { r: br, c: bc } of blockMarks) {
+      const { x, y } = posToXY(br, bc);
+      const mk = document.createElement('div');
+      mk.className = 'pinned-dot';
+      mk.style.left = x + '%';
+      mk.style.top = y + '%';
+      // 안내용 — 클릭을 가로채지 않음(아래 기물 클릭 그대로 동작). CSS pointer-events:none.
+      piecesLayer.appendChild(mk);
     }
     renderCaptured();
   }
@@ -2537,7 +2546,7 @@
       } else {
         selected = null;
         legalForSel = [];
-        blockedForSel = [];
+        blockedForSel = []; pinnedDests = [];
         render();
       }
       return;
@@ -2553,9 +2562,32 @@
     if (p && p.side === turn) {
       selected = [r, c];
       legalForSel = Eng.legalMoves(board, r, c);
-      blockedForSel = [];   // 대국 화면은 막힘 표시 안 함(튜토리얼 전용)
+      blockedForSel = [];   // 대국 화면은 튜토리얼식 멱 막힘 표시 안 함(튜토리얼 전용)
+      // ★ 핀 표시: 행마는 되는데(pseudo>0) 합법수가 0이면, 두면 모두 將이 장군 맞는 상황.
+      //   "갈 수 있어 보이는데 점이 안 뜬다"는 혼란을 막기 위해 그 후보칸들에 막힘 표식을 띄움.
+      //   일부만 막힌 경우(legal>0)는 기존대로 갈 수 있는 점만 보이므로 표식 없음.
+      if (legalForSel.length === 0) {
+        const pseudo = Eng.pseudoMoves(board, r, c);
+        pinnedDests = pseudo.length ? pseudo.map(([rr, cc]) => ({ r: rr, c: cc })) : [];
+      } else {
+        pinnedDests = [];
+      }
       playPickSound();   // 기물 선택 소리
-      setStatus(legalForSel.length ? t('pickDest') : t('cantMove'));
+      // 문구: 합법수 있으면 '둘 곳 고르세요'.
+      //   합법수 0인데 행마(pseudo)는 있으면 '왜 못 두는지' 원인을 갈라 안내:
+      //     - 이미 장군당한 상태  → '지금은 장군을 막아야 합니다'
+      //     - 그 외(핀/장 노출)   → '장을 지키고 있어 움직일 수 없습니다'
+      //   행마 자체가 없으면(pseudo도 0) 기존 '둘 수 없는 기물입니다'.
+      //   ※ 표식(block-mark)은 두 경우 모두 동일 — 시각 언어는 같고 문구만 원인을 알려줌.
+      let msgKey;
+      if (legalForSel.length) {
+        msgKey = 'pickDest';
+      } else if (pinnedDests.length) {
+        msgKey = Eng.isInCheck(board, turn) ? 'cantMoveInCheck' : 'cantMovePinned';
+      } else {
+        msgKey = 'cantMove';
+      }
+      setStatus(t(msgKey));
       render();
     } else if (p) {
       setStatus(t('notYourTurn', factionLabel(turn)));
@@ -2718,7 +2750,7 @@
     });
     selected = null;
     legalForSel = [];
-    blockedForSel = [];
+    blockedForSel = []; pinnedDests = [];
     turn = turn === 'r' ? 'b' : 'r';
     render();
     // ★ 이동 미끄럼 연출 — render()로 새 판을 그린 위에 고스트가 from→to로 미끄러진다.
@@ -3536,7 +3568,7 @@
     if (aiSide && turn === aiSide && history.length) {
       popOne();
     }
-    selected = null; legalForSel = []; blockedForSel = [];
+    selected = null; legalForSel = []; blockedForSel = []; pinnedDests = [];
     gameOver = false;
     endState = null;
     clearAiFailUI();
@@ -3569,7 +3601,7 @@
     endGame(winner, 'resign');
   };
   document.getElementById('frame').onclick = () => {
-    if (selected) { selected = null; legalForSel = []; blockedForSel = []; render(); }
+    if (selected) { selected = null; legalForSel = []; blockedForSel = []; pinnedDests = []; render(); }
   };
   setupSkip.onclick = (e) => { e.stopPropagation(); skipSetup(); };
   langKo.onclick = () => { setLang('ko'); closeSettings(); };
