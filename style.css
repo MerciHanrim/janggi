@@ -1266,13 +1266,14 @@
   .settings-dropdown.open { display: block; }
   .settings-section-label {
     font-family: 'Gowun Batang', var(--cjk-font), serif;
-    font-size: 0.7rem;
-    color: var(--ink-soft);
-    letter-spacing: 0.08em;
-    padding: 4px 16px 6px;
-    border-bottom: 1px solid rgba(107,93,72,0.2);
-    margin-bottom: 4px;
+    padding: 12px 18px 6px;      /* 위 여백을 줘 앞 그룹과 분리, 아래는 좁게 목록에 붙임 */
+    font-size: 0.82rem;
+    font-weight: 600;            /* 굵기로 헤더답게 (선 없이 위계) */
+    letter-spacing: 0.04em;
+    color: var(--ink-read);      /* 항목(--ink-soft)보다 진하게 — 선 대신 색·굵기로 구분 */
   }
+  /* 두 번째 이후 섹션 헤더('장기판 배경')는 divider가 이미 나누므로 위 여백만 살짝 */
+  .settings-section-label:not(:first-child) { margin-top: 6px; }
   .lang-btn {
     display: block; width: 100%;
     font-family: 'Gowun Batang', var(--cjk-font), serif;
