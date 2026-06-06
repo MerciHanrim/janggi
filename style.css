@@ -1154,6 +1154,19 @@
     line-height: 1.7;
     letter-spacing: 0.02em;
   }
+  .tut-trait {
+    /* 기물 성격 한 줄 (intro에만). desc보다 옅게 — 규칙 아래 덧붙는 인상.
+       먹선이 옅어지듯 한 톤 흐리고, 위에 살짝 여백을 둬 desc와 분리. */
+    font-family: 'Gowun Batang', var(--cjk-font), serif;
+    font-size: 0.84rem;
+    color: var(--ink-soft);
+    opacity: 0.85;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(107,93,72,0.15);   /* 아주 옅은 먹선 — desc와 trait 사이 호흡 */
+  }
   .tut-buttons {
     display: flex; flex-direction: column; gap: 8px;
     margin-top: 4px;
