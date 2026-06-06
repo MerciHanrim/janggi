@@ -1361,6 +1361,9 @@
   //   phase: 'intro'(설명) → 'practice'(자유연습) → 'mission'(미션) → 'success'/'fail'
   let tutorialMode = false;
   let tutorialScenario = null;
+  // 튜토리얼에서 "학습 중인 기물(주인공)"의 현재 위치 [r,c]. 시나리오 pieces[0]이 주인공.
+  //   이 칸만 선택 가능 — 보조 기물(받침 졸, 잡을 대상 등)은 같은 'r'이어도 못 집게.
+  let tutorialHeroPos = null;
   let tutorialPhase = 'intro';   // 'intro' | 'practice' | 'mission' | 'success' | 'fail'
   let tutorialMovesLeft = 0;        // 미션 남은 수
 
@@ -1897,6 +1900,9 @@
     for (const p of scenario.pieces) {
       board[p.r][p.c] = { side: p.side, type: p.type };
     }
+    // pieces[0] = 주인공(학습 기물). 그 시작 위치를 기억 — 선택 가능 칸은 여기뿐.
+    const hero = scenario.pieces[0];
+    tutorialHeroPos = hero ? [hero.r, hero.c] : null;
     flipped = false;
     frame.classList.remove('flipped');
     turn = 'r';
@@ -2039,6 +2045,8 @@
     const res = Eng.applyMove(board, fr, fc, tr, tc);
     const captured = res.captured;
     board = res.board;
+    // 주인공이 이동했으니 추적 위치도 도착칸으로 갱신(다음에도 이 기물만 선택 가능).
+    tutorialHeroPos = [tr, tc];
     if (captured) {
       playCaptureSound();
       spawnSplat(tr, tc);
@@ -2573,6 +2581,31 @@
     };
     diag(0,3,2,5); diag(0,5,2,3);   // top palace
     diag(7,3,9,5); diag(7,5,9,3);   // bottom palace
+
+    // ── 좌표축 라벨 (오목에서 이식 — 숫자×숫자, 화면 고정, flip 무관) ──
+    //   가로(열): 위쪽 바깥에 1~9.  세로(행): 왼쪽 바깥에 1~10.
+    //   flip을 쓰지 않음 — 좌표계는 화면 고정이라 진영을 바꿔도 라벨이 그대로여야
+    //   기보(coordName: 열 c+1, 행 r+1)와 매 수 일치한다. overflow:visible 이라 음수 좌표도 보임.
+    //   장기 판은 담백하므로 라벨도 격자선 톤(0.09)에 맞춰 은은하게(아래 CSS).
+    for (let c = 0; c < COLS; c++) {
+      const tx = document.createElementNS(ns, 'text');
+      tx.setAttribute('class', 'axis-label');
+      tx.setAttribute('x', c * cw);
+      tx.setAttribute('y', -3.2);            // 격자 위쪽 바깥
+      tx.setAttribute('text-anchor', 'middle');
+      tx.textContent = (c + 1);              // 1~9
+      grid.appendChild(tx);
+    }
+    for (let r = 0; r < ROWS; r++) {
+      const tx = document.createElementNS(ns, 'text');
+      tx.setAttribute('class', 'axis-label');
+      tx.setAttribute('x', -3.2);            // 격자 왼쪽 바깥
+      tx.setAttribute('y', r * ch);
+      tx.setAttribute('text-anchor', 'middle');
+      tx.setAttribute('dominant-baseline', 'central');
+      tx.textContent = (r + 1);              // 1~10
+      grid.appendChild(tx);
+    }
   }
 
   function posToXY(r, c) {
@@ -2697,7 +2730,7 @@
         doTutorialMove(r, c);
         return;
       }
-      if (p && p.side === 'r') {
+      if (p && p.side === 'r' && tutorialHeroPos && r === tutorialHeroPos[0] && c === tutorialHeroPos[1]) {
         selected = [r, c];
         // 튜토리얼: 왕 안전 검사 없이 순수 행마법만 표시 (왕이 없으니 legalMoves 쓰면 전부 차단됨)
         legalForSel = Eng.pseudoMoves(board, r, c);
