@@ -2580,24 +2580,27 @@
     diag(0,3,2,5); diag(0,5,2,3);   // top palace
     diag(7,3,9,5); diag(7,5,9,3);   // bottom palace
 
-    // ── 좌표축 라벨 (오목에서 이식 — 숫자×숫자, 화면 고정, flip 무관) ──
-    //   가로(열): 위쪽 바깥에 1~9.  세로(행): 왼쪽 바깥에 1~10.
+    // ── 좌표축 라벨 (오목에서 이식 — 알파벳×숫자, 화면 고정, flip 무관) ──
+    //   가로(열): 위쪽 바깥에 A~I.  세로(행): 왼쪽 바깥에 1~10.
     //   flip을 쓰지 않음 — 좌표계는 화면 고정이라 진영을 바꿔도 라벨이 그대로여야
-    //   기보(coordName: 열 c+1, 행 r+1)와 매 수 일치한다. overflow:visible 이라 음수 좌표도 보임.
-    //   장기 판은 담백하므로 라벨도 격자선 톤(0.09)에 맞춰 은은하게(아래 CSS).
+    //   기보(coordName: 열 A~I, 행 r+1)와 매 수 일치한다. overflow:visible 이라 음수 좌표도 보임.
+    //   장기는 시작부터 기물이 빽빽해 첫 줄(車象馬士)과 시선이 부딪힘 → 오목보다 더
+    //   바깥으로(오프셋 -4.6). 단 .board-frame이 overflow:hidden + pad 6%라 한계가 있어
+    //   ~-5 이내로(그 이상이면 나무 테두리에 잘림). 격자선 톤(0.09)에 맞춰 은은하게(아래 CSS).
+    const AXIS_OFF = 4.6;                     // 격자 바깥으로 빼는 양 (viewBox 단위)
     for (let c = 0; c < COLS; c++) {
       const tx = document.createElementNS(ns, 'text');
       tx.setAttribute('class', 'axis-label');
       tx.setAttribute('x', c * cw);
-      tx.setAttribute('y', -3.2);            // 격자 위쪽 바깥
+      tx.setAttribute('y', -AXIS_OFF);        // 격자 위쪽 바깥
       tx.setAttribute('text-anchor', 'middle');
-      tx.textContent = (c + 1);              // 1~9
+      tx.textContent = String.fromCharCode(65 + c);  // A~I (0→A .. 8→I)
       grid.appendChild(tx);
     }
     for (let r = 0; r < ROWS; r++) {
       const tx = document.createElementNS(ns, 'text');
       tx.setAttribute('class', 'axis-label');
-      tx.setAttribute('x', -3.2);            // 격자 왼쪽 바깥
+      tx.setAttribute('x', -AXIS_OFF);        // 격자 왼쪽 바깥
       tx.setAttribute('y', r * ch);
       tx.setAttribute('text-anchor', 'middle');
       tx.setAttribute('dominant-baseline', 'central');
@@ -2906,9 +2909,9 @@
   }
 
   function coordName(r, c) {
-    // 열: 가(0)~자(8) 한글 줄이름, 행: 1~10 (위에서부터)
-    const colNames = ['1','2','3','4','5','6','7','8','9'];
-    return colNames[c] + (r + 1);
+    // 열: A(0)~I(8) 알파벳 줄이름, 행: 1~10 (위에서부터). 화면 고정 — flip 무관.
+    const col = String.fromCharCode(65 + c);  // 0→A .. 8→I
+    return col + (r + 1);                       // 예: 7열4행 → 'G4'
   }
 
   // ★ 기물 이동 미끄럼 연출. render()는 무변경 — 새 판을 그린 위에 "이동 기물 모양의

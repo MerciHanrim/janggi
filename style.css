@@ -250,7 +250,7 @@
   svg.grid { position: absolute; overflow: visible; z-index: 1; }
   .grid line { stroke: rgba(60,45,28,0.09); stroke-width: 1.2; stroke-linecap: round; }
   .grid .palace { stroke: rgba(60,45,28,0.12); stroke-width: 1.2; }
-  /* 좌표축 라벨 — 오목에서 이식. 숫자×숫자(가로 1~9·세로 1~10), 화면 고정·flip 무관.
+  /* 좌표축 라벨 — 오목에서 이식. 알파벳×숫자(가로 A~I·세로 1~10), 화면 고정·flip 무관.
      장기 판은 담백하므로 오목보다 옅게. halo(밝은 stroke)로 산수화/원목/십장생/한지
      배경 위에서도 읽히게. viewBox 100 스케일 기준 font-size. */
   .grid .axis-label {
