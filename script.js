@@ -174,7 +174,7 @@
       lvBeginnerName: '초심자', lvBeginnerSub: '처음 장기를 배우는 분을 위한 상대',
       lvFriendName: '익숙한 벗', lvFriendSub: '가볍게 한 판 즐길 수 있는 상대',
       lvMasterName: '노련한 기객', lvMasterSub: '쉽게 빈틈을 보이지 않는 상대',
-      lvExpertName: '대국수', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
+      lvExpertName: '명인', lvExpertSub: '한 치의 빈틈도 허락하지 않는 상대',
       levelNote: '마음에 드는 상대를 고르세요 · 한 판이 끝나면 다시 고를 수 있습니다',
       settingsLangLabel: '언어',
       settingsBtnLabel: '설정',
@@ -1117,28 +1117,45 @@
   //     → 검증된 그 점을 맨 위(노련한 기객)에 놓고, 아래 두 칸은 추측으로 더 약하게 배치.
   //     (추측을 위로 쌓지 않음. 미측정 강도를 "노련한 기객"이라 부르던 이전 배치를 바로잡음.)
   //   ★ 노출 제어: 강도 정의(AI_LEVELS)와 화면 노출(AI_LEVEL_ORDER)을 분리.
-  //     expert(🎍 대국수)는 값만 예약해두고 UI엔 안 띄움. "선택지가 늘면 좋은 게 아니라
-  //     뭐가 뭔지 모르겠다가 먼저 옴" — 검증 안 된 단계를 미리 늘어놓지 않음(다실 톤).
-  //     실제 고수층이 4단계를 원한다는 데이터가 쌓이면 AI_LEVEL_ORDER에 'expert'만 추가하면 공개됨.
+  //     현재 4단계 모두 공개(beginner~expert). expert(🏮 명인)는 최상위 도전 영역으로 열어둠 —
+  //     "노련한 기객" 다음 "명인"으로 이어지는 다실 톤의 위계(배움→벗→기객→명인).
+  //     필요시 ORDER에서 빼면 다시 숨길 수 있음(값은 보존).
   //   ※ 생각 시간(호흡)도 강도별로 미세하게 다름(thinkMin~thinkMax ms). 단 강도를 만드는 게 아니라
   //     "사람이 고민하는 모습"을 만드는 용도. 차이는 0.5~1초로 작게 — 시간이 강도를 가르지 않음.
   //     사람은 상대 강도를 '실력 50% + 생각하는 모습 50%'로 느낌. 강도=skill/depth, 인격=시간.
   //     ★ 약한 AI라고 빨리 두지 않음(빠르면 약한 게 아니라 "계산기 느낌"). 초심자도 최소 2.5초.
   //     강할수록 살짝 더 신중(사람도 그러함). 셋 다 "다실에서 고민하는 호흡" 안에 머묾.
+  // ── 블런더(실수) 주입 ─────────────────────────────────────
+  //   ★ 진단(HANDOVER §E): depth1/skill0까지 내려도 입문자 승률 0건. Stockfish는
+  //     skill0이 Elo 1320 하한이라 "엔진 약화"로는 체스 초급(Elo 250~800) 구간에 못 내려감.
+  //     → 엔진을 더 약하게가 아니라 "일부러 봐주는 상대"를 설계. = 블런더 주입.
+  //   blunder = 그 수에 엔진을 아예 안 부르고 무작위 합법수를 둘 확률(0~1).
+  //     발동 시 commitMove로 동일 경로(doMove·render·애니·멍군·기보 전부 그대로 탐).
+  //   ★ 모드는 상수로 분리(measure not guess): 구현 먼저, 모드는 플레이 테스트 후 결정.
+  //     'random' = 잡는 수 포함 완전 무작위. AI가 공짜 기물도 내줌 → 입문자가 따먹을 "틈".
+  //     'mercy'  = 잡는 수 제외(일부러 안 따먹음). 단 한림 판단: 장기에서 가장 큰 실수는
+  //                "공짜 안 먹기"보다 "공짜로 내주기" → mercy는 의외로 더 강할 수 있음.
+  //     기본 random. 5판씩 돌려 체감 비교 후 확정. 바꿀 땐 이 한 줄만.
+  const BLUNDER_MODE = 'random';   // 'random' | 'mercy'
+
+  //   ★ 구조: UI는 3단계만 노출(AI_LEVEL_ORDER)하되, 각 단계는 내부적으로
+  //     depth/skill/blunder를 조합한 "레벨 프리셋". 사용자는 이름 3개만 고르고,
+  //     코드는 level 1/2/3 계층을 가짐. 조정은 프리셋 값만 바꾸면 됨(UI 문구 불변).
+  //     나중에 "초보자 안에서 더 쉬움" 같은 숨은 옵션이 필요하면 level 기준으로 확장.
   const AI_LEVELS = {
-    beginner: { skill: 0,  depth: 1,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — depth 1로 하향. 앞을 거의 못 보는 수준. "이겨보는 경험" 우선.
-    friend:   { skill: 3,  depth: 4,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — 초심자↔노련한 기객 계단 유지용 하향(추측). 가끔 이기고 가끔 지는 중간.
-    master:   { skill: 6,  depth: 8,  thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — skill 6/depth 8. 계단 유지용(추측).
-    expert:   { skill: 20, depth: 15, thinkMin: 4000, thinkMax: 5500 },   // 🎍 대국수 — (비공개 예약) 고수층 데이터 쌓이면 공개
+    beginner: { level: 1, skill: 0,  depth: 3,  blunder: 0.2,  thinkMin: 2500, thinkMax: 3500 },   // 🌱 초심자 — depth3 + 블런더 0.2 [확정]. 측정: 0.55/d1="압승·너무쉬움" → 0.3/d3="압승·예리한순간O·던져주는티남" → 0.2/d3="1패 후 1승 = 가끔 이기고 가끔 진다" = 입문 목표점 도달. 한림(초심자) 직접 검증.
+    friend:   { level: 2, skill: 3,  depth: 4,  blunder: 0.1,  thinkMin: 3000, thinkMax: 4000 },   // 🍃 익숙한 벗 — beginner보다 한 칸 위(depth4/skill3), 실수는 더 적게(0.1). [설계값·미측정] 한림이 입문자라 측정 불가.
+    master:   { level: 3, skill: 6,  depth: 8,  blunder: 0.05, thinkMin: 3500, thinkMax: 5000 },   // 🎋 노련한 기객 — 거의 순수 엔진, 아주 드문 실수(0.05). [설계값·미측정] 고수 테스터 피드백으로 조정.
+    expert:   { level: 4, skill: 20, depth: 15, blunder: 0,    thinkMin: 4000, thinkMax: 5500 },   // 🏮 명인 — 최강(skill20/depth15/blunder0). [공개·미측정] 1차 진단 skill12/depth12도 못 이김보다 더 셈 → 사실상 도전 영역. 한 칸 윗줄 master와 큰 격차 정상.
   };
-  // ★ UI에 노출할 강도 순서. expert는 의도적으로 제외(값만 살아있음).
-  const AI_LEVEL_ORDER = ['beginner', 'friend', 'master'];
+  // ★ UI에 노출할 강도 순서. expert(🏮 명인) 공개 — 최상위 도전 영역.
+  const AI_LEVEL_ORDER = ['beginner', 'friend', 'master', 'expert'];
   // 강도별 표시 정보(이모지·라벨키). expert도 정의는 둠 — 공개 시 ORDER에만 추가하면 됨.
   const AI_LEVEL_META = {
     beginner: { emoji: '🌱', nameKey: 'lvBeginnerName', subKey: 'lvBeginnerSub' },
     friend:   { emoji: '🍃', nameKey: 'lvFriendName',   subKey: 'lvFriendSub'   },
     master:   { emoji: '🎋', nameKey: 'lvMasterName',   subKey: 'lvMasterSub'   },
-    expert:   { emoji: '🎍', nameKey: 'lvExpertName',   subKey: 'lvExpertSub'   },
+    expert:   { emoji: '🏮', nameKey: 'lvExpertName',   subKey: 'lvExpertSub'   },
   };
   let aiLevel = 'friend';   // 현재 강도. 첫 진입 시 강도 선택에서 정함. 재대국 땐 유지.
 
@@ -2740,7 +2757,32 @@
     };
 
     // 현재 판/차례를 그대로 넘긴다. (가) 매 수 전체 FEN 재생성 방식.
-    const lv = AI_LEVELS[aiLevel] || AI_LEVELS.friend;   // ★ 현재 강도(depth·skill)
+    const lv = AI_LEVELS[aiLevel] || AI_LEVELS.friend;   // ★ 현재 강도(depth·skill·blunder)
+
+    // ★ 블런더 분기: 이 수를 "일부러 실수"로 둘지 확률 판정.
+    //   발동 시 엔진(SF)을 아예 안 부르고 무작위 합법수를 둔다.
+    //   ※ 생각 시간(호흡)은 그대로 유지 — 무작위라고 빨리 두면 "계산기 느낌"이 남.
+    //     min 생각 시간 뒤에 commitMove로 동일 경로(doMove·render·애니·멍군·기보).
+    if (lv.blunder && Math.random() < lv.blunder) {
+      const all = Eng.allLegalMoves(board, turn);
+      if (all.length > 0) {
+        // 모드별 후보 풀: random=전체 / mercy=잡는 수 제외(없으면 전체로 폴백)
+        let pool = all;
+        if (BLUNDER_MODE === 'mercy') {
+          const nonCaptures = all.filter(([, , rr, cc]) => !board[rr][cc]);
+          if (nonCaptures.length) pool = nonCaptures;   // 잡을 수 있어도 일부러 안 잡음
+        }
+        const mv = pool[Math.floor(Math.random() * pool.length)];
+        console.info('[JanggiAI] 블런더 발동(' + BLUNDER_MODE + ', p=' + lv.blunder + '):', mv);
+        const elapsed = Date.now() - startedAt;
+        const wait = Math.max(0, minThinkMs - elapsed);
+        if (wait > 0) setTimeout(() => commitMove(mv), wait);
+        else commitMove(mv);
+        return;   // 엔진 호출 건너뜀
+      }
+      // all.length === 0이면 둘 수 없음 → 아래 엔진 경로의 종료 판정에 맡김(여기서 분기 안 함)
+    }
+
     window.JanggiAI.bestMove(board, turn, lv.depth, lv.skill).then((mv) => {
       // 계산이 최소 시간보다 빨리 끝났으면 남은 만큼 기다렸다가 착수.
       const elapsed = Date.now() - startedAt;
