@@ -1426,13 +1426,11 @@
       missionMoves: 3,
       pieces: [
         { side: 'r', type: 'C', r: 6, c: 4 },   // 포(주인공)
-        // 위쪽 정면: 바로 앞이 적 포 → 포는 포를 받침으로 못 씀. 그 너머 적 병도 못 잡음.
-        //   (주인공이 가려는 방향 정면에서 막히므로 "포는 포를 못 넘는다"가 눈에 들어옴)
-        { side: 'b', type: 'C', r: 4, c: 4 },    // 정면 적 포(받침 불가)
-        { side: 'b', type: 'P', r: 2, c: 4 },    // 그 너머 적 병(그래서 못 잡음)
-        // 오른쪽: 받침(아군 졸) 넘어 적 병 잡기 — 미션 경로
-        { side: 'r', type: 'P', r: 6, c: 6 },    // 받침
-        { side: 'b', type: 'P', r: 6, c: 8 },    // 받침 너머 적 병
+        // 연습 단계는 "할 수 있는 것"만 선명하게: 받침(아군 졸)을 하나 넘어 적 병을 잡는 기본 행마.
+        //   "포는 포를 받침/잡기로 못 쓴다"는 예외는 trait/설명문으로 안내하고, 화면엔 안 섞는다
+        //   (초보 혼란 방지 — 기본 원리 먼저, 예외는 나중). cannonBlockedStones 함수는 보존(대국·심화용).
+        { side: 'r', type: 'P', r: 6, c: 6 },    // 받침(아군 졸)
+        { side: 'b', type: 'P', r: 6, c: 8 },    // 받침 너머 적 병 — 미션: 받침 넘어 잡기
       ],
     },
     guard: {
@@ -2737,6 +2735,7 @@
         // ★ [D] 상(象)·마(馬)일 때 멱이 막혀 못 가는 칸을 함께 계산(학습용 표시)
         blockedForSel = (p.type === 'E') ? elephantBlockedLegs(board, r, c)
                       : (p.type === 'H') ? horseBlockedLegs(board, r, c)
+                      : (p.type === 'C') ? cannonBlockedStones(board, r, c)
                       : [];
         render();
       } else {
@@ -2857,6 +2856,47 @@
       if (reachable) blocked.push({ r: mr, c: mc });
     }
     // 중복 좌표 제거
+    const seen = new Set();
+    return blocked.filter(({ r, c }) => {
+      const k = `${r},${c}`;
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+  }
+
+  // ★ [D] 포(包) 막힘 돌 계산 (튜토리얼 학습용)
+  //   엔진(engine.js) C case와 동일한 4방향을 미러링한다. 포는 멱이 아니라
+  //   "받침/대상" 규칙이라, 길을 막는 '원인 돌' 위에 표식을 띄운다(상·마와 같은 시각 언어):
+  //    1) 첫 기물이 포(包)면 → 받침 불가. 그 포가 막는 돌.
+  //    2) 받침을 넘은 뒤 둘째 기물이 포(包)거나 아군이면 → 못 잡음. 그 기물이 막는 돌.
+  //   받침이 아예 없는 방향은 막는 돌이 없으므로 표시하지 않음(상·마가 멱이 비면 표시 안 하는 것과 동일).
+  //   ※ engine.js를 건드리지 않기 위해 행마 규칙만 여기서 복제한다.
+  function cannonBlockedStones(bd, r, c) {
+    const inB = (rr, cc) => rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS;
+    const me = bd[r][c] ? bd[r][c].side : 'r';
+    const enemy = me === 'r' ? 'b' : 'r';
+    const blocked = [];
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (const [dr, dc] of dirs) {
+      let rr = r + dr, cc = c + dc;
+      let screenFound = false;
+      while (inB(rr, cc)) {
+        const t = bd[rr][cc];
+        if (!screenFound) {
+          if (t) {
+            if (t.type === 'C') { blocked.push({ r: rr, c: cc }); break; }  // 1) 받침 불가(포)
+            screenFound = true;   // 받침 확보
+          }
+        } else {
+          if (t) {
+            // 2) 받침 너머 첫 기물 — 포거나 아군이면 못 잡음 → 막는 돌
+            if (t.type === 'C' || t.side === me) blocked.push({ r: rr, c: cc });
+            break;
+          }
+        }
+        rr += dr; cc += dc;
+      }
+    }
     const seen = new Set();
     return blocked.filter(({ r, c }) => {
       const k = `${r},${c}`;
