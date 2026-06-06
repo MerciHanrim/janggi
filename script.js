@@ -186,15 +186,34 @@
       rulesClose: '닫기',
       aboutTitle: '소개',
       aboutClose: '닫기',
+      aboutSourceLabel: '출처 ↗',
+      aboutTagline: '정성을 담아 만들었습니다',
       aboutSections: [
         {
           title: '소개',
           body: '장기는 한국의 전통 전략 보드게임으로, 흔히 Korean chess로 소개됩니다.',
         },
         {
-          title: '크레딧',
-          body: '기물과 장기판 이미지: 이 프로젝트를 위해 제작\n효과음: Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: '제작',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: '그래픽',
+          body: '장기판 · 기물 디자인 — 이 프로젝트를 위해 제작',
+        },
+        {
+          title: '사운드',
+          items: [
+            { label: '보드게임 기물음 (이동·잡기·선택·외통)', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: '승리', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: '패배', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'AI 엔진',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -320,15 +339,34 @@
       rulesClose: 'Close',
       aboutTitle: 'About',
       aboutClose: 'Close',
+      aboutSourceLabel: 'Source ↗',
+      aboutTagline: 'Made with care',
       aboutSections: [
         {
           title: 'About',
           body: 'Korean Janggi is a traditional Korean strategy board game, often described as Korean chess.',
         },
         {
-          title: 'Credits',
-          body: 'Piece & board artwork: created for this project\nSound effects: Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: 'Made by',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: 'Graphics',
+          body: 'Board & piece design — created for this project',
+        },
+        {
+          title: 'Sound',
+          items: [
+            { label: 'Board Game Pieces (move · capture · pick · checkmate)', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: 'Victory', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: 'Defeat', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'AI Engine',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -450,15 +488,34 @@
       rulesClose: '关闭',
       aboutTitle: '关于',
       aboutClose: '关闭',
+      aboutSourceLabel: '来源 ↗',
+      aboutTagline: '用心制作',
       aboutSections: [
         {
           title: '关于',
           body: '韩国象棋（장기）是韩国传统的策略棋类游戏，常被介绍为韩国象棋（Korean chess）。',
         },
         {
-          title: '鸣谢',
-          body: '棋子与棋盘图像：为本项目制作\n音效：Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: '制作',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: '图像',
+          body: '棋盘与棋子设计 — 为本项目制作',
+        },
+        {
+          title: '音效',
+          items: [
+            { label: '棋子音效（移动 · 吃子 · 选择 · 将死）', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: '胜利', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: '失败', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'AI 引擎',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -580,15 +637,34 @@
       rulesClose: '關閉',
       aboutTitle: '關於',
       aboutClose: '關閉',
+      aboutSourceLabel: '來源 ↗',
+      aboutTagline: '用心製作',
       aboutSections: [
         {
           title: '關於',
           body: '韓國象棋（장기）是韓國傳統的策略棋類遊戲，常被介紹為韓國象棋（Korean chess）。',
         },
         {
-          title: '鳴謝',
-          body: '棋子與棋盤圖像：為本專案製作\n音效：Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: '製作',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: '圖像',
+          body: '棋盤與棋子設計 — 為本專案製作',
+        },
+        {
+          title: '音效',
+          items: [
+            { label: '棋子音效（移動 · 吃子 · 選擇 · 將死）', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: '勝利', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: '失敗', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'AI 引擎',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -710,15 +786,34 @@
       rulesClose: '閉じる',
       aboutTitle: 'このゲームについて',
       aboutClose: '閉じる',
+      aboutSourceLabel: '出典 ↗',
+      aboutTagline: '心を込めて作りました',
       aboutSections: [
         {
           title: 'このゲームについて',
           body: 'チャンギ（장기）は韓国の伝統的な戦略ボードゲームで、しばしば「韓国将棋（Korean chess）」として紹介されます。',
         },
         {
-          title: 'クレジット',
-          body: '駒と盤の画像：本プロジェクトのために制作\n効果音：Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: '制作',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: 'グラフィック',
+          body: '盤と駒のデザイン — 本プロジェクトのために制作',
+        },
+        {
+          title: 'サウンド',
+          items: [
+            { label: '駒音（移動 · 捕獲 · 選択 · 詰み）', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: '勝利', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: '敗北', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'AIエンジン',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -840,15 +935,34 @@
       rulesClose: 'Schließen',
       aboutTitle: 'Über',
       aboutClose: 'Schließen',
+      aboutSourceLabel: 'Quelle ↗',
+      aboutTagline: 'Mit Sorgfalt erstellt',
       aboutSections: [
         {
           title: 'Über',
           body: 'Janggi ist ein traditionelles koreanisches Strategie-Brettspiel, oft als koreanisches Schach (Korean chess) bezeichnet.',
         },
         {
-          title: 'Mitwirkende',
-          body: 'Figuren- und Brettgrafik: für dieses Projekt erstellt\nSoundeffekte: Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: 'Erstellt von',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: 'Grafik',
+          body: 'Brett- & Figurendesign — für dieses Projekt erstellt',
+        },
+        {
+          title: 'Sound',
+          items: [
+            { label: 'Brettspiel-Figurensounds (Zug · Schlag · Auswahl · Matt)', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: 'Sieg', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: 'Niederlage', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'KI-Engine',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -970,15 +1084,34 @@
       rulesClose: 'Fermer',
       aboutTitle: 'À propos',
       aboutClose: 'Fermer',
+      aboutSourceLabel: 'Source ↗',
+      aboutTagline: 'Fait avec soin',
       aboutSections: [
         {
           title: 'À propos',
           body: 'Le Janggi est un jeu de plateau stratégique traditionnel coréen, souvent présenté comme les échecs coréens (Korean chess).',
         },
         {
-          title: 'Crédits',
-          body: 'Images des pièces et du plateau : créées pour ce projet\nEffets sonores : Pixabay / taure',
-          link: { url: 'https://pixabay.com/sound-effects/', label: 'Pixabay' },
+          title: 'Réalisé par',
+          body: 'Hanrim',
+          link: { url: 'https://cozyshelter.tistory.com', label: 'Cozy Shelter' },
+        },
+        {
+          title: 'Graphismes',
+          body: 'Plateau & pièces — créés pour ce projet',
+        },
+        {
+          title: 'Sons',
+          items: [
+            { label: 'Sons des pièces (déplacement · capture · sélection · mat)', by: 'taure', url: 'https://pixabay.com/sound-effects/board-game-pieces-59039/' },
+            { label: 'Victoire', by: 'Sarah H', url: 'https://pixabay.com/users/astralsynthesizer-50776509/' },
+            { label: 'Défaite', by: 'Universfield', url: 'https://pixabay.com/users/universfield-28281460/' },
+          ],
+        },
+        {
+          title: 'Moteur IA',
+          body: 'Fairy-Stockfish · GPLv3',
+          link: { url: 'https://github.com/fairy-stockfish/Fairy-Stockfish', label: 'GitHub' },
         },
       ],
       rulesSections: [
@@ -2128,6 +2261,9 @@
   const aboutCloseBtn = document.getElementById('aboutClose');
   const aboutBtn = document.getElementById('aboutBtn');
 
+  // About 푸터에 표시할 버전. 릴리스마다 이 한 줄만 갱신.
+  const ABOUT_VERSION = 'v0.3.0';
+
   function renderAbout() {
     document.getElementById('aboutTitle').textContent = t('aboutTitle');
     aboutCloseBtn.setAttribute('aria-label', t('aboutClose'));
@@ -2143,18 +2279,45 @@
       body.className = 'rules-section-body';
       body.textContent = sec.body;   // \n 줄바꿈은 CSS white-space로 살림
       card.appendChild(title);
-      card.appendChild(body);
-      if (sec.link) {
+      if (sec.body) card.appendChild(body);
+      // 개별 출처 항목(sec.items) — Sound 섹션처럼 "라벨 — 저자 [Source]"가 여럿일 때.
+      //   각 item: { label, by, url? }. url이 없으면 링크는 생략(나중에 채워 넣기 쉬움).
+      if (sec.items) {
+        sec.items.forEach((it) => {
+          const row = document.createElement('p');
+          row.className = 'rules-section-body about-item';
+          row.textContent = it.by ? `${it.label} — ${it.by}` : it.label;
+          if (it.url) {
+            const a = document.createElement('a');
+            a.className = 'about-link about-item-link';
+            a.href = it.url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = t('aboutSourceLabel') || 'Source ↗';
+            row.appendChild(document.createTextNode(' '));
+            row.appendChild(a);
+          }
+          card.appendChild(row);
+        });
+      }
+      // 링크: 단일 sec.link(기존) 또는 sec.links 배열(여럿) 모두 지원.
+      const links = sec.links ? sec.links : (sec.link ? [sec.link] : []);
+      links.forEach((lk) => {
         const a = document.createElement('a');
         a.className = 'about-link';
-        a.href = sec.link.url;
+        a.href = lk.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.textContent = sec.link.label;
+        a.textContent = lk.label;
         card.appendChild(a);
-      }
+      });
       aboutPanelBody.appendChild(card);
     });
+    // 맨 아래 푸터 — 버전 + 한 줄. 언어 무관 고정 표기.
+    const footer = document.createElement('div');
+    footer.className = 'about-footer';
+    footer.textContent = ABOUT_VERSION + ' · ' + t('aboutTagline');
+    aboutPanelBody.appendChild(footer);
   }
 
   function openAboutOverlay() {
@@ -3040,6 +3203,38 @@
   let _pickAudioFailed = false;
   const PICK_SOUND_SRC       = 'assets/sound/janggi_sfx_pick.mp3';
 
+  // 승/패 사운드 (오목에서 이식 — 사람 입장 기준 1회). 합성 폴백 없음(파일만).
+  //   win: Sarah H / lose: Universfield, 둘 다 Pixabay (ASSETS_LICENSE.md 참고).
+  let _winAudioEl = null;
+  let _winAudioFailed = false;
+  const WIN_SOUND_SRC        = 'assets/sound/janggi_sfx_win.mp3';
+  let _loseAudioEl = null;
+  let _loseAudioFailed = false;
+  const LOSE_SOUND_SRC       = 'assets/sound/janggi_sfx_lose.mp3';
+
+  // 장기 기존 playCheckSound 패턴 그대로(개별 변수 + lazy + _failed 플래그 + play() catch).
+  function playResultSound(kind) {
+    const failed = (kind === 'win') ? _winAudioFailed : _loseAudioFailed;
+    if (failed) return;
+    try {
+      let el = (kind === 'win') ? _winAudioEl : _loseAudioEl;
+      if (!el) {
+        el = new Audio((kind === 'win') ? WIN_SOUND_SRC : LOSE_SOUND_SRC);
+        el.addEventListener('error', () => {
+          if (kind === 'win') _winAudioFailed = true; else _loseAudioFailed = true;
+        });
+        if (kind === 'win') _winAudioEl = el; else _loseAudioEl = el;
+      }
+      el.currentTime = 0;
+      const pr = el.play();
+      if (pr && pr.catch) pr.catch(() => {
+        if (kind === 'win') _winAudioFailed = true; else _loseAudioFailed = true;
+      });
+    } catch (e) {
+      if (kind === 'win') _winAudioFailed = true; else _loseAudioFailed = true;
+    }
+  }
+
   function playCheckSound() {
     // 1순위: 음원 파일. 로드 실패 이력이 있으면 바로 합성으로.
     if (!_checkAudioFailed) {
@@ -3360,6 +3555,12 @@
       lastResult = (winner === 'r') ? 'chu' : 'han';
       const loser = (winner === 'r') ? 'b' : 'r';
       endState = { winner, reason: reason || null, loser, draw: false, score: null };
+    }
+    // 승/패 사운드 (사람 입장). 무승부(winner===null)는 둘 다 안 울림.
+    //   AI 대국에서 승자가 AI면 lose, 그 외(사람 승 / 2인 모드)는 win.
+    //   ※ 외통(checkmate) 연출음이 직전에 울릴 수 있음 — 겹침이 거슬리면 추후 조정.
+    if (winner !== null) {
+      playResultSound((aiSide && winner === aiSide) ? 'lose' : 'win');
     }
     winOverlay.classList.add('show');
     refreshPersp();   // gameOver면 관점 줄 비움

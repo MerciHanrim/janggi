@@ -32,10 +32,17 @@ the assets are **not** covered by that license.
 
 ## 2. Sound Assets (Third Party, Attributed)
 
-The four sound effects under `assets/sound/` (`janggi_sfx_move` / `capture` /
-`pick` / `checkmate`) are **not** created by Hanrim. They were derived from the
-Pixabay sound pack "Board Game Pieces" by editing and splitting it, and are
-attributed below.
+The sound effects under `assets/sound/` are **not** created by Hanrim; they come
+from Pixabay (Pixabay Content License) and are attributed below. They fall into
+two groups by source:
+
+**(a)** `janggi_sfx_move` / `capture` / `pick` / `checkmate` were derived from the
+Pixabay sound pack "Board Game Pieces" by editing and splitting it.
+
+**(b)** `janggi_sfx_win` / `janggi_sfx_lose` are separate Pixabay sound effects by
+different authors (used for the win/lose result cue at the end of a game).
+
+### (a) Board Game Pieces — move / capture / pick / checkmate
 
 - Title: Board Game Pieces
 - Original author: taure (Freesound)
@@ -52,6 +59,23 @@ selling or distributing content on a *standalone* basis with no creative effort
 applied; this project edited and split the sound pack and integrated it into the
 game, so that prohibition does not apply.) These sound assets are **not** subject
 to the All Rights Reserved terms of the visual assets above.
+
+### (b) Win / Lose result cues
+
+Two additional sound effects play once at the end of a game, from the human
+player's point of view (win when the player wins, lose when the AI wins; no cue
+on a draw). They are separate Pixabay sound effects, not part of the pack above.
+
+- `janggi_sfx_win.mp3` — by Sarah H, via Pixabay (Pixabay Content License)
+- `janggi_sfx_lose.mp3` — by Universfield, via Pixabay (Pixabay Content License)
+
+> Victory — Sound Effect by [Sarah H](https://pixabay.com/users/astralsynthesizer-50776509/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358765) from [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358765)
+
+> Defeat — Sound Effect by [Universfield](https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=250960) from [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=250960)
+
+The Pixabay Content License permits free use without requiring attribution;
+credit is given here for transparency. These cues are **not** subject to the All
+Rights Reserved terms of the visual assets above.
 
 ## Note
 

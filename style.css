@@ -1362,6 +1362,19 @@
     color: var(--blue-deep);
     border-bottom-color: var(--blue-deep);
   }
+  /* 한 섹션에 링크가 둘 이상일 때(제작 섹션: GitHub + Cozy Shelter) 사이 간격 */
+  .about-link + .about-link { margin-left: 16px; }
+  /* 개별 출처 항목(Sound 섹션) — 라벨 — 저자, 그 옆 Source 링크 */
+  .about-item { margin: 4px 0 0; font-size: 0.88rem; }
+  .about-item-link { margin-top: 0; font-size: 0.78rem; }
+  .about-item + .about-item { margin-top: 6px; }
+  /* About 맨 아래 버전 푸터 */
+  .about-footer {
+    margin-top: 18px; padding-top: 12px;
+    border-top: 1px solid rgba(60,45,28,0.14);
+    text-align: center; font-size: 0.8rem; color: rgba(74,64,54,0.7);
+    letter-spacing: 0.02em;
+  }
   /* 장기판 배경 테마 — board-frame에 클래스로 전환 */
   /* 기본(산수화)은 기존 ::before 그대로 */
   .board-frame.bg-simple::before {
