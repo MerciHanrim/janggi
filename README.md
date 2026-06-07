@@ -1,6 +1,6 @@
 # Janggi · Korean Chess
 
-Traditional Korean Janggi in your browser — AI opponents, interactive tutorials, multilingual support, and handcrafted Korean-inspired board themes.
+Traditional Korean Janggi in your browser — an AI opponent with four difficulty tiers, interactive tutorials, multilingual support, and handcrafted Korean-inspired board themes.
 
 [![License: GPL v3](https://img.shields.io/badge/Code%20License-GPLv3-blue.svg)](LICENSE)
 [![Assets: All Rights Reserved](https://img.shields.io/badge/Assets-All%20Rights%20Reserved-lightgrey.svg)](ASSETS_LICENSE.md)
@@ -15,7 +15,11 @@ Traditional Korean Janggi in your browser — AI opponents, interactive tutorial
 
 ## Features
 
-- **Play against AI opponents** — powered by Fairy-Stockfish (WebAssembly), with selectable difficulty
+- **Play against the AI** — powered by [Fairy-Stockfish](https://github.com/fairy-stockfish/Fairy-Stockfish) (WebAssembly), across four difficulty tiers:
+  - 🌱 **Beginner** — for someone learning Janggi for the first time
+  - 🍃 **Familiar Friend** — a relaxed opponent for a casual game
+  - 🎋 **Seasoned Player** — rarely leaves an opening
+  - 🏮 **Master** — allows not a single opening
 - **Interactive piece tutorials** — learn how each piece moves, step by step
 - **Rules reference for beginners** — check, checkmate, and how to win, explained in plain language
 - **Traditional Korean board themes**
@@ -43,13 +47,20 @@ The two sides, **Cho (楚)** and **Han (漢)**, take their names from the histor
 
 ---
 
-## Play Online
+## Difficulty
 
-Play instantly in your browser:
+The four tiers are built on the Fairy-Stockfish engine, adjusted along a few axes
+so the climb from beginner to master feels natural:
 
-**https://korea-janggi.pages.dev**
+- **Search depth and skill level** rise with each tier — the higher tiers look
+  further ahead and play more precisely.
+- **The lower tiers mix in occasional deliberate slips**, so a beginner can win
+  with focus, while the Master concedes nothing.
 
-No installation required — it runs entirely in the browser.
+At every tier the engine still recognises immediate wins and threats; the easier
+opponents simply don't always choose the sharpest line. **Beginner** is tuned so
+that a newcomer who plays carefully can win some of the time — not a pushover, not
+a wall. **Master** plays at full strength and is meant as a genuine challenge.
 
 ---
 
@@ -58,6 +69,7 @@ No installation required — it runs entirely in the browser.
 - Vanilla JavaScript, HTML, and CSS (no framework)
 - AI opponent via [Fairy-Stockfish](https://github.com/fairy-stockfish/Fairy-Stockfish) (GPLv3) compiled to WebAssembly
 - Requires cross-origin isolation (`COOP`/`COEP`) for the WASM engine
+- Deployed on Cloudflare Pages
 
 ---
 
