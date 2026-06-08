@@ -3269,6 +3269,28 @@
   let _checkAudioFailed = false;
   let _audioCtx = null;
   const CHECK_SOUND_SRC      = 'assets/sound/janggi_sfx_checkmate.mp3';
+
+  // ── PC 음량 증폭 (★ 파일 재생음 전용) ──
+  // PC는 출력이 작게 들려 1.3배 증폭. 모바일은 그대로(증폭 없음).
+  // audio.volume은 최대 1.0이라, 1.0 초과 증폭은 Web Audio GainNode로 처리.
+  // _attachGain: 각 new Audio() 직후 한 번 호출. PC가 아니면 아무것도 안 함.
+  const _isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const _PC_GAIN = 1.3;
+  const _gainAttached = new WeakSet();   // 요소당 1회만 (createMediaElementSource 중복 방지)
+  function _attachGain(el) {
+    if (_isMobile || !el || _gainAttached.has(el)) return;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    try {
+      if (!_audioCtx) _audioCtx = new Ctx();
+      el.crossOrigin = 'anonymous';
+      const src = _audioCtx.createMediaElementSource(el);
+      const gain = _audioCtx.createGain();
+      gain.gain.value = _PC_GAIN;
+      src.connect(gain).connect(_audioCtx.destination);
+      _gainAttached.add(el);
+    } catch (_) { /* 실패 시 원본 그대로 재생 */ }
+  }
   let _moveAudioEl = null;
   let _moveAudioFailed = false;
   const MOVE_SOUND_SRC       = 'assets/sound/janggi_sfx_move.mp3';
@@ -3296,6 +3318,7 @@
       let el = (kind === 'win') ? _winAudioEl : _loseAudioEl;
       if (!el) {
         el = new Audio((kind === 'win') ? WIN_SOUND_SRC : LOSE_SOUND_SRC);
+        _attachGain(el);
         el.addEventListener('error', () => {
           if (kind === 'win') _winAudioFailed = true; else _loseAudioFailed = true;
         });
@@ -3317,6 +3340,7 @@
       try {
         if (!_checkAudioEl) {
           _checkAudioEl = new Audio(CHECK_SOUND_SRC);
+          _attachGain(_checkAudioEl);
           _checkAudioEl.addEventListener('error', () => { _checkAudioFailed = true; });
         }
         if (!_checkAudioFailed) {
@@ -3434,6 +3458,7 @@
       try {
         if (!_moveAudioEl) {
           _moveAudioEl = new Audio(MOVE_SOUND_SRC);
+          _attachGain(_moveAudioEl);
           _moveAudioEl.addEventListener('error', () => { _moveAudioFailed = true; });
         }
         if (!_moveAudioFailed) {
@@ -3455,6 +3480,7 @@
       try {
         if (!_captureAudioEl) {
           _captureAudioEl = new Audio(CAPTURE_SOUND_SRC);
+          _attachGain(_captureAudioEl);
           _captureAudioEl.addEventListener('error', () => { _captureAudioFailed = true; });
         }
         if (!_captureAudioFailed) {
@@ -3476,6 +3502,7 @@
       try {
         if (!_pickAudioEl) {
           _pickAudioEl = new Audio(PICK_SOUND_SRC);
+          _attachGain(_pickAudioEl);
           _pickAudioEl.addEventListener('error', () => { _pickAudioFailed = true; });
         }
         if (!_pickAudioFailed) {
